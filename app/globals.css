@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 248 250 252;
+    --foreground: 15 23 42;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
+    --primary: 22 163 74;
+    --primary-foreground: 255 255 255;
+    --secondary: 241 245 249;
+    --secondary-foreground: 15 23 42;
+    --muted: 241 245 249;
+    --muted-foreground: 100 116 139;
+    --accent: 241 245 249;
+    --accent-foreground: 15 23 42;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 22 163 74;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background;
+    color: rgb(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Numeric/financial figures use monospace */
+.font-numeric {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sidebar active state */
+.sidebar-link-active {
+  @apply bg-green-600 text-white shadow-lg;
+}
+
+/* Consistent primary button */
+.btn-primary {
+  @apply bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition shadow-sm;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full;
+  background: #cbd5e1;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus ring color consistent with brand */
+:focus-visible {
+  outline: 2px solid #16a34a;
+  outline-offset: 2px;
+}
