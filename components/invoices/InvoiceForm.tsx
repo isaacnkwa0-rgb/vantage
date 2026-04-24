@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus, Trash2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -70,6 +70,23 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
   ]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingItems, setLoadingItems] = useState(false);
+
+  useEffect(() => {
+    if (!editingInvoice?.id) return;
+    setLoadingItems(true);
+    const supabase = createClient();
+    supabase
+      .from("invoice_items")
+      .select("description, quantity, unit_price")
+      .eq("invoice_id", editingInvoice.id)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setItems(data.map((i) => ({ description: i.description, quantity: i.quantity, unit_price: i.unit_price })));
+        }
+        setLoadingItems(false);
+      });
+  }, [editingInvoice?.id]);
 
   const subtotal = items.reduce((s, i) => s + i.quantity * i.unit_price, 0);
 
@@ -279,11 +296,18 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-[#0F172A]">Line Items</label>
-              <button onClick={addItem} className="flex items-center gap-1 text-xs text-green-600 hover:underline font-medium">
-                <Plus className="w-3.5 h-3.5" /> Add item
-              </button>
+              {!loadingItems && (
+                <button onClick={addItem} className="flex items-center gap-1 text-xs text-green-600 hover:underline font-medium">
+                  <Plus className="w-3.5 h-3.5" /> Add item
+                </button>
+              )}
             </div>
 
+            {loadingItems ? (
+              <div className="flex items-center justify-center py-6 bg-slate-50 rounded-xl">
+                <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
+              </div>
+            ) : (
             <div className="bg-slate-50 rounded-xl overflow-hidden">
               <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wide border-b border-slate-100">
                 <div className="col-span-6">Description</div>
@@ -329,6 +353,7 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
                 <span className="font-numeric">{subtotal.toLocaleString("en", { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
+            )}
           </div>
 
           {/* Notes + Bank details */}
@@ -366,14 +391,14 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
           <div className="flex gap-2">
             <button
               onClick={() => handleSave("draft")}
-              disabled={saving}
+              disabled={saving || loadingItems}
               className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
             >
               Save as Draft
             </button>
             <button
               onClick={() => handleSave("sent")}
-              disabled={saving}
+              disabled={saving || loadingItems}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 shadow-sm shadow-green-300/40"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
