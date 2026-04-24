@@ -13,7 +13,6 @@ import {
   Settings,
   X,
   ChevronDown,
-  Plus,
   Zap,
   ClipboardList,
   FileText,
@@ -140,21 +139,14 @@ export function Sidebar({ slug }: SidebarProps) {
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 py-4 border-t border-slate-100">
-          {userBusinesses.length > 1 && (
-            <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition mb-1">
+        {userBusinesses.length > 1 && (
+          <div className="px-3 py-4 border-t border-slate-100">
+            <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition">
               <ChevronDown className="w-3.5 h-3.5" />
               Switch business
             </button>
-          )}
-          <Link
-            href="/onboarding"
-            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add new business
-          </Link>
-        </div>
+          </div>
+        )}
       </aside>
     </>
   );

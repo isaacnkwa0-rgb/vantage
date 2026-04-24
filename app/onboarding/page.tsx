@@ -131,6 +131,7 @@ export default function OnboardingPage() {
       business_id: business.id,
       user_id: user.id,
       role: "owner",
+      is_active: true,
     });
 
     // Seed default categories based on business type

@@ -25,7 +25,7 @@ export async function proxy(request: NextRequest) {
   if (user && isAuthPath) {
     const { data: membership } = await supabase
       .from("business_members")
-      .select("businesses(slug)")
+      .select("businesses!inner(slug)")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .limit(1)
@@ -41,7 +41,7 @@ export async function proxy(request: NextRequest) {
   if (user && isRoot) {
     const { data: membership } = await supabase
       .from("business_members")
-      .select("businesses(slug)")
+      .select("businesses!inner(slug)")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .limit(1)

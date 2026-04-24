@@ -53,6 +53,15 @@ export function ProductsClient({ products, categories, locations, businessId, cu
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showImport, setShowImport] = useState(false);
+  const [stockOverrides, setStockOverrides] = useState<Record<string, number>>({});
+
+  function handleStockChange(productId: string, newQty: number) {
+    setStockOverrides((prev) => ({ ...prev, [productId]: newQty }));
+  }
+
+  function getQty(p: Product) {
+    return stockOverrides[p.id] !== undefined ? stockOverrides[p.id] : p.stock_quantity;
+  }
 
   const filtered = products.filter((p) => {
     const matchSearch =
@@ -60,13 +69,13 @@ export function ProductsClient({ products, categories, locations, businessId, cu
       (p.sku ?? "").toLowerCase().includes(search.toLowerCase());
     if (!matchSearch) return false;
     if (selectedFilter === "all") return true;
-    if (selectedFilter === "low-stock") return p.stock_quantity <= p.low_stock_threshold;
+    if (selectedFilter === "low-stock") return getQty(p) <= p.low_stock_threshold;
     if (selectedFilter.startsWith("loc-")) return p.location_id === selectedFilter.slice(4);
     return p.category_id === selectedFilter;
   });
 
-  const stockValue = filtered.reduce((s, p) => s + p.cost_price * p.stock_quantity, 0);
-  const retailValue = filtered.reduce((s, p) => s + p.selling_price * p.stock_quantity, 0);
+  const stockValue = filtered.reduce((s, p) => s + p.cost_price * getQty(p), 0);
+  const retailValue = filtered.reduce((s, p) => s + p.selling_price * getQty(p), 0);
   const profitPotential = retailValue - stockValue;
   const fmt = (n: number) => formatCurrency(n, currency);
 
@@ -262,7 +271,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
             <span className="text-slate-300">|</span>
             <span className="text-slate-500">
               <span className="font-semibold text-amber-600">
-                {products.filter((p) => p.stock_quantity <= p.low_stock_threshold && p.stock_quantity > 0).length}
+                {products.filter((p) => getQty(p) <= p.low_stock_threshold && getQty(p) > 0).length}
               </span>{" "}
               low stock
             </span>
@@ -317,6 +326,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                 product={product}
                 currency={currency}
                 onEdit={() => { setEditingProduct(product); setShowForm(true); }}
+                onStockChange={handleStockChange}
                 hideStock={isService}
                 isService={isService}
               />

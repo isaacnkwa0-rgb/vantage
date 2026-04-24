@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, Package, AlertTriangle, X, MapPin } from "lucide-react";
+import { Edit2, Package, AlertTriangle, X, MapPin, Plus, Minus } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 interface Product {
   id: string;
@@ -23,16 +24,30 @@ interface Props {
   product: Product;
   currency: string;
   onEdit: () => void;
+  onStockChange?: (productId: string, newQty: number) => void;
   hideStock?: boolean;
   isService?: boolean;
 }
 
-export function ProductCard({ product, currency, onEdit, hideStock = false, isService = false }: Props) {
+export function ProductCard({ product, currency, onEdit, onStockChange, hideStock = false, isService = false }: Props) {
   const [preview, setPreview] = useState(false);
-  const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= product.low_stock_threshold;
-  const isOutOfStock = product.stock_quantity === 0;
+  const [qty, setQty] = useState(product.stock_quantity);
+  const [saving, setSaving] = useState(false);
+  const isLowStock = qty > 0 && qty <= product.low_stock_threshold;
+  const isOutOfStock = qty === 0;
   const profit = product.selling_price - product.cost_price;
   const margin = product.selling_price > 0 ? (profit / product.selling_price) * 100 : 0;
+
+  async function adjustStock(delta: number) {
+    const newQty = Math.max(0, qty + delta);
+    if (newQty === qty) return;
+    setQty(newQty);
+    setSaving(true);
+    const supabase = createClient();
+    await supabase.from("products").update({ stock_quantity: newQty }).eq("id", product.id);
+    setSaving(false);
+    onStockChange?.(product.id, newQty);
+  }
 
   return (
     <>
@@ -76,24 +91,36 @@ export function ProductCard({ product, currency, onEdit, hideStock = false, isSe
           </div>
         </div>
 
-        {/* Stock badge */}
-        {!hideStock && <div className="w-36 flex-shrink-0 hidden sm:block">
-          <span className={cn(
-            "inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
-            isOutOfStock
-              ? "bg-red-50 text-red-600"
-              : isLowStock
-              ? "bg-amber-50 text-amber-600"
-              : "bg-emerald-50 text-emerald-700"
-          )}>
-            {(isLowStock || isOutOfStock) && <AlertTriangle className="w-3 h-3" />}
-            {isOutOfStock
-              ? "Out of stock"
-              : isLowStock
-              ? `Low: ${product.stock_quantity}`
-              : `${product.stock_quantity} in stock`}
-          </span>
-        </div>}
+        {/* Stock controls */}
+        {!hideStock && (
+          <div className="w-36 flex-shrink-0 hidden sm:flex items-center gap-1.5">
+            <button
+              onClick={() => adjustStock(-1)}
+              disabled={saving || qty === 0}
+              className="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 transition flex-shrink-0"
+            >
+              <Minus className="w-3 h-3" />
+            </button>
+            <span className={cn(
+              "flex-1 inline-flex items-center justify-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
+              isOutOfStock
+                ? "bg-red-50 text-red-600"
+                : isLowStock
+                ? "bg-amber-50 text-amber-600"
+                : "bg-emerald-50 text-emerald-700"
+            )}>
+              {(isLowStock || isOutOfStock) && <AlertTriangle className="w-3 h-3" />}
+              {isOutOfStock ? "Out of stock" : isLowStock ? `Low: ${qty}` : `${qty} in stock`}
+            </span>
+            <button
+              onClick={() => adjustStock(1)}
+              disabled={saving}
+              className="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 transition flex-shrink-0"
+            >
+              <Plus className="w-3 h-3" />
+            </button>
+          </div>
+        )}
 
         {/* Price */}
         <div className="text-right flex-shrink-0 w-28 hidden md:block">

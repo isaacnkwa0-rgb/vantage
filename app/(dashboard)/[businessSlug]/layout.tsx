@@ -21,10 +21,10 @@ export default async function BusinessLayout({ children, params }: Props) {
   // Verify the user is a member of this business
   const { data: membership } = await supabase
     .from("business_members")
-    .select("role, businesses(*)")
+    .select("role, businesses!inner(*)")
     .eq("user_id", user.id)
     .eq("is_active", true)
-    .filter("businesses.slug", "eq", businessSlug)
+    .eq("businesses.slug", businessSlug)
     .single();
 
   if (!membership || !membership.businesses) {
