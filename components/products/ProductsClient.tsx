@@ -121,79 +121,79 @@ export function ProductsClient({ products, categories, locations, businessId, cu
         </div>
       )}
       {isService ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+          <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 to-green-400" />
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200">
-                <Briefcase className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200 flex-shrink-0">
+                <Briefcase className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
               </div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Services</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Services</p>
             </div>
-            <p className="font-numeric text-xl font-bold text-[#0F172A]">{products.length}</p>
-            <p className="text-xs text-slate-400 mt-0.5">in your catalog</p>
+            <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{products.length}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">in your catalog</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+          <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200">
-                <TrendingUp className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200 flex-shrink-0">
+                <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
               </div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Avg. Charge</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Avg. Charge</p>
             </div>
-            <p className="font-numeric text-xl font-bold text-emerald-600 truncate">
+            <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">
               {products.length > 0 ? fmt(products.reduce((s, p) => s + p.selling_price, 0) / products.length) : "—"}
             </p>
-            <p className="text-xs text-slate-400 mt-0.5">per service</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">per service</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+          <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative col-span-2 sm:col-span-1">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-500 to-violet-400" />
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center shadow-sm shadow-violet-200">
-                <BarChart3 className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center shadow-sm shadow-violet-200 flex-shrink-0">
+                <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
               </div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Top Charge</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Top Charge</p>
             </div>
-            <p className="font-numeric text-xl font-bold text-violet-600 truncate">
+            <p className="font-numeric text-sm sm:text-xl font-bold text-violet-600">
               {products.length > 0 ? fmt(Math.max(...products.map((p) => p.selling_price))) : "—"}
             </p>
-            <p className="text-xs text-slate-400 mt-0.5">highest priced service</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">highest priced service</p>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+          <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-slate-500 to-slate-400" />
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-slate-500 to-slate-700 rounded-lg flex items-center justify-center shadow-sm">
-                <Package className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-slate-500 to-slate-700 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                <Package className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
               </div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Stock Value</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Stock Value</p>
             </div>
-            <p className="font-numeric text-xl font-bold text-[#0F172A] truncate">{fmt(stockValue)}</p>
-            <p className="text-xs text-slate-400 mt-0.5">at cost price</p>
+            <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{fmt(stockValue)}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">at cost price</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+          <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200">
-                <TrendingUp className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200 flex-shrink-0">
+                <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
               </div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Retail Value</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Retail Value</p>
             </div>
-            <p className="font-numeric text-xl font-bold text-emerald-600 truncate">{fmt(retailValue)}</p>
-            <p className="text-xs text-slate-400 mt-0.5">at selling price</p>
+            <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">{fmt(retailValue)}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">at selling price</p>
           </div>
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+          <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative col-span-2 sm:col-span-1">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-500 to-violet-400" />
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center shadow-sm shadow-violet-200">
-                <BarChart3 className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center shadow-sm shadow-violet-200 flex-shrink-0">
+                <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
               </div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Profit Potential</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Profit Potential</p>
             </div>
-            <p className="font-numeric text-xl font-bold text-violet-600 truncate">{fmt(profitPotential)}</p>
-            <p className="text-xs text-slate-400 mt-0.5">if all stock sold</p>
+            <p className="font-numeric text-sm sm:text-xl font-bold text-violet-600">{fmt(profitPotential)}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">if all stock sold</p>
           </div>
         </div>
       )}
@@ -312,12 +312,12 @@ export function ProductsClient({ products, categories, locations, businessId, cu
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-4 px-4 py-2 bg-slate-50 border-b border-slate-100">
-            <div className="w-12 flex-shrink-0" />
+          <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
+            <div className="w-10 sm:w-12 flex-shrink-0" />
             <div className="flex-1 text-xs font-medium text-slate-500 uppercase tracking-wide">{isService ? "Service" : "Product"}</div>
-            {!isService && <div className="w-36 flex-shrink-0 hidden sm:block text-xs font-medium text-slate-500 uppercase tracking-wide">Stock</div>}
+            {!isService && <div className="w-[76px] sm:w-36 flex-shrink-0 text-xs font-medium text-slate-500 uppercase tracking-wide">Stock</div>}
             <div className="w-28 text-right flex-shrink-0 hidden md:block text-xs font-medium text-slate-500 uppercase tracking-wide">{isService ? "Charge" : "Price"}</div>
-            <div className="w-8 flex-shrink-0" />
+            <div className="w-16 flex-shrink-0" />
           </div>
           <div className="divide-y divide-slate-50">
             {filtered.map((product) => (

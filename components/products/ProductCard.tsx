@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, Package, AlertTriangle, X, MapPin, Plus, Minus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Edit2, Package, AlertTriangle, X, MapPin, Plus, Minus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -24,12 +25,14 @@ interface Props {
   product: Product;
   currency: string;
   onEdit: () => void;
+  onDelete?: () => void;
   onStockChange?: (productId: string, newQty: number) => void;
   hideStock?: boolean;
   isService?: boolean;
 }
 
-export function ProductCard({ product, currency, onEdit, onStockChange, hideStock = false, isService = false }: Props) {
+export function ProductCard({ product, currency, onEdit, onDelete, onStockChange, hideStock = false, isService = false }: Props) {
+  const router = useRouter();
   const [preview, setPreview] = useState(false);
   const [qty, setQty] = useState(product.stock_quantity);
   const [saving, setSaving] = useState(false);
@@ -49,13 +52,21 @@ export function ProductCard({ product, currency, onEdit, onStockChange, hideStoc
     onStockChange?.(product.id, newQty);
   }
 
+  async function handleDelete() {
+    if (!window.confirm(`Delete "${product.name}"? This will remove it from your catalog.`)) return;
+    const supabase = createClient();
+    await supabase.from("products").update({ is_active: false }).eq("id", product.id);
+    onDelete?.();
+    router.refresh();
+  }
+
   return (
     <>
-      <div className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition group">
+      <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-slate-50 transition group">
         {/* Image thumbnail */}
         <div
           className={cn(
-            "w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200",
+            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200",
             product.image_url ? "cursor-pointer hover:ring-2 hover:ring-green-400 hover:ring-offset-1" : ""
           )}
           onClick={() => product.image_url && setPreview(true)}
@@ -63,14 +74,14 @@ export function ProductCard({ product, currency, onEdit, onStockChange, hideStoc
           {product.image_url ? (
             <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
           ) : (
-            <Package className="w-5 h-5 text-slate-300" />
+            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
           )}
         </div>
 
-        {/* Name + SKU + category */}
+        {/* Name + SKU + category + mobile price */}
         <div className="flex-1 min-w-0">
           <p className="font-medium text-[#0F172A] text-sm truncate">{product.name}</p>
-          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
             {product.sku && (
               <span className="text-xs text-slate-400">SKU: {product.sku}</span>
             )}
@@ -89,40 +100,74 @@ export function ProductCard({ product, currency, onEdit, onStockChange, hideStoc
               </span>
             )}
           </div>
+          {/* Price shown below name on mobile */}
+          <p className="font-numeric font-semibold text-emerald-600 text-sm mt-1 md:hidden">
+            {formatCurrency(product.selling_price, currency)}
+            {!isService && (
+              <span className="text-slate-400 font-normal text-xs ml-1">· {margin.toFixed(0)}% margin</span>
+            )}
+          </p>
         </div>
 
         {/* Stock controls */}
         {!hideStock && (
-          <div className="w-36 flex-shrink-0 hidden sm:flex items-center gap-1.5">
-            <button
-              onClick={() => adjustStock(-1)}
-              disabled={saving || qty === 0}
-              className="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 transition flex-shrink-0"
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-            <span className={cn(
-              "flex-1 inline-flex items-center justify-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
-              isOutOfStock
-                ? "bg-red-50 text-red-600"
-                : isLowStock
-                ? "bg-amber-50 text-amber-600"
-                : "bg-emerald-50 text-emerald-700"
-            )}>
-              {(isLowStock || isOutOfStock) && <AlertTriangle className="w-3 h-3" />}
-              {isOutOfStock ? "Out of stock" : isLowStock ? `Low: ${qty}` : `${qty} in stock`}
-            </span>
-            <button
-              onClick={() => adjustStock(1)}
-              disabled={saving}
-              className="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 transition flex-shrink-0"
-            >
-              <Plus className="w-3 h-3" />
-            </button>
-          </div>
+          <>
+            {/* Mobile: compact +/- with quantity number */}
+            <div className="flex items-center gap-1 sm:hidden flex-shrink-0">
+              <button
+                onClick={() => adjustStock(-1)}
+                disabled={saving || qty === 0}
+                className="w-6 h-6 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition flex-shrink-0"
+              >
+                <Minus className="w-3 h-3" />
+              </button>
+              <span className={cn(
+                "text-xs font-semibold w-7 text-center",
+                isOutOfStock ? "text-red-500" : isLowStock ? "text-amber-500" : "text-slate-700"
+              )}>
+                {qty}
+              </span>
+              <button
+                onClick={() => adjustStock(1)}
+                disabled={saving}
+                className="w-6 h-6 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition flex-shrink-0"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+
+            {/* Desktop: full stock status badge */}
+            <div className="w-36 flex-shrink-0 hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => adjustStock(-1)}
+                disabled={saving || qty === 0}
+                className="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 transition flex-shrink-0"
+              >
+                <Minus className="w-3 h-3" />
+              </button>
+              <span className={cn(
+                "flex-1 inline-flex items-center justify-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
+                isOutOfStock
+                  ? "bg-red-50 text-red-600"
+                  : isLowStock
+                  ? "bg-amber-50 text-amber-600"
+                  : "bg-emerald-50 text-emerald-700"
+              )}>
+                {(isLowStock || isOutOfStock) && <AlertTriangle className="w-3 h-3" />}
+                {isOutOfStock ? "Out of stock" : isLowStock ? `Low: ${qty}` : `${qty} in stock`}
+              </span>
+              <button
+                onClick={() => adjustStock(1)}
+                disabled={saving}
+                className="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 transition flex-shrink-0"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+          </>
         )}
 
-        {/* Price */}
+        {/* Price column — desktop only (mobile shows below name) */}
         <div className="text-right flex-shrink-0 w-28 hidden md:block">
           <p className="font-numeric font-semibold text-[#0F172A] text-sm">
             {formatCurrency(product.selling_price, currency)}
@@ -133,13 +178,23 @@ export function ProductCard({ product, currency, onEdit, onStockChange, hideStoc
           )}
         </div>
 
-        {/* Edit button */}
-        <button
-          onClick={onEdit}
-          className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition flex-shrink-0 opacity-0 group-hover:opacity-100"
-        >
-          <Edit2 className="w-4 h-4" />
-        </button>
+        {/* Action buttons — always visible on mobile, hover-reveal on desktop */}
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          <button
+            onClick={onEdit}
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition sm:opacity-0 sm:group-hover:opacity-100"
+            title="Edit"
+          >
+            <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+          <button
+            onClick={handleDelete}
+            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition sm:opacity-0 sm:group-hover:opacity-100"
+            title="Delete"
+          >
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Image preview lightbox */}

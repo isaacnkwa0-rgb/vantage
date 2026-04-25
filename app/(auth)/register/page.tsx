@@ -102,17 +102,17 @@ export default function RegisterPage() {
               </div>
               <div className="space-y-1.5">
                 <div className="flex justify-between text-white/80 text-xs">
-                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Running Shoes ×1</span>
-                  <span className="font-numeric font-semibold">₦24,000</span>
+                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Wireless Earbuds ×1</span>
+                  <span className="font-numeric font-semibold">$89.00</span>
                 </div>
                 <div className="flex justify-between text-white/80 text-xs">
-                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> T-Shirt ×2</span>
-                  <span className="font-numeric font-semibold">₦7,000</span>
+                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Premium Tee ×2</span>
+                  <span className="font-numeric font-semibold">€54.00</span>
                 </div>
               </div>
               <div className="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
                 <span className="text-green-200 text-xs">Total</span>
-                <span className="font-numeric text-white font-bold text-sm">₦31,000</span>
+                <span className="font-numeric text-white font-bold text-sm">$143.00</span>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">
@@ -163,7 +163,7 @@ export default function RegisterPage() {
               </div>
               <div className="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
                 <span className="text-green-200 text-xs">Charge</span>
-                <span className="font-numeric text-white font-bold text-sm">₦6,500</span>
+                <span className="font-numeric text-white font-bold text-sm">£65.00</span>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">

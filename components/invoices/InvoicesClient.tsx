@@ -144,43 +144,43 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
   }
 
   return (
-    <div className="flex-1 p-5 space-y-4">
+    <div className="flex-1 p-3 sm:p-5 space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+        <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 to-green-400" />
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200">
-              <FileText className="w-3.5 h-3.5 text-white" />
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200 flex-shrink-0">
+              <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
             </div>
-            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Invoices</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Invoices</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{invoices.length}</p>
-          <p className="text-xs text-slate-400 mt-0.5">all time</p>
+          <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{invoices.length}</p>
+          <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">all time</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
+        <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200 flex-shrink-0">
+              <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
             </div>
-            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Collected</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Collected</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-emerald-600 truncate">{fmt(totalPaid)}</p>
-          <p className="text-xs text-slate-400 mt-0.5">from paid invoices</p>
+          <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">{fmt(totalPaid)}</p>
+          <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">from paid invoices</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-red-50 p-4 shadow-sm overflow-hidden relative">
+        <div className="bg-white rounded-2xl border border-red-50 p-3 sm:p-4 shadow-sm overflow-hidden relative col-span-2 sm:col-span-1">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-red-500 to-red-400" />
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center shadow-sm shadow-red-200">
-              <Clock className="w-3.5 h-3.5 text-white" />
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center shadow-sm shadow-red-200 flex-shrink-0">
+              <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
             </div>
-            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Outstanding</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Outstanding</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-red-500 truncate">{fmt(totalOutstanding)}</p>
-          <p className="text-xs text-slate-400 mt-0.5">pending collection</p>
+          <p className="font-numeric text-sm sm:text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
+          <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">pending collection</p>
         </div>
       </div>
 

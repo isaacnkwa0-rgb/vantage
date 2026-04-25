@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import {
-  Loader2, Zap, TrendingUp, ArrowUpRight,
-  ShoppingCart, Users, BarChart3, Package,
+  Loader2, Zap, ShoppingCart, Users, BarChart3, Package,
+  TrendingUp, Receipt, CheckCircle2, Clock,
 } from "lucide-react";
 
 const schema = z.object({
@@ -18,14 +19,226 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
+const SLIDE_TABS = ["Sales", "Inventory", "Invoices", "Analytics"];
+
+function SalesSlide() {
+  return (
+    <div className="h-full flex flex-col gap-2.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="w-3.5 h-3.5 text-emerald-300" />
+          <span className="text-white text-[11px] font-semibold">POS Terminal</span>
+        </div>
+        <span className="text-[9px] bg-emerald-400/30 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-300/20">
+          ● Live
+        </span>
+      </div>
+
+      <div className="flex-1 space-y-1.5">
+        {[
+          { name: "Wireless Earbuds", qty: 1, price: "$89.00" },
+          { name: "Premium Hoodie", qty: 2, price: "$110.00" },
+          { name: "Yoga Mat", qty: 1, price: "$45.00" },
+        ].map((item) => (
+          <div key={item.name} className="flex items-center gap-2 bg-white/10 rounded-lg px-2.5 py-2 border border-white/5">
+            <Package className="w-3 h-3 text-green-300/70 flex-shrink-0" />
+            <span className="flex-1 text-white/85 text-[11px] truncate">{item.name}</span>
+            <span className="text-green-300/60 text-[10px] flex-shrink-0">×{item.qty}</span>
+            <span className="font-numeric text-white text-[11px] font-semibold flex-shrink-0">{item.price}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="pt-2.5 border-t border-white/10 space-y-1">
+        <div className="flex justify-between text-white/60 text-[10px]">
+          <span>Subtotal</span><span className="font-numeric">$244.00</span>
+        </div>
+        <div className="flex justify-between text-white/60 text-[10px]">
+          <span>Tax (7.5%)</span><span className="font-numeric">$18.30</span>
+        </div>
+        <div className="flex items-center justify-between bg-emerald-500/25 rounded-lg px-2.5 py-1.5 border border-emerald-400/20 mt-1">
+          <span className="text-white font-semibold text-xs">Total</span>
+          <span className="font-numeric text-white font-bold text-sm">$262.30</span>
+        </div>
+        <div className="bg-emerald-500/80 hover:bg-emerald-500 rounded-lg py-2 text-center text-white text-[11px] font-bold transition cursor-default">
+          Charge $262.30
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InventorySlide() {
+  return (
+    <div className="h-full flex flex-col gap-2.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Package className="w-3.5 h-3.5 text-violet-300" />
+          <span className="text-white text-[11px] font-semibold">Inventory</span>
+        </div>
+        <span className="text-[9px] bg-white/10 text-green-200 px-2 py-0.5 rounded-full">86 products</span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5">
+        {[
+          { label: "Stock Value", value: "$12.4K", color: "text-white" },
+          { label: "Retail Value", value: "$24.8K", color: "text-emerald-300" },
+          { label: "Profit", value: "$12.4K", color: "text-violet-300" },
+        ].map((s) => (
+          <div key={s.label} className="bg-white/10 rounded-lg p-2 text-center border border-white/5">
+            <p className={`font-numeric font-bold text-xs ${s.color}`}>{s.value}</p>
+            <p className="text-green-300/60 text-[8px] mt-0.5 leading-tight">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex-1 space-y-1.5">
+        {[
+          { name: "Wireless Earbuds", stock: 12, status: "ok" as const, price: "$89" },
+          { name: "Premium Hoodie", stock: 3, status: "low" as const, price: "$55" },
+          { name: "Yoga Mat", stock: 28, status: "ok" as const, price: "$45" },
+          { name: "Smart Watch", stock: 0, status: "out" as const, price: "$199" },
+        ].map((p) => (
+          <div key={p.name} className="flex items-center gap-2 bg-white/10 rounded-lg px-2.5 py-1.5 border border-white/5">
+            <Package className="w-2.5 h-2.5 text-green-300/60 flex-shrink-0" />
+            <span className="flex-1 text-white/85 text-[11px] truncate">{p.name}</span>
+            <span className={cn(
+              "text-[9px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0",
+              p.status === "ok" ? "bg-emerald-400/20 text-emerald-300" :
+              p.status === "low" ? "bg-amber-400/20 text-amber-300" :
+              "bg-red-400/20 text-red-300"
+            )}>
+              {p.status === "ok" ? `${p.stock} in stock` : p.status === "low" ? `Low: ${p.stock}` : "Out"}
+            </span>
+            <span className="font-numeric text-white text-[11px] font-semibold flex-shrink-0">{p.price}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function InvoicesSlide() {
+  return (
+    <div className="h-full flex flex-col gap-2.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Receipt className="w-3.5 h-3.5 text-blue-300" />
+          <span className="text-white text-[11px] font-semibold">Invoices</span>
+        </div>
+        <span className="text-[9px] bg-white/10 text-green-200 px-2 py-0.5 rounded-full">This month</span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5">
+        {[
+          { label: "Paid", value: "$8.4K", color: "text-emerald-300", icon: CheckCircle2 },
+          { label: "Pending", value: "$2.1K", color: "text-amber-300", icon: Clock },
+          { label: "Overdue", value: "$890", color: "text-red-300", icon: Clock },
+        ].map((s) => (
+          <div key={s.label} className="bg-white/10 rounded-lg p-2 text-center border border-white/5">
+            <p className={`font-numeric font-bold text-xs ${s.color}`}>{s.value}</p>
+            <p className="text-green-300/60 text-[8px] mt-0.5">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex-1 space-y-1.5">
+        {[
+          { id: "INV-042", client: "Acme Corp", amount: "$1,200", status: "paid" as const },
+          { id: "INV-041", client: "TechStart", amount: "$850", status: "pending" as const },
+          { id: "INV-040", client: "Studio J", amount: "$450", status: "paid" as const },
+          { id: "INV-039", client: "DevHub", amount: "$320", status: "overdue" as const },
+        ].map((inv) => (
+          <div key={inv.id} className="flex items-center gap-2 bg-white/10 rounded-lg px-2.5 py-1.5 border border-white/5">
+            <span className="text-green-300/50 text-[9px] font-mono w-12 flex-shrink-0">{inv.id}</span>
+            <span className="flex-1 text-white/85 text-[11px] truncate">{inv.client}</span>
+            <span className="font-numeric text-white text-[11px] font-semibold flex-shrink-0">{inv.amount}</span>
+            <span className={cn(
+              "text-[9px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0",
+              inv.status === "paid" ? "bg-emerald-400/20 text-emerald-300" :
+              inv.status === "pending" ? "bg-amber-400/20 text-amber-300" :
+              "bg-red-400/20 text-red-300"
+            )}>
+              {inv.status === "paid" ? "✓ Paid" : inv.status === "pending" ? "Pending" : "Overdue"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsSlide() {
+  const bars = [35, 52, 41, 68, 48, 75, 90, 62, 80, 95, 70, 100];
+  return (
+    <div className="h-full flex flex-col gap-2.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-3.5 h-3.5 text-amber-300" />
+          <span className="text-white text-[11px] font-semibold">Analytics</span>
+        </div>
+        <div className="flex items-center gap-1 bg-emerald-400/20 text-emerald-300 text-[9px] px-2 py-0.5 rounded-full border border-emerald-300/20">
+          <TrendingUp className="w-2.5 h-2.5" />
+          +24.8% YoY
+        </div>
+      </div>
+
+      <div className="bg-white/10 rounded-xl p-2.5 border border-white/5">
+        <p className="text-green-300/60 text-[9px] mb-0.5">Annual Revenue</p>
+        <p className="font-numeric text-white font-bold text-lg">$284,600</p>
+      </div>
+
+      <div className="flex-1 flex items-end gap-0.5 min-h-0">
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            className="flex-1 rounded-t"
+            style={{
+              height: `${h}%`,
+              backgroundColor: i === 11 ? "rgba(52,211,153,0.85)" : "rgba(255,255,255,0.15)",
+            }}
+          />
+        ))}
+      </div>
+      <div className="flex gap-0.5">
+        {["J","F","M","A","M","J","J","A","S","O","N","D"].map((m, i) => (
+          <span key={i} className="flex-1 text-center text-[8px] text-green-300/40">{m}</span>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-3 gap-1.5">
+        {[
+          { label: "Orders", value: "1,248" },
+          { label: "Customers", value: "384" },
+          { label: "Avg. Order", value: "$228" },
+        ].map((m) => (
+          <div key={m.label} className="bg-white/10 rounded-lg p-2 text-center border border-white/5">
+            <p className="font-numeric text-white font-bold text-xs">{m.value}</p>
+            <p className="text-green-300/60 text-[8px] mt-0.5">{m.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const SLIDE_COMPONENTS = [<SalesSlide key="sales" />, <InventorySlide key="inv" />, <InvoicesSlide key="invoices" />, <AnalyticsSlide key="analytics" />];
+
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [slide, setSlide] = useState(0);
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  useEffect(() => {
+    const t = setInterval(() => setSlide((s) => (s + 1) % 4), 3500);
+    return () => clearInterval(t);
+  }, []);
 
   async function onSubmit(data: FormData) {
     setError(null);
@@ -34,10 +247,7 @@ export default function LoginPage() {
       email: data.email,
       password: data.password,
     });
-    if (authError) {
-      setError(authError.message);
-      return;
-    }
+    if (authError) { setError(authError.message); return; }
     router.refresh();
   }
 
@@ -45,15 +255,14 @@ export default function LoginPage() {
     <div className="min-h-screen lg:grid lg:grid-cols-2">
       {/* ── Left panel ── */}
       <div className="hidden lg:flex flex-col bg-gradient-to-br from-green-900 via-green-800 to-green-700 p-10 relative overflow-hidden">
-        {/* Background decoration */}
+        {/* Background circles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/5 rounded-full" />
           <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/[0.02] rounded-full" />
         </div>
 
         {/* Logo */}
-        <div className="relative flex items-center gap-3 mb-12">
+        <div className="relative flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30">
             <Zap className="w-5 h-5 text-white" />
           </div>
@@ -61,104 +270,82 @@ export default function LoginPage() {
         </div>
 
         {/* Headline */}
-        <div className="relative mb-10">
+        <div className="relative mb-6">
           <h2 className="text-4xl font-extrabold text-white leading-tight">
-            Welcome back.<br />
-            Your business awaits.
+            Your business.<br />One platform.
           </h2>
-          <p className="text-green-200 mt-3 text-base leading-relaxed">
-            Sign in to see your sales, manage your<br />
-            team, and grow your business today.
+          <p className="text-green-200 mt-3 text-sm leading-relaxed">
+            Point of sale, inventory, invoicing and<br />analytics — built for businesses worldwide.
           </p>
         </div>
 
-        {/* Mini dashboard mockup */}
-        <div className="relative space-y-4 flex-1">
-          {/* Revenue summary card */}
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-green-300 text-xs font-semibold uppercase tracking-wider">Today's Revenue</p>
-                <p className="font-numeric text-3xl font-bold text-white mt-1">₦142,500</p>
-              </div>
-              <div className="w-10 h-10 bg-emerald-400/20 rounded-xl flex items-center justify-center border border-emerald-300/30">
-                <TrendingUp className="w-5 h-5 text-emerald-300" />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 bg-emerald-400/20 text-emerald-300 text-xs font-semibold px-2 py-1 rounded-full border border-emerald-300/30">
-                <ArrowUpRight className="w-3 h-3" />
-                +18.4%
-              </div>
-              <span className="text-green-300 text-xs">vs yesterday</span>
-            </div>
-
-            {/* Mini bar chart */}
-            <div className="mt-4 flex items-end gap-1.5 h-14">
-              {[40, 65, 50, 80, 60, 90, 100].map((h, i) => (
-                <div
-                  key={i}
-                  className="flex-1 rounded-t-sm"
-                  style={{
-                    height: `${h}%`,
-                    backgroundColor: i === 6 ? "rgba(52,211,153,0.9)" : "rgba(255,255,255,0.15)",
-                  }}
-                />
-              ))}
-            </div>
-            <div className="flex justify-between mt-1.5">
-              {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
-                <span key={i} className="flex-1 text-center text-[9px] text-green-300/60">{d}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { icon: ShoppingCart, label: "Sales Today", value: "24", color: "text-emerald-300", bg: "bg-emerald-400/20" },
-              { icon: Users, label: "Customers", value: "312", color: "text-blue-300", bg: "bg-blue-400/20" },
-              { icon: Package, label: "Products", value: "89", color: "text-violet-300", bg: "bg-violet-400/20" },
-            ].map(({ icon: Icon, label, value, color, bg }) => (
-              <div key={label} className="bg-white/10 border border-white/20 rounded-xl p-3 backdrop-blur-sm">
-                <div className={`w-7 h-7 ${bg} rounded-lg flex items-center justify-center mb-2`}>
-                  <Icon className={`w-3.5 h-3.5 ${color}`} />
-                </div>
-                <p className="font-numeric text-white font-bold text-lg leading-none">{value}</p>
-                <p className="text-green-300 text-[10px] mt-1">{label}</p>
-              </div>
+        {/* App preview slideshow */}
+        <div className="relative flex-1 flex flex-col min-h-0">
+          {/* Tab selector */}
+          <div className="flex gap-1.5 mb-3 flex-shrink-0">
+            {SLIDE_TABS.map((label, i) => (
+              <button
+                key={label}
+                onClick={() => setSlide(i)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-[11px] font-semibold transition-all",
+                  i === slide
+                    ? "bg-white/20 text-white border border-white/30 backdrop-blur-sm"
+                    : "text-green-300/60 hover:text-green-200 hover:bg-white/10"
+                )}
+              >
+                {label}
+              </button>
             ))}
           </div>
 
-          {/* Recent transactions */}
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-green-200 text-[10px] font-semibold uppercase tracking-wider">Recent Sales</span>
-              <BarChart3 className="w-3.5 h-3.5 text-green-300/60" />
+          {/* App frame */}
+          <div className="flex-1 bg-black/20 border border-white/20 rounded-2xl overflow-hidden backdrop-blur-sm flex flex-col min-h-0">
+            {/* Browser chrome */}
+            <div className="flex items-center gap-1.5 px-4 py-2 bg-black/20 border-b border-white/10 flex-shrink-0">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/60" />
+              <div className="ml-2 flex-1 bg-white/10 rounded px-2.5 py-0.5 text-[9px] text-green-300/50 font-mono">
+                app.vantage.io · {SLIDE_TABS[slide].toLowerCase()}
+              </div>
             </div>
-            <div className="space-y-2">
-              {[
-                { name: "Running Shoes", amount: "₦24,000", time: "2m ago" },
-                { name: "Haircut + Beard Trim", amount: "₦6,500", time: "14m ago" },
-                { name: "Silk T-Shirt ×2", amount: "₦7,000", time: "31m ago" },
-              ].map((tx) => (
-                <div key={tx.name} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                    <span className="text-white/80 text-xs">{tx.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-numeric text-white text-xs font-semibold">{tx.amount}</span>
-                    <span className="text-green-300/60 text-[9px] ml-2">{tx.time}</span>
-                  </div>
+
+            {/* Slides */}
+            <div className="relative flex-1 min-h-0">
+              {SLIDE_COMPONENTS.map((content, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "absolute inset-0 p-4 transition-all duration-500",
+                    i === slide
+                      ? "opacity-100 translate-y-0 pointer-events-auto"
+                      : "opacity-0 translate-y-2 pointer-events-none"
+                  )}
+                >
+                  {content}
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Progress dots */}
+          <div className="flex justify-center items-center gap-2 mt-4 flex-shrink-0">
+            {SLIDE_TABS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlide(i)}
+                className={cn(
+                  "rounded-full transition-all duration-300",
+                  i === slide ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/30 hover:bg-white/50"
+                )}
+              />
+            ))}
           </div>
         </div>
 
         {/* Trust signal */}
-        <div className="relative mt-8">
+        <div className="relative mt-6 flex-shrink-0">
           <div className="flex items-center gap-3 mb-2">
             <div className="flex -space-x-2">
               {[5, 28, 44, 57, 15].map((n) => (
@@ -175,7 +362,7 @@ export default function LoginPage() {
               <p className="text-white text-xs font-semibold">
                 Trusted by <span className="text-emerald-300">1,200+</span> businesses
               </p>
-              <p className="text-green-300 text-[10px]">across Africa and beyond</p>
+              <p className="text-green-300 text-[10px]">in 50+ countries worldwide</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
@@ -206,7 +393,6 @@ export default function LoginPage() {
 
         <div className="flex-1 flex items-center justify-center px-6 py-10">
           <div className="w-full max-w-sm">
-            {/* Header */}
             <div className="mb-7">
               <h2 className="text-2xl font-bold text-[#0F172A]">Welcome back</h2>
               <p className="text-slate-500 text-sm mt-1">Sign in to your account</p>
@@ -222,9 +408,7 @@ export default function LoginPage() {
                   placeholder="you@business.com"
                   className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-                )}
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
               </div>
 
               <div>
@@ -236,9 +420,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                 />
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
-                )}
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
               </div>
 
               {error && (
@@ -255,7 +437,6 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Feature pills */}
             <div className="mt-6 grid grid-cols-3 gap-3 text-center">
               {[
                 { icon: ShoppingCart, label: "Live POS" },

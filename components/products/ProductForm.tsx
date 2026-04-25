@@ -353,7 +353,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                 onClick={handleDelete}
                 className="px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition font-medium"
               >
-                Archive
+                Delete
               </button>
             )}
             <button
