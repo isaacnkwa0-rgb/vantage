@@ -26,6 +26,7 @@ export default async function ProductsPage({ params }: Props) {
       .from("products")
       .select("*, categories(name, color), locations(name)")
       .eq("business_id", business.id)
+      .eq("is_active", true)
       .order("created_at", { ascending: false }),
     supabase
       .from("categories")

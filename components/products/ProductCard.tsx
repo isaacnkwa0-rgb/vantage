@@ -55,7 +55,8 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
   async function handleDelete() {
     if (!window.confirm(`Delete "${product.name}"? This will remove it from your catalog.`)) return;
     const supabase = createClient();
-    await supabase.from("products").update({ is_active: false }).eq("id", product.id);
+    const { error } = await supabase.from("products").update({ is_active: false }).eq("id", product.id);
+    if (error) { alert(`Failed to delete: ${error.message}`); return; }
     onDelete?.();
     router.refresh();
   }
