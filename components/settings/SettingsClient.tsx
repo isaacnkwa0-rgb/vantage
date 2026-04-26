@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2 } from "lucide-react";
+import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star } from "lucide-react";
 
 interface Business {
   id: string;
@@ -24,6 +24,9 @@ interface Business {
   tax_enabled: boolean;
   tax_rate: number;
   tax_name: string;
+  loyalty_enabled: boolean | null;
+  loyalty_points_per_dollar: number | null;
+  loyalty_redemption_rate: number | null;
 }
 
 interface Member {
@@ -100,6 +103,9 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [taxEnabled, setTaxEnabled] = useState(business.tax_enabled ?? false);
   const [taxRate, setTaxRate] = useState((business.tax_rate ?? 0).toString());
   const [taxName, setTaxName] = useState(business.tax_name ?? "VAT");
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(business.loyalty_enabled ?? false);
+  const [loyaltyPtsPerDollar, setLoyaltyPtsPerDollar] = useState((business.loyalty_points_per_dollar ?? 1).toString());
+  const [loyaltyRedemptionRate, setLoyaltyRedemptionRate] = useState((business.loyalty_redemption_rate ?? 100).toString());
 
   // Locations state
   const [locationsList, setLocationsList] = useState<Location[]>(initialLocations);
@@ -163,6 +169,9 @@ export function SettingsClient({ business, members, locations: initialLocations,
       tax_enabled: taxEnabled,
       tax_rate: parseFloat(taxRate) || 0,
       tax_name: taxName || "VAT",
+      loyalty_enabled: loyaltyEnabled,
+      loyalty_points_per_dollar: parseInt(loyaltyPtsPerDollar) || 1,
+      loyalty_redemption_rate: parseInt(loyaltyRedemptionRate) || 100,
     }).eq("id", business.id);
     setSaving(false);
     router.refresh();
@@ -423,6 +432,61 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   />
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Loyalty Program */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#0F172A] flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500" />
+                  Loyalty Program
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">Reward customers with points on every purchase</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLoyaltyEnabled((v) => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${loyaltyEnabled ? "bg-amber-500" : "bg-slate-200"}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${loyaltyEnabled ? "translate-x-5" : "translate-x-0"}`} />
+              </button>
+            </div>
+            {loyaltyEnabled && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-[#0F172A] mb-1">Points per 1 currency spent</label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={loyaltyPtsPerDollar}
+                      onChange={(e) => setLoyaltyPtsPerDollar(e.target.value)}
+                      placeholder="e.g. 1"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 font-numeric"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Points earned per unit spent</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#0F172A] mb-1">Points needed for 1 unit off</label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={loyaltyRedemptionRate}
+                      onChange={(e) => setLoyaltyRedemptionRate(e.target.value)}
+                      placeholder="e.g. 100"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 font-numeric"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Points needed to redeem 1 currency unit</p>
+                  </div>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
+                  Customers earn <strong>{loyaltyPtsPerDollar || 1} pt</strong> per unit spent and can redeem <strong>{loyaltyRedemptionRate || 100} pts</strong> for 1 unit off.
+                </div>
+              </>
             )}
           </div>
 
