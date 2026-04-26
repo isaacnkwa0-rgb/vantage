@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { X, Loader2, Upload } from "lucide-react";
+import { X, Loader2, Upload, ScanLine, CheckCircle2, AlertCircle } from "lucide-react";
+import { BarcodeScanner } from "@/components/pos/BarcodeScanner";
 
 const schema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -17,6 +18,7 @@ const schema = z.object({
   category_id: z.string().optional(),
   location_id: z.string().optional(),
   sku: z.string().optional(),
+  barcode: z.string().optional(),
   description: z.string().optional(),
   track_inventory: z.boolean().default(true),
 });
@@ -48,11 +50,15 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
   const [error, setError] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(editingProduct?.image_url ?? null);
   const [uploading, setUploading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [lookingUp, setLookingUp] = useState(false);
+  const [scanStatus, setScanStatus] = useState<"found" | "notfound" | null>(null);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -66,11 +72,37 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           category_id: editingProduct.category_id ?? undefined,
           location_id: editingProduct.location_id ?? undefined,
           sku: editingProduct.sku ?? undefined,
+          barcode: editingProduct.barcode ?? undefined,
           description: editingProduct.description ?? undefined,
           track_inventory: editingProduct.track_inventory,
         }
       : { track_inventory: true, cost_price: 0, stock_quantity: 0, low_stock_threshold: 5 },
   });
+
+  async function handleBarcodeScan(barcode: string) {
+    setShowScanner(false);
+    setLookingUp(true);
+    setScanStatus(null);
+    try {
+      const res = await fetch(`/api/barcode-lookup?barcode=${encodeURIComponent(barcode)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setValue("name", data.name, { shouldValidate: true });
+        setValue("barcode", barcode);
+        if (data.description) setValue("description", data.description);
+        if (data.imageUrl) setImageUrl(data.imageUrl);
+        setScanStatus("found");
+      } else {
+        setValue("barcode", barcode);
+        setScanStatus("notfound");
+      }
+    } catch {
+      setValue("barcode", barcode);
+      setScanStatus("notfound");
+    }
+    setLookingUp(false);
+    setTimeout(() => setScanStatus(null), 4000);
+  }
 
   const trackInventory = watch("track_inventory");
 
@@ -108,6 +140,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
       low_stock_threshold: data.low_stock_threshold,
       category_id: data.category_id || null,
       sku: data.sku || null,
+      barcode: data.barcode || null,
       description: data.description || null,
       track_inventory: data.track_inventory,
       image_url: imageUrl,
@@ -150,15 +183,46 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               ? isService ? "Edit Service" : "Edit Product"
               : isService ? "Add Service" : "Add Product"}
           </h2>
-          <button
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {!isService && !editingProduct && (
+              <button
+                type="button"
+                onClick={() => setShowScanner(true)}
+                disabled={lookingUp}
+                title="Scan barcode to auto-fill product details"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition disabled:opacity-60"
+              >
+                {lookingUp
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <ScanLine className="w-3.5 h-3.5" />
+                }
+                {lookingUp ? "Looking up…" : "Scan to fill"}
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
+          {/* Scan status banner */}
+          {scanStatus === "found" && (
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-3 py-2 rounded-lg">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              Product details filled from barcode database — review and add your prices.
+            </div>
+          )}
+          {scanStatus === "notfound" && (
+            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-3 py-2 rounded-lg">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              Barcode saved — product not found in database. Fill details manually.
+            </div>
+          )}
+
           {/* Image upload */}
           <div>
             <label className="block text-sm font-medium text-[#0F172A] mb-2">
@@ -215,7 +279,16 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               </div>
             )}
           </div>
-
+          {!isService && (
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">Barcode</label>
+              <input
+                {...register("barcode")}
+                placeholder="EAN / UPC — or scan above to fill automatically"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+          )}
           {/* Location — only for selling businesses */}
           {!isService && locations.length > 0 && (
             <div>
@@ -374,6 +447,13 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           </div>
         </form>
       </div>
+
+      {showScanner && (
+        <BarcodeScanner
+          onScan={handleBarcodeScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
     </div>
   );
 }
