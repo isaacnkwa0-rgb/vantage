@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -97,7 +97,9 @@ const CURRENCIES = ["NGN", "USD", "GHS", "KES", "ZAR", "GBP", "EUR", "XOF", "XAF
 
 export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, currentUserId, userEmail }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing">("business");
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as any) ?? "business";
+  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing">(initialTab);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
   const [uploadingLogo, setUploadingLogo] = useState(false);

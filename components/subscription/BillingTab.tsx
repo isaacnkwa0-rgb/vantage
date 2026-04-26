@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Zap, Star, Loader2, ExternalLink } from "lucide-react";
-import { PLAN_PRICING, PLAN_LIMITS, type PlanTier } from "@/lib/plans";
+import { useSearchParams } from "next/navigation";
+import { Check, Zap, Star, Loader2, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import { PLAN_PRICING, type PlanTier } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -19,6 +20,9 @@ const PLAN_META = {
 export function BillingTab({ business, userEmail }: Props) {
   const [annual, setAnnual] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const paymentSuccess = searchParams.get("success") === "1";
+  const paymentError = searchParams.get("error") === "payment_failed";
   const currentTier = (business.subscription_tier ?? "free") as PlanTier;
   const currentMeta = PLAN_META[currentTier] ?? PLAN_META.free;
 
@@ -76,6 +80,19 @@ export function BillingTab({ business, userEmail }: Props) {
 
   return (
     <div className="max-w-2xl space-y-5">
+      {paymentSuccess && (
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm font-medium">
+          <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+          Payment successful! Your plan has been upgraded.
+        </div>
+      )}
+      {paymentError && (
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          Payment was not completed. Please try again.
+        </div>
+      )}
+
       {/* Current plan */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
         <h3 className="font-semibold text-[#0F172A] mb-4">Current Plan</h3>
