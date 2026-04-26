@@ -41,6 +41,16 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        "scan-line": {
+          "0%": { top: "0%" },
+          "50%": { top: "calc(100% - 2px)" },
+          "100%": { top: "0%" },
+        },
+      },
+      animation: {
+        "scan-line": "scan-line 2s ease-in-out infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
