@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star } from "lucide-react";
+import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard } from "lucide-react";
+import { BillingTab } from "@/components/subscription/BillingTab";
 
 interface Business {
   id: string;
@@ -78,6 +79,7 @@ interface Props {
   locations: Location[];
   categories: Category[];
   currentUserId: string;
+  userEmail: string;
 }
 
 const bizSchema = z.object({
@@ -93,9 +95,9 @@ type BizForm = z.infer<typeof bizSchema>;
 
 const CURRENCIES = ["NGN", "USD", "GHS", "KES", "ZAR", "GBP", "EUR", "XOF", "XAF"];
 
-export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, currentUserId }: Props) {
+export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, currentUserId, userEmail }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff">("business");
+  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing">("business");
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -302,6 +304,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
     { key: "categories", label: "Categories", icon: Tag },
     { key: "locations", label: "Locations", icon: MapPin },
     { key: "staff", label: "Staff & Roles", icon: Users },
+    { key: "billing", label: "Billing & Plan", icon: CreditCard },
   ];
 
   return (
@@ -759,6 +762,11 @@ export function SettingsClient({ business, members, locations: initialLocations,
             </div>
           )}
         </div>
+      )}
+
+      {/* ─── Billing & Plan ─── */}
+      {tab === "billing" && (
+        <BillingTab business={business} userEmail={userEmail} />
       )}
 
       {/* ─── Staff & Roles ─── */}

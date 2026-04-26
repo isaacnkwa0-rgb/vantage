@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -139,14 +139,23 @@ export function Sidebar({ slug }: SidebarProps) {
         </nav>
 
         {/* Bottom */}
-        {userBusinesses.length > 1 && (
-          <div className="px-3 py-4 border-t border-slate-100">
+        <div className="px-3 py-4 border-t border-slate-100 space-y-1">
+          {activeBusiness?.subscription_tier === "free" && (
+            <Link
+              href={`/${slug}/settings?tab=billing`}
+              className="flex items-center gap-2 w-full px-3 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl text-xs font-bold transition shadow-md shadow-green-200"
+            >
+              <Zap className="w-3.5 h-3.5 flex-shrink-0" />
+              Upgrade to Starter
+            </Link>
+          )}
+          {userBusinesses.length > 1 && (
             <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition">
               <ChevronDown className="w-3.5 h-3.5" />
               Switch business
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </aside>
     </>
   );

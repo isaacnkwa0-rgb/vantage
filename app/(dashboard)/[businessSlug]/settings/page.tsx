@@ -49,6 +49,7 @@ export default async function SettingsPage({ params }: Props) {
         locations={(locations ?? []) as any}
         categories={(categories ?? []) as any}
         currentUserId={user.id}
+        userEmail={user.email ?? ""}
       />
     </div>
   );
