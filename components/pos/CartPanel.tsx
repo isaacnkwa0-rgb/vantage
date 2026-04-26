@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Trash2, Plus, Minus, ShoppingBag, Tag, UserCheck, X, ChevronDown } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, Tag, UserCheck, X, ChevronDown, Star } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface Customer {
   id: string;
   name: string;
   phone: string | null;
+  loyalty_points: number;
 }
 
 interface Props {
@@ -20,16 +22,24 @@ interface Props {
   taxEnabled: boolean;
   taxRate: number;
   taxName: string;
+  loyaltyEnabled: boolean;
+  loyaltyPointsPerDollar: number;
+  loyaltyRedemptionRate: number;
   onCheckout: () => void;
   mode?: "selling" | "service";
 }
 
-export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate, taxName, onCheckout, mode = "selling" }: Props) {
+export function CartPanel({
+  customers, currency, businessId, taxEnabled, taxRate, taxName,
+  loyaltyEnabled, loyaltyPointsPerDollar, loyaltyRedemptionRate,
+  onCheckout, mode = "selling",
+}: Props) {
   const router = useRouter();
   const {
     items, removeItem, updateQuantity, setDiscount, setCustomer,
     discountType, discountValue, customerId, customerName,
-    subtotal, discountAmount, taxAmount, total, clearCart, setTaxConfig,
+    subtotal, discountAmount, taxAmount, loyaltyDiscountValue, total,
+    clearCart, setTaxConfig, setLoyaltyRedemption, loyaltyPointsToRedeem,
   } = useCartStore();
 
   useEffect(() => {
@@ -50,7 +60,27 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
   const sub = subtotal();
   const disc = discountAmount();
   const tax = taxAmount();
+  const loyaltyDisc = loyaltyDiscountValue();
   const tot = total();
+
+  const selectedCustomer = customers.find((c) => c.id === customerId);
+  const availablePoints = selectedCustomer?.loyalty_points ?? 0;
+  const pointsToEarn = loyaltyEnabled && customerId ? Math.floor(tot * loyaltyPointsPerDollar) : 0;
+  const maxRedeemablePoints = Math.min(availablePoints, Math.floor((sub - disc + tax) * loyaltyRedemptionRate));
+  const canRedeem = loyaltyEnabled && availablePoints >= loyaltyRedemptionRate && !!customerId;
+
+  function toggleLoyaltyRedemption() {
+    if (loyaltyPointsToRedeem > 0) {
+      setLoyaltyRedemption(0, loyaltyRedemptionRate);
+    } else {
+      setLoyaltyRedemption(maxRedeemablePoints, loyaltyRedemptionRate);
+    }
+  }
+
+  // Reset loyalty redemption when customer changes
+  useEffect(() => {
+    setLoyaltyRedemption(0, loyaltyRedemptionRate);
+  }, [customerId, loyaltyRedemptionRate, setLoyaltyRedemption]);
 
   const filteredCustomers = customers.filter((c) =>
     c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
@@ -70,7 +100,7 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
     const { data } = await supabase
       .from("customers")
       .insert({ business_id: businessId, name: newCustomerName.trim(), phone: newCustomerPhone || null })
-      .select("id, name")
+      .select("id, name, loyalty_points")
       .single();
     if (data) {
       setCustomer(data.id, data.name);
@@ -117,12 +147,8 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[#0F172A] truncate">{item.name}</p>
-                {item.variantName && (
-                  <p className="text-xs text-slate-400">{item.variantName}</p>
-                )}
-                <p className="font-numeric text-sm text-green-600 font-semibold mt-0.5">
-                  {fmt(item.unitPrice)}
-                </p>
+                {item.variantName && <p className="text-xs text-slate-400">{item.variantName}</p>}
+                <p className="font-numeric text-sm text-green-600 font-semibold mt-0.5">{fmt(item.unitPrice)}</p>
               </div>
               <button
                 onClick={() => removeItem(item.productId, item.variantId)}
@@ -132,7 +158,6 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
               </button>
             </div>
             <div className="flex items-center justify-between mt-2">
-              {/* Qty stepper */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => updateQuantity(item.productId, item.quantity - 1, item.variantId)}
@@ -140,9 +165,7 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="font-numeric text-sm font-semibold w-6 text-center">
-                  {item.quantity}
-                </span>
+                <span className="font-numeric text-sm font-semibold w-6 text-center">{item.quantity}</span>
                 <button
                   onClick={() => updateQuantity(item.productId, item.quantity + 1, item.variantId)}
                   className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-green-400 transition"
@@ -158,7 +181,7 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
         ))}
       </div>
 
-      {/* Customer + Discount */}
+      {/* Customer + Discount + Loyalty */}
       <div className="px-3 py-2 space-y-2 border-t border-slate-100">
         {/* Customer selector */}
         <div className="relative">
@@ -200,10 +223,17 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
                 <button
                   key={c.id}
                   onClick={() => { setCustomer(c.id, c.name); setShowCustomerSearch(false); setCustomerSearch(""); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-slate-50 text-left text-sm"
+                  className="w-full flex items-center justify-between gap-2 px-3 py-2.5 hover:bg-slate-50 text-left text-sm"
                 >
-                  <span className="font-medium text-[#0F172A]">{c.name}</span>
-                  {c.phone && <span className="text-slate-400 text-xs">{c.phone}</span>}
+                  <div>
+                    <span className="font-medium text-[#0F172A]">{c.name}</span>
+                    {c.phone && <span className="text-slate-400 text-xs ml-2">{c.phone}</span>}
+                  </div>
+                  {loyaltyEnabled && c.loyalty_points > 0 && (
+                    <span className="text-[10px] bg-amber-50 text-amber-600 font-semibold px-1.5 py-0.5 rounded-full border border-amber-200 flex-shrink-0">
+                      ⭐ {c.loyalty_points} pts
+                    </span>
+                  )}
                 </button>
               ))}
               <button
@@ -215,6 +245,34 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
             </div>
           )}
         </div>
+
+        {/* Loyalty points row (shown when customer selected and loyalty enabled) */}
+        {customerId && loyaltyEnabled && (
+          <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+            <div className="flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-amber-700">{availablePoints} pts available</p>
+                <p className="text-[10px] text-amber-600">+{pointsToEarn} pts on this sale</p>
+              </div>
+            </div>
+            {canRedeem && (
+              <button
+                onClick={toggleLoyaltyRedemption}
+                className={cn(
+                  "text-[11px] px-2.5 py-1 rounded-lg font-semibold transition flex-shrink-0",
+                  loyaltyPointsToRedeem > 0
+                    ? "bg-amber-500 text-white"
+                    : "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                )}
+              >
+                {loyaltyPointsToRedeem > 0
+                  ? `✓ -{fmt(loyaltyDisc)}`
+                  : `Redeem (-${fmt(maxRedeemablePoints / loyaltyRedemptionRate)})`}
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Add customer mini form */}
         {showAddCustomer && (
@@ -294,6 +352,12 @@ export function CartPanel({ customers, currency, businessId, taxEnabled, taxRate
           <div className="flex justify-between text-sm text-amber-600">
             <span>{taxName} ({taxRate}%)</span>
             <span className="font-numeric">+{fmt(tax)}</span>
+          </div>
+        )}
+        {loyaltyDisc > 0 && (
+          <div className="flex justify-between text-sm text-amber-500">
+            <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Loyalty</span>
+            <span className="font-numeric">-{fmt(loyaltyDisc)}</span>
           </div>
         )}
         <div className="flex justify-between text-base font-bold text-[#0F172A] pt-1 border-t border-slate-100">

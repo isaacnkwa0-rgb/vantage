@@ -23,6 +23,8 @@ interface CartState {
   taxEnabled: boolean;
   taxRate: number;
   taxName: string;
+  loyaltyPointsToRedeem: number;
+  loyaltyRedemptionRate: number; // points per $1 off
 
   // Actions
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
@@ -36,12 +38,14 @@ interface CartState {
   setCustomer: (id: string | null, name: string | null) => void;
   setNote: (note: string) => void;
   setTaxConfig: (enabled: boolean, rate: number, name: string) => void;
+  setLoyaltyRedemption: (pts: number, rate: number) => void;
   clearCart: () => void;
 
-  // Computed (derived from items + discount + tax)
+  // Computed (derived from items + discount + tax + loyalty)
   subtotal: () => number;
   discountAmount: () => number;
   taxAmount: () => number;
+  loyaltyDiscountValue: () => number;
   total: () => number;
   totalCost: () => number;
   itemCount: () => number;
@@ -57,6 +61,8 @@ export const useCartStore = create<CartState>()((set, get) => ({
   taxEnabled: false,
   taxRate: 0,
   taxName: "VAT",
+  loyaltyPointsToRedeem: 0,
+  loyaltyRedemptionRate: 100,
 
   addItem: (item) => {
     set((state) => {
@@ -106,6 +112,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
   setCustomer: (id, name) => set({ customerId: id, customerName: name }),
   setNote: (note) => set({ note }),
   setTaxConfig: (enabled, rate, name) => set({ taxEnabled: enabled, taxRate: rate, taxName: name }),
+  setLoyaltyRedemption: (pts, rate) => set({ loyaltyPointsToRedeem: pts, loyaltyRedemptionRate: rate }),
 
   clearCart: () =>
     set((state) => ({
@@ -115,10 +122,12 @@ export const useCartStore = create<CartState>()((set, get) => ({
       customerId: null,
       customerName: null,
       note: "",
-      // Preserve tax config across sales
+      loyaltyPointsToRedeem: 0,
+      // Preserve configs across sales
       taxEnabled: state.taxEnabled,
       taxRate: state.taxRate,
       taxName: state.taxName,
+      loyaltyRedemptionRate: state.loyaltyRedemptionRate,
     })),
 
   subtotal: () => get().items.reduce((s, i) => s + i.unitPrice * i.quantity, 0),
@@ -137,7 +146,16 @@ export const useCartStore = create<CartState>()((set, get) => ({
     return (get().subtotal() - get().discountAmount()) * taxRate / 100;
   },
 
-  total: () => get().subtotal() - get().discountAmount() + get().taxAmount(),
+  loyaltyDiscountValue: () => {
+    const { loyaltyPointsToRedeem, loyaltyRedemptionRate } = get();
+    if (!loyaltyPointsToRedeem || !loyaltyRedemptionRate) return 0;
+    return loyaltyPointsToRedeem / loyaltyRedemptionRate;
+  },
+
+  total: () => {
+    const base = get().subtotal() - get().discountAmount() + get().taxAmount();
+    return Math.max(0, base - get().loyaltyDiscountValue());
+  },
 
   totalCost: () =>
     get().items.reduce((s, i) => s + i.costPrice * i.quantity, 0),

@@ -16,7 +16,7 @@ export default async function POSPage({ params }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, currency, phone, address, logo_url, tax_enabled, tax_rate, tax_name, business_type")
+    .select("id, name, currency, phone, address, logo_url, tax_enabled, tax_rate, tax_name, business_type, loyalty_enabled, loyalty_points_per_dollar, loyalty_redemption_rate")
     .eq("slug", businessSlug)
     .single();
   if (!business) redirect("/onboarding");
@@ -32,20 +32,30 @@ export default async function POSPage({ params }: Props) {
       .order("name"),
     supabase
       .from("customers")
-      .select("id, name, phone")
+      .select("id, name, phone, loyalty_points")
       .eq("business_id", business.id)
       .order("name"),
   ]);
 
   const products = productsRes.data ?? [];
-  const customers = customersRes.data ?? [];
+  const customers = (customersRes.data ?? []).map((c) => ({
+    ...c,
+    loyalty_points: c.loyalty_points ?? 0,
+  }));
+
+  const businessData = {
+    ...business,
+    loyalty_enabled: business.loyalty_enabled ?? false,
+    loyalty_points_per_dollar: business.loyalty_points_per_dollar ?? 1,
+    loyalty_redemption_rate: business.loyalty_redemption_rate ?? 100,
+  };
 
   if (isService) {
     return (
       <ServicePOSClient
         services={products as any}
         customers={customers as any}
-        business={business as any}
+        business={businessData as any}
         userId={user.id}
       />
     );
@@ -55,7 +65,7 @@ export default async function POSPage({ params }: Props) {
     <POSClient
       products={products as any}
       customers={customers as any}
-      business={business as any}
+      business={businessData as any}
       userId={user.id}
     />
   );

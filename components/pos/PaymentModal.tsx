@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, Loader2, Banknote, CreditCard, ArrowLeftRight, BookOpen } from "lucide-react";
+import { X, Loader2, Banknote, CreditCard, ArrowLeftRight, BookOpen, WifiOff } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useOfflineStore } from "@/store/offlineStore";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,7 +18,9 @@ interface Business {
 interface Props {
   business: Business;
   userId: string;
-  customers: Array<{ id: string; name: string; phone: string | null }>;
+  customers: Array<{ id: string; name: string; phone: string | null; loyalty_points?: number }>;
+  loyaltyEnabled: boolean;
+  loyaltyPointsPerDollar: number;
   onClose: () => void;
   onSuccess: (sale: any) => void;
 }
@@ -29,11 +32,13 @@ const PAYMENT_METHODS = [
   { value: "credit", label: "Credit", icon: BookOpen },
 ];
 
-export function PaymentModal({ business, userId, customers, onClose, onSuccess }: Props) {
+export function PaymentModal({ business, userId, customers, loyaltyEnabled, loyaltyPointsPerDollar, onClose, onSuccess }: Props) {
   const {
     items, discountType, discountValue, discountAmount, customerId, customerName,
-    subtotal, taxAmount, total, totalCost, clearCart,
+    subtotal, taxAmount, total, clearCart, loyaltyPointsToRedeem,
   } = useCartStore();
+
+  const { addPendingSale } = useOfflineStore();
 
   const [paymentMethod, setPaymentMethod] = useState<string>("cash");
   const [amountPaid, setAmountPaid] = useState(total().toFixed(2));
@@ -45,8 +50,8 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
   const paid = parseFloat(amountPaid) || 0;
   const change = Math.max(0, paid - tot);
   const fmt = (n: number) => formatCurrency(n, business.currency);
-
   const isCredit = paymentMethod === "credit";
+  const pointsToEarn = loyaltyEnabled && customerId && !isCredit ? Math.floor(tot * loyaltyPointsPerDollar) : 0;
 
   async function handleCharge() {
     if (isCredit && !customerId) {
@@ -60,17 +65,77 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
     setError(null);
     setLoading(true);
 
+    const sub = subtotal();
+    const disc = discountAmount();
+    const taxAmt = taxAmount();
+    const customerObj = customers.find((c) => c.id === customerId);
+
+    // Offline path — queue the sale for later sync
+    if (!navigator.onLine) {
+      addPendingSale({
+        businessId: business.id,
+        userId,
+        customerId,
+        customerName: customerObj?.name ?? customerName ?? null,
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId,
+          productName: i.name,
+          variantName: i.variantName ?? null,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+          costPrice: i.costPrice,
+        })),
+        subtotal: sub,
+        discountType,
+        discountValue,
+        discountAmount: disc,
+        taxAmount: taxAmt,
+        total: tot,
+        amountPaid: isCredit ? 0 : paid,
+        changeAmount: isCredit ? 0 : change,
+        paymentMethod,
+        paymentReference: reference,
+        loyaltyPointsToEarn: pointsToEarn,
+        loyaltyPointsToRedeem,
+        createdAt: new Date().toISOString(),
+      });
+
+      const offlineId = `OFFLINE-${Date.now()}`;
+      clearCart();
+      onSuccess({
+        id: offlineId,
+        sale_number: offlineId,
+        total_amount: tot,
+        amount_paid: isCredit ? 0 : paid,
+        change_amount: isCredit ? 0 : change,
+        payment_method: paymentMethod,
+        subtotal: sub,
+        discount_amount: disc,
+        tax_amount: taxAmt,
+        created_at: new Date().toISOString(),
+        customer_name: customerObj?.name ?? customerName ?? null,
+        customer_phone: customerObj?.phone ?? null,
+        items: items.map((i) => ({
+          product_name: i.name,
+          variant_name: i.variantName ?? null,
+          quantity: i.quantity,
+          unit_price: i.unitPrice,
+          line_total: i.unitPrice * i.quantity,
+        })),
+        _offline: true,
+      });
+      return;
+    }
+
+    // Online path
     const supabase = createClient();
 
-    // Generate sale number
     const { data: saleNumData } = await supabase
       .rpc("generate_sale_number", { p_business_id: business.id });
 
     const saleNumber = saleNumData ?? `INV-${Date.now()}`;
-    const sub = subtotal();
-    const disc = discountAmount();
 
-    // Insert sale
     const { data: sale, error: saleErr } = await supabase
       .from("sales")
       .insert({
@@ -81,7 +146,7 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
         discount_type: discountType,
         discount_value: discountValue,
         discount_amount: disc,
-        tax_amount: taxAmount(),
+        tax_amount: taxAmt,
         total_amount: tot,
         amount_paid: isCredit ? 0 : paid,
         change_amount: isCredit ? 0 : change,
@@ -99,7 +164,6 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
       return;
     }
 
-    // Insert sale items
     const { error: itemsErr } = await supabase.from("sale_items").insert(
       items.map((item) => ({
         sale_id: sale.id,
@@ -121,7 +185,6 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
       return;
     }
 
-    // Increment customer credit balance for credit sales
     if (isCredit && customerId) {
       const { data: cust } = await supabase
         .from("customers").select("credit_balance").eq("id", customerId).single();
@@ -130,7 +193,12 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
       }).eq("id", customerId);
     }
 
-    const customerObj = customers.find((c) => c.id === customerId);
+    if (loyaltyEnabled && customerId && !isCredit) {
+      const { data: cust } = await supabase
+        .from("customers").select("loyalty_points").eq("id", customerId).single();
+      const newPoints = Math.max(0, (cust?.loyalty_points ?? 0) + pointsToEarn - loyaltyPointsToRedeem);
+      await supabase.from("customers").update({ loyalty_points: newPoints }).eq("id", customerId);
+    }
 
     clearCart();
     onSuccess({
@@ -158,19 +226,27 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
         </div>
 
         <div className="p-5 space-y-5">
-          {/* Amount due */}
+          {!navigator.onLine && (
+            <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-700 text-sm px-3 py-2 rounded-lg">
+              <WifiOff className="w-4 h-4 flex-shrink-0" />
+              Offline — sale will be saved locally and synced when connected.
+            </div>
+          )}
+
           <div className="bg-[#0F172A] rounded-xl p-4 text-center">
             <p className="text-slate-400 text-sm">Amount Due</p>
             <p className="font-numeric text-3xl font-bold text-white mt-1">{fmt(tot)}</p>
             {discountAmount() > 0 && (
               <p className="text-emerald-400 text-xs mt-1">Discount: -{fmt(discountAmount())}</p>
             )}
+            {loyaltyEnabled && pointsToEarn > 0 && (
+              <p className="text-amber-400 text-xs mt-1">+{pointsToEarn} loyalty pts to earn</p>
+            )}
           </div>
 
-          {/* Payment method */}
           <div>
             <p className="text-sm font-medium text-[#0F172A] mb-2">Payment Method</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               {PAYMENT_METHODS.map((m) => (
                 <button
                   key={m.value}
@@ -188,7 +264,6 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
             </div>
           </div>
 
-          {/* Credit info */}
           {isCredit && (
             <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm px-3 py-2 rounded-lg">
               {customerId
@@ -197,7 +272,6 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
             </div>
           )}
 
-          {/* Amount paid (cash only) */}
           {paymentMethod === "cash" && (
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">
@@ -219,8 +293,7 @@ export function PaymentModal({ business, userId, customers, onClose, onSuccess }
             </div>
           )}
 
-          {/* Reference for card/transfer */}
-          {paymentMethod !== "cash" && (
+          {paymentMethod !== "cash" && !isCredit && (
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">
                 Reference / Transaction ID{" "}

@@ -22,6 +22,7 @@ interface Customer {
   id: string;
   name: string;
   phone: string | null;
+  loyalty_points: number;
 }
 
 interface Business {
@@ -34,6 +35,9 @@ interface Business {
   tax_enabled: boolean;
   tax_rate: number;
   tax_name: string;
+  loyalty_enabled: boolean;
+  loyalty_points_per_dollar: number;
+  loyalty_redemption_rate: number;
 }
 
 interface CompletedSale {
@@ -127,6 +131,9 @@ export function ServicePOSClient({ services, customers, business, userId }: Prop
             taxEnabled={business.tax_enabled}
             taxRate={business.tax_rate}
             taxName={business.tax_name}
+            loyaltyEnabled={business.loyalty_enabled}
+            loyaltyPointsPerDollar={business.loyalty_points_per_dollar}
+            loyaltyRedemptionRate={business.loyalty_redemption_rate}
             onCheckout={() => setShowPayment(true)}
             mode="service"
           />
@@ -138,6 +145,8 @@ export function ServicePOSClient({ services, customers, business, userId }: Prop
           business={business}
           userId={userId}
           customers={customers}
+          loyaltyEnabled={business.loyalty_enabled}
+          loyaltyPointsPerDollar={business.loyalty_points_per_dollar}
           onClose={() => setShowPayment(false)}
           onSuccess={(sale) => {
             setShowPayment(false);
