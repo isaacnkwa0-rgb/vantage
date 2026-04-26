@@ -127,6 +127,21 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
     setUploading(false);
   }
 
+  async function contributeBarcodeToLocalDB(data: FormData) {
+    if (!data.barcode?.trim()) return;
+    try {
+      await fetch("/api/barcode-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          barcode: data.barcode.trim(),
+          name: data.name,
+          description: data.description || null,
+        }),
+      });
+    } catch {}
+  }
+
   async function onSubmit(data: FormData) {
     setError(null);
     const supabase = createClient();
@@ -160,6 +175,9 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
       const { error: err } = await supabase.from("products").insert(payload);
       if (err) { setError(err.message); return; }
     }
+
+    // Contribute barcode to shared local DB (fire and forget)
+    contributeBarcodeToLocalDB(data);
 
     router.refresh();
     onClose();
