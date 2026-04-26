@@ -219,7 +219,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           {scanStatus === "notfound" && (
             <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-3 py-2 rounded-lg">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Barcode saved — product not found in database. Fill details manually.
+              <span>Barcode saved but not found in global databases — local/regional brands may not be listed. Fill details manually.</span>
             </div>
           )}
 

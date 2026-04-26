@@ -1,55 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const barcode = req.nextUrl.searchParams.get("barcode");
-  if (!barcode) return NextResponse.json({ error: "No barcode provided" }, { status: 400 });
+async function tryOpenFacts(domain: string, barcode: string) {
+  try {
+    const res = await fetch(
+      `https://${domain}/api/v0/product/${barcode}.json`,
+      { next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.status !== 1 || !data.product) return null;
+    const p = data.product;
+    const name = p.product_name || p.abbreviated_product_name || p.generic_name;
+    if (!name) return null;
+    return {
+      name: name.trim(),
+      brand: p.brands?.split(",")[0]?.trim() || null,
+      description: p.generic_name?.trim() || null,
+      imageUrl: p.image_url ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
 
-  // Try UPCitemdb first (good for electronics, general retail)
+async function tryUPCitemdb(barcode: string) {
   try {
     const res = await fetch(
       `https://api.upcitemdb.com/prod/trial/lookup?upc=${barcode}`,
       { headers: { Accept: "application/json" }, next: { revalidate: 86400 } }
     );
-    if (res.ok) {
-      const data = await res.json();
-      if (data.code === "OK" && data.items?.length > 0) {
-        const item = data.items[0];
-        if (item.title) {
-          return NextResponse.json({
-            name: item.title,
-            brand: item.brand || null,
-            description: [item.description, item.model].filter(Boolean).join(" — ") || null,
-            imageUrl: item.images?.[0] ?? null,
-            barcode,
-          });
-        }
-      }
-    }
-  } catch {}
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.code !== "OK" || !data.items?.length) return null;
+    const item = data.items[0];
+    if (!item.title) return null;
+    return {
+      name: item.title.trim(),
+      brand: item.brand || null,
+      description: item.description?.trim() || null,
+      imageUrl: item.images?.[0] ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
 
-  // Fallback: Open Food Facts (great for food, beverages, FMCG)
-  try {
-    const res = await fetch(
-      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
-      { next: { revalidate: 86400 } }
-    );
-    if (res.ok) {
-      const data = await res.json();
-      if (data.status === 1 && data.product) {
-        const p = data.product;
-        const name = p.product_name || p.abbreviated_product_name || p.generic_name;
-        if (name) {
-          return NextResponse.json({
-            name,
-            brand: p.brands || null,
-            description: p.generic_name || null,
-            imageUrl: p.image_url ?? null,
-            barcode,
-          });
-        }
-      }
-    }
-  } catch {}
+export async function GET(req: NextRequest) {
+  const barcode = req.nextUrl.searchParams.get("barcode");
+  if (!barcode) return NextResponse.json({ error: "No barcode provided" }, { status: 400 });
+
+  // Run all lookups in parallel for speed
+  const [upc, food, beauty, products] = await Promise.all([
+    tryUPCitemdb(barcode),
+    tryOpenFacts("world.openfoodfacts.org", barcode),
+    tryOpenFacts("world.openbeautyfacts.org", barcode),
+    tryOpenFacts("world.openproductsfacts.org", barcode),
+  ]);
+
+  const result = upc || food || beauty || products;
+
+  if (result) {
+    return NextResponse.json({ ...result, barcode });
+  }
 
   return NextResponse.json({ error: "Product not found in database" }, { status: 404 });
 }
