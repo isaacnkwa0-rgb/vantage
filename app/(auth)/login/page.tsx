@@ -243,12 +243,23 @@ export default function LoginPage() {
   async function onSubmit(data: FormData) {
     setError(null);
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { error: authError, data: authData } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
     });
     if (authError) { setError(authError.message); return; }
-    router.refresh();
+
+    const { data: membership } = await supabase
+      .from("business_members")
+      .select("businesses(slug)")
+      .eq("user_id", authData.user.id)
+      .eq("is_active", true)
+      .limit(1)
+      .single();
+
+    const biz = membership?.businesses as unknown as { slug: string } | { slug: string }[] | null;
+    const slug = Array.isArray(biz) ? biz[0]?.slug : biz?.slug;
+    router.push(slug ? `/${slug}/dashboard` : "/onboarding");
   }
 
   return (
