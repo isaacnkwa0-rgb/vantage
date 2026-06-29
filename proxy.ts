@@ -6,39 +6,38 @@ const AUTH_PATHS = ["/login", "/register"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Always refresh session
-  const { supabaseResponse, user, supabase } = await updateSession(request);
-
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
   const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p));
   const isRoot = pathname === "/";
 
-  // Not logged in → redirect to login
-  if (!user && !isPublic) {
+  // Fast path: skip Supabase network call when no session cookie exists.
+  // Supabase stores its session in a cookie containing "-auth-token".
+  const hasSessionCookie = request.cookies
+    .getAll()
+    .some((c) => c.name.includes("-auth-token"));
+
+  if (!hasSessionCookie) {
+    if (isPublic || isRoot) return NextResponse.next();
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // Logged in + visiting auth pages → redirect to app
-  if (user && isAuthPath) {
-    const { data: membership } = await supabase
-      .from("business_members")
-      .select("businesses!inner(slug)")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .limit(1)
-      .single();
+  // Session cookie exists — validate with Supabase and handle routing.
+  const { supabaseResponse, user, supabase } = await updateSession(request);
 
-    const slug = (membership?.businesses as unknown as { slug: string } | null)?.slug;
-    const url = request.nextUrl.clone();
-    url.pathname = slug ? `/${slug}/dashboard` : "/onboarding";
-    return NextResponse.redirect(url);
+  if (!user) {
+    // Cookie present but invalid/expired.
+    if (!isPublic) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
   }
 
-  // Root redirect
-  if (user && isRoot) {
+  // Logged-in user visiting auth page or root → send to dashboard.
+  if (isAuthPath || isRoot) {
     const { data: membership } = await supabase
       .from("business_members")
       .select("businesses!inner(slug)")
@@ -47,7 +46,9 @@ export async function proxy(request: NextRequest) {
       .limit(1)
       .single();
 
-    const slug = (membership?.businesses as unknown as { slug: string } | null)?.slug;
+    const slug = (
+      membership?.businesses as unknown as { slug: string } | null
+    )?.slug;
     const url = request.nextUrl.clone();
     url.pathname = slug ? `/${slug}/dashboard` : "/onboarding";
     return NextResponse.redirect(url);
