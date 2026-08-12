@@ -234,7 +234,7 @@ export function TopBar({ title }: TopBarProps) {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden">
+            <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-1rem))] bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden">
               <div className="h-0.5 bg-gradient-to-r from-green-600 to-green-400" />
               <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                 <p className="font-semibold text-sm text-[#0F172A]">Notifications</p>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ShoppingCart, Plus, Package, Users, FileText, Receipt, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -43,23 +43,34 @@ const SERVICE_ACTIONS = [
 
 export function DashboardHeader({ businessName, businessType, slug }: Props) {
   const [showMore, setShowMore] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
   const actions = businessType === "service" ? SERVICE_ACTIONS : QUICK_ACTIONS;
   const primaryAction = actions[0];
   const secondaryActions = actions.slice(1);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!showMore) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setShowMore(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showMore]);
+
   return (
     <div className="space-y-4">
       {/* Greeting */}
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs text-slate-400 font-medium">{getFormattedDate()}</p>
-          <h1 className="text-xl font-bold text-slate-900 mt-0.5">
-            {getGreeting()}, {businessName} 👋
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Here&apos;s what&apos;s happening with your business today.
-          </p>
-        </div>
+      <div>
+        <p className="text-xs text-slate-400 font-medium">{getFormattedDate()}</p>
+        <h1 className="text-xl font-bold text-slate-900 mt-0.5">
+          {getGreeting()}, {businessName} <span aria-hidden="true">👋</span>
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Here&apos;s what&apos;s happening with your business today.
+        </p>
       </div>
 
       {/* Quick Actions */}
@@ -69,7 +80,7 @@ export function DashboardHeader({ businessName, businessType, slug }: Props) {
           href={`/${slug}/${primaryAction.href}`}
           className={cn("flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all", primaryAction.color)}
         >
-          <primaryAction.icon className="w-3.5 h-3.5" />
+          <primaryAction.icon className="w-3.5 h-3.5" aria-hidden="true" />
           {primaryAction.label}
         </Link>
 
@@ -81,30 +92,37 @@ export function DashboardHeader({ businessName, businessType, slug }: Props) {
               href={`/${slug}/${action.href}`}
               className={cn("flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-all", action.color)}
             >
-              <action.icon className="w-3.5 h-3.5" />
+              <action.icon className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden md:inline">{action.label}</span>
             </Link>
           ))}
         </div>
 
-        {/* More — mobile */}
-        <div className="relative sm:hidden">
+        {/* More dropdown — mobile only */}
+        <div ref={moreRef} className="relative sm:hidden">
           <button
-            onClick={() => setShowMore(!showMore)}
+            onClick={() => setShowMore((v) => !v)}
+            aria-expanded={showMore}
+            aria-haspopup="true"
+            aria-label="More actions"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
           >
-            More <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", showMore && "rotate-180")} />
+            More <ChevronDown aria-hidden="true" className={cn("w-3.5 h-3.5 transition-transform", showMore && "rotate-180")} />
           </button>
           {showMore && (
-            <div className="absolute top-full left-0 mt-1.5 bg-white rounded-xl border border-slate-200 shadow-lg z-20 w-44 py-1">
+            <div
+              role="menu"
+              className="absolute top-full left-0 mt-1.5 bg-white rounded-xl border border-slate-200 shadow-lg z-20 w-48 py-1"
+            >
               {secondaryActions.map((action) => (
                 <Link
                   key={action.href}
                   href={`/${slug}/${action.href}`}
+                  role="menuitem"
                   onClick={() => setShowMore(false)}
                   className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition"
                 >
-                  <action.icon className="w-4 h-4 text-slate-400" />
+                  <action.icon className="w-4 h-4 text-slate-400" aria-hidden="true" />
                   {action.label}
                 </Link>
               ))}

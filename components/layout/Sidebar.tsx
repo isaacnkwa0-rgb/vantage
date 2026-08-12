@@ -148,7 +148,7 @@ function NavLink({ href, label, Icon, isActive, collapsed, onClick }: NavLinkPro
       className={cn(
         "flex items-center gap-2.5 rounded-lg text-[13px] font-medium transition-all duration-150",
         collapsed
-          ? "lg:w-9 lg:h-9 lg:justify-center px-3 py-2 lg:p-0"
+          ? "px-3 py-2 lg:w-9 lg:h-9 lg:p-0 lg:justify-center"
           : "px-3 py-2",
         isActive
           ? "bg-green-600 text-white shadow-md shadow-green-900/30"
@@ -377,30 +377,30 @@ export function Sidebar({ slug }: { slug: string }) {
 
         {/* Bottom upgrade CTA */}
         {activeBusiness?.subscription_tier === "free" && (
-          <div
-            className={cn(
-              "flex-shrink-0 border-t border-white/5 p-2",
-              sidebarCollapsed ? "lg:flex lg:justify-center" : ""
+          <div className="flex-shrink-0 border-t border-white/5 p-2">
+            {/* Desktop collapsed: icon + tooltip */}
+            {sidebarCollapsed && (
+              <div className="hidden lg:flex justify-center">
+                <div className="relative group/tip">
+                  <Link
+                    href={`/${slug}/settings?tab=billing`}
+                    aria-label="Upgrade to Starter"
+                    className="flex w-9 h-9 items-center justify-center rounded-lg bg-green-700 hover:bg-green-600 text-white transition shadow-md shadow-green-900/50"
+                  >
+                    <Zap className="w-4 h-4" aria-hidden="true" />
+                  </Link>
+                  <Tooltip label="Upgrade to Starter" />
+                </div>
+              </div>
             )}
-          >
-            {/* Collapsed: icon button with tooltip */}
-            <div className={cn("hidden", sidebarCollapsed && "lg:block relative group/tip")}>
-              <Link
-                href={`/${slug}/settings?tab=billing`}
-                className="flex w-9 h-9 items-center justify-center rounded-lg bg-green-700 hover:bg-green-600 text-white transition shadow-md shadow-green-900/50"
-              >
-                <Zap className="w-4 h-4" />
-              </Link>
-              <Tooltip label="Upgrade to Starter" />
-            </div>
 
-            {/* Expanded */}
+            {/* Expanded (mobile always, desktop when not collapsed) */}
             <div className={cn(sidebarCollapsed && "lg:hidden")}>
               <Link
                 href={`/${slug}/settings?tab=billing`}
                 className="flex items-center gap-2 w-full px-3 py-2.5 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-green-900/40"
               >
-                <Zap className="w-3.5 h-3.5 flex-shrink-0" />
+                <Zap className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                 <span>Upgrade to Starter</span>
               </Link>
             </div>

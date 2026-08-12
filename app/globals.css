@@ -125,8 +125,16 @@
   @apply fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start justify-center pt-[12vh];
 }
 
+/* ── iOS safe area for bottom nav ── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(4rem + env(safe-area-inset-bottom));
+  }
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .skeleton { animation: none; background: #f1f5f9; }
+  .skeleton { animation: none; background: #f1f5f9; will-change: auto; }
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
