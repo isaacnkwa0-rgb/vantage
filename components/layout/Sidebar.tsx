@@ -40,6 +40,7 @@ import {
   Barcode,
   Thermometer,
   BellRing,
+  Landmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -75,6 +76,7 @@ const SELLING_NAV = [
   { label: "Barcode Labels", icon: Barcode, href: "barcode-labels" },
   { label: "Thermal Printer", icon: Thermometer, href: "thermal-printer" },
   { label: "Notifications", icon: BellRing, href: "notifications" },
+  { label: "Bank Accounts", icon: Landmark, href: "bank-accounts" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
