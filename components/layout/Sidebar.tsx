@@ -20,6 +20,7 @@ import {
   Briefcase,
   UserCheck,
   Ticket,
+  FilePen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -30,6 +31,7 @@ const SELLING_NAV = [
   { label: "Point of Sale", icon: ShoppingCart, href: "pos" },
   { label: "Transactions", icon: ClipboardList, href: "sales" },
   { label: "Invoices", icon: FileText, href: "invoices" },
+  { label: "Quotes", icon: FilePen, href: "quotes" },
   { label: "Discounts", icon: Ticket, href: "discounts" },
   { label: "Products", icon: Package, href: "products" },
   { label: "Customers", icon: Users, href: "customers" },
@@ -44,6 +46,7 @@ const SERVICE_NAV = [
   { label: "Record Service", icon: Scissors, href: "pos" },
   { label: "Transactions", icon: ClipboardList, href: "sales" },
   { label: "Invoices", icon: FileText, href: "invoices" },
+  { label: "Quotes", icon: FilePen, href: "quotes" },
   { label: "Discounts", icon: Ticket, href: "discounts" },
   { label: "Services", icon: Briefcase, href: "products" },
   { label: "Clients", icon: UserCheck, href: "customers" },
