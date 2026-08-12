@@ -47,7 +47,25 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Multi-currency
+  const SUPPORTED_CURRENCIES = ["NGN", "USD", "GBP", "CAD", "GHS", "KES", "ZAR", "EUR"];
+  const [txCurrency, setTxCurrency] = useState(business.currency);
+  const [exchangeRate, setExchangeRate] = useState(1);
+  const [fetchingRate, setFetchingRate] = useState(false);
+
+  async function switchCurrency(target: string) {
+    setTxCurrency(target);
+    if (target === business.currency) { setExchangeRate(1); return; }
+    setFetchingRate(true);
+    const res = await fetch(`/api/exchange-rate?base=${business.currency}&target=${target}`);
+    const data = await res.json();
+    setExchangeRate(data.rate ?? 1);
+    setFetchingRate(false);
+  }
+
   const tot = total();
+  const foreignTotal = tot * exchangeRate;
+  const fmtForeign = (n: number) => new Intl.NumberFormat("en", { style: "currency", currency: txCurrency, minimumFractionDigits: 2 }).format(n);
   const paid = parseFloat(amountPaid) || 0;
   const change = Math.max(0, paid - tot);
   const fmt = (n: number) => formatCurrency(n, business.currency);
@@ -156,6 +174,8 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
         payment_status: isCredit ? "unpaid" : "paid",
         discount_code_id: promoCodeId ?? null,
         served_by: userId,
+        transaction_currency: txCurrency !== business.currency ? txCurrency : null,
+        exchange_rate: txCurrency !== business.currency ? exchangeRate : 1,
       })
       .select()
       .single();
@@ -261,12 +281,34 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
           <div className="bg-[#0F172A] rounded-xl p-4 text-center">
             <p className="text-slate-400 text-sm">Amount Due</p>
             <p className="font-numeric text-3xl font-bold text-white mt-1">{fmt(tot)}</p>
+            {txCurrency !== business.currency && !fetchingRate && (
+              <p className="text-blue-300 text-sm font-numeric mt-1">≈ {fmtForeign(foreignTotal)} @ {exchangeRate.toFixed(4)}</p>
+            )}
+            {fetchingRate && <p className="text-slate-400 text-xs mt-1">Fetching rate...</p>}
             {discountAmount() > 0 && (
               <p className="text-emerald-400 text-xs mt-1">Discount: -{fmt(discountAmount())}</p>
             )}
             {loyaltyEnabled && pointsToEarn > 0 && (
               <p className="text-amber-400 text-xs mt-1">+{pointsToEarn} loyalty pts to earn</p>
             )}
+          </div>
+
+          {/* Currency selector */}
+          <div>
+            <p className="text-xs font-medium text-slate-500 mb-1.5">Transaction Currency</p>
+            <div className="flex flex-wrap gap-1.5">
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => switchCurrency(c)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                    txCurrency === c ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
