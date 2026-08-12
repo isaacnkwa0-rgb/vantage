@@ -21,11 +21,18 @@ export default async function CustomersPage({ params }: Props) {
     .single();
   if (!business) redirect("/onboarding");
 
-  const { data: customers } = await supabase
-    .from("customers")
-    .select("*")
-    .eq("business_id", business.id)
-    .order("name");
+  const [customersRes, tagsRes] = await Promise.all([
+    supabase
+      .from("customers")
+      .select("id, name, email, phone, address, notes, credit_balance, total_spent, last_purchase_at, created_at, customer_tag_assignments(tag_id, customer_tags(id, name, color))")
+      .eq("business_id", business.id)
+      .order("name"),
+    supabase
+      .from("customer_tags")
+      .select("id, name, color")
+      .eq("business_id", business.id)
+      .order("name"),
+  ]);
 
   const isService = business.business_type === "service";
 
@@ -33,7 +40,8 @@ export default async function CustomersPage({ params }: Props) {
     <div className="flex flex-col h-full overflow-auto">
       <TopBar title={isService ? "Clients" : "Customers"} />
       <CustomersClient
-        customers={customers ?? []}
+        customers={(customersRes.data ?? []) as any}
+        tags={(tagsRes.data ?? []) as any}
         businessId={business.id}
         currency={business.currency}
         businessType={(business.business_type ?? "retail") as "retail" | "service"}

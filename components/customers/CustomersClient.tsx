@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Users, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Search, Users, AlertCircle, Loader2, Tag } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { CustomerForm } from "./CustomerForm";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+
+interface CustomerTag {
+  id: string;
+  name: string;
+  color: string;
+}
 
 interface Customer {
   id: string;
@@ -13,26 +19,34 @@ interface Customer {
   email: string | null;
   phone: string | null;
   address: string | null;
+  notes: string | null;
   credit_balance: number;
   total_spent: number;
   last_purchase_at: string | null;
   created_at: string;
+  customer_tag_assignments?: Array<{
+    tag_id: string;
+    customer_tags: CustomerTag | null;
+  }>;
 }
 
 interface Props {
   customers: Customer[];
+  tags: CustomerTag[];
   businessId: string;
   currency: string;
   businessType?: "retail" | "service";
 }
 
-export function CustomersClient({ customers, businessId, currency, businessType = "retail" }: Props) {
+export function CustomersClient({ customers, tags: initialTags, businessId, currency, businessType = "retail" }: Props) {
   const isService = businessType === "service";
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [debtorFilter, setDebtorFilter] = useState(false);
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
+  const [tags, setTags] = useState<CustomerTag[]>(initialTags);
   const [recordingPaymentFor, setRecordingPaymentFor] = useState<Customer | null>(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentNote, setPaymentNote] = useState("");
@@ -44,11 +58,18 @@ export function CustomersClient({ customers, businessId, currency, businessType 
       (c.phone ?? "").includes(search) ||
       (c.email ?? "").toLowerCase().includes(search.toLowerCase());
     const matchDebt = !debtorFilter || c.credit_balance > 0;
-    return matchSearch && matchDebt;
+    const matchTag = !tagFilter || c.customer_tag_assignments?.some((a) => a.tag_id === tagFilter);
+    return matchSearch && matchDebt && matchTag;
   });
 
   const fmt = (n: number) => formatCurrency(n, currency);
   const totalOutstanding = customers.reduce((s, c) => s + (c.credit_balance ?? 0), 0);
+
+  function getCustomerTags(customer: Customer): CustomerTag[] {
+    return (customer.customer_tag_assignments ?? [])
+      .map((a) => a.customer_tags)
+      .filter(Boolean) as CustomerTag[];
+  }
 
   async function recordPayment() {
     if (!recordingPaymentFor) return;
@@ -62,6 +83,18 @@ export function CustomersClient({ customers, businessId, currency, businessType 
     setPaymentAmount("");
     setPaymentNote("");
     setRecordingPayment(false);
+    router.refresh();
+  }
+
+  function openEdit(customer: Customer) {
+    setEditing(customer);
+    setShowForm(true);
+  }
+
+  function handleFormClose(newTags?: CustomerTag[]) {
+    setShowForm(false);
+    setEditing(null);
+    if (newTags) setTags(newTags);
     router.refresh();
   }
 
@@ -110,32 +143,56 @@ export function CustomersClient({ customers, businessId, currency, businessType 
         </div>
       </div>
 
-      {/* Debt filter */}
-      {totalOutstanding > 0 && (
-        <button
-          onClick={() => setDebtorFilter((v) => !v)}
-          className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-full border transition font-medium ${
-            debtorFilter
-              ? "bg-red-50 border-red-300 text-red-600"
-              : "bg-white border-slate-200 text-slate-500 hover:border-red-300 hover:text-red-500"
-          }`}
-        >
-          <AlertCircle className="w-3.5 h-3.5" />
-          {debtorFilter ? "Showing debtors only" : "Show debtors only"} · {customers.filter((c) => c.credit_balance > 0).length}
-        </button>
-      )}
+      {/* Filter row */}
+      <div className="flex flex-wrap items-center gap-2">
+        {totalOutstanding > 0 && (
+          <button
+            onClick={() => setDebtorFilter((v) => !v)}
+            className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-full border transition font-medium ${
+              debtorFilter
+                ? "bg-red-50 border-red-300 text-red-600"
+                : "bg-white border-slate-200 text-slate-500 hover:border-red-300 hover:text-red-500"
+            }`}
+          >
+            <AlertCircle className="w-3.5 h-3.5" />
+            {debtorFilter ? "Debtors only" : "Show debtors"} · {customers.filter((c) => c.credit_balance > 0).length}
+          </button>
+        )}
+
+        {tags.length > 0 && (
+          <>
+            <div className="h-4 w-px bg-slate-200" />
+            <Tag className="w-3.5 h-3.5 text-slate-400" />
+            {tags.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTagFilter(tagFilter === t.id ? null : t.id)}
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition font-semibold"
+                style={
+                  tagFilter === t.id
+                    ? { backgroundColor: t.color, borderColor: t.color, color: "#fff" }
+                    : { borderColor: t.color + "60", color: t.color, backgroundColor: t.color + "15" }
+                }
+              >
+                {t.name}
+                {tagFilter === t.id && <span className="opacity-80">×</span>}
+              </button>
+            ))}
+          </>
+        )}
+      </div>
 
       {/* Table */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <Users className="w-14 h-14 text-slate-200 mb-4" />
           <p className="text-slate-600 font-medium">
-            {search
+            {search || tagFilter
               ? `No ${isService ? "clients" : "customers"} found`
               : `No ${isService ? "clients" : "customers"} yet`}
           </p>
           <p className="text-slate-400 text-sm mt-1">
-            {search ? "Try a different search" : `Add your first ${isService ? "client" : "customer"}`}
+            {search || tagFilter ? "Try a different search or filter" : `Add your first ${isService ? "client" : "customer"}`}
           </p>
         </div>
       ) : (
@@ -151,58 +208,68 @@ export function CustomersClient({ customers, businessId, currency, businessType 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filtered.map((customer) => (
-                <tr
-                  key={customer.id}
-                  className="hover:bg-slate-50 transition group"
-                >
-                  <td
-                    className="px-4 py-3 cursor-pointer"
-                    onClick={() => { setEditing(customer); setShowForm(true); }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-                        customer.credit_balance > 0 ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
-                      }`}>
-                        {customer.name.charAt(0).toUpperCase()}
+              {filtered.map((customer) => {
+                const customerTags = getCustomerTags(customer);
+                return (
+                  <tr key={customer.id} className="hover:bg-slate-50 transition group">
+                    <td className="px-4 py-3 cursor-pointer" onClick={() => openEdit(customer)}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                          customer.credit_balance > 0 ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
+                        }`}>
+                          {customer.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-[#0F172A] text-sm">{customer.name}</p>
+                          {customerTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                              {customerTags.map((t) => (
+                                <span
+                                  key={t.id}
+                                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                                  style={{ backgroundColor: t.color + "20", color: t.color }}
+                                >
+                                  {t.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {customer.credit_balance > 0 && (
+                            <span className="text-xs text-red-500 font-semibold">
+                              Owes {fmt(customer.credit_balance)}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-[#0F172A] text-sm">{customer.name}</p>
-                        {customer.credit_balance > 0 && (
-                          <span className="text-xs text-red-500 font-semibold">
-                            Owes {fmt(customer.credit_balance)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <p className="text-sm text-slate-600">{customer.phone ?? customer.email ?? "—"}</p>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <span className="font-numeric text-sm font-semibold text-emerald-600">
-                      {fmt(customer.total_spent)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <span className="text-xs text-slate-400">
-                      {customer.last_purchase_at
-                        ? new Date(customer.last_purchase_at).toLocaleDateString()
-                        : "Never"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {customer.credit_balance > 0 && (
-                      <button
-                        onClick={() => { setRecordingPaymentFor(customer); setPaymentAmount(""); setPaymentNote(""); }}
-                        className="opacity-0 group-hover:opacity-100 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
-                      >
-                        Record Payment
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <p className="text-sm text-slate-600">{customer.phone ?? customer.email ?? "—"}</p>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="font-numeric text-sm font-semibold text-emerald-600">
+                        {fmt(customer.total_spent)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="text-xs text-slate-400">
+                        {customer.last_purchase_at
+                          ? new Date(customer.last_purchase_at).toLocaleDateString()
+                          : "Never"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {customer.credit_balance > 0 && (
+                        <button
+                          onClick={() => { setRecordingPaymentFor(customer); setPaymentAmount(""); setPaymentNote(""); }}
+                          className="opacity-0 group-hover:opacity-100 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
+                        >
+                          Record Payment
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -212,7 +279,8 @@ export function CustomersClient({ customers, businessId, currency, businessType 
         <CustomerForm
           businessId={businessId}
           editingCustomer={editing}
-          onClose={() => { setShowForm(false); setEditing(null); }}
+          tags={tags}
+          onClose={handleFormClose}
         />
       )}
 
