@@ -29,6 +29,7 @@ export function TopBar({ title }: TopBarProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [liveCount, setLiveCount] = useState(0);
   const bellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +43,21 @@ export function TopBar({ title }: TopBarProps) {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotifications]);
+
+  // Subscribe to realtime notifications
+  useEffect(() => {
+    if (!activeBusiness?.id) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`topbar_notif_${activeBusiness.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `business_id=eq.${activeBusiness.id}` },
+        () => setLiveCount((c) => c + 1)
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [activeBusiness?.id]);
 
   const fetchNotifications = useCallback(async () => {
     if (!activeBusiness?.id) return;
@@ -122,8 +138,27 @@ export function TopBar({ title }: TopBarProps) {
       });
     });
 
-    setNotifications(notifs);
-    setCount(notifs.length);
+    // Also fetch persisted notifications
+    const { data: persisted } = await supabase
+      .from("notifications")
+      .select("id, type, title, body, href")
+      .eq("business_id", businessId)
+      .is("read_at", null)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    const persistedNotifs: Notification[] = (persisted ?? []).map((n: any) => ({
+      id: n.id,
+      type: n.type as Notification["type"],
+      title: n.title,
+      body: n.body,
+      href: n.href ?? `/${slug}/notifications`,
+    }));
+
+    const all = [...persistedNotifs, ...notifs];
+    setNotifications(all);
+    setCount(all.length);
+    setLiveCount(0);
     setLoading(false);
   }, [activeBusiness]);
 
@@ -171,9 +206,9 @@ export function TopBar({ title }: TopBarProps) {
             }`}
           >
             <Bell className="w-5 h-5" />
-            {count > 0 && !showNotifications && (
+            {(count > 0 || liveCount > 0) && !showNotifications && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
-                {count > 9 ? "9+" : count}
+                {(count + liveCount) > 9 ? "9+" : count + liveCount}
               </span>
             )}
           </button>
@@ -219,13 +254,22 @@ export function TopBar({ title }: TopBarProps) {
                 </div>
               )}
 
-              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50">
+              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
                 <button
                   onClick={fetchNotifications}
                   className="text-xs text-green-600 hover:underline font-medium"
                 >
                   Refresh
                 </button>
+                {activeBusiness?.slug && (
+                  <Link
+                    href={`/${activeBusiness.slug}/notifications`}
+                    onClick={() => setShowNotifications(false)}
+                    className="text-xs text-slate-500 hover:text-slate-700 font-medium"
+                  >
+                    View all →
+                  </Link>
+                )}
               </div>
             </div>
           )}

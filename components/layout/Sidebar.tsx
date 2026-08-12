@@ -39,6 +39,7 @@ import {
   RefreshCw,
   Barcode,
   Thermometer,
+  BellRing,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -73,6 +74,7 @@ const SELLING_NAV = [
   { label: "Recurring Billing", icon: RefreshCw, href: "recurring" },
   { label: "Barcode Labels", icon: Barcode, href: "barcode-labels" },
   { label: "Thermal Printer", icon: Thermometer, href: "thermal-printer" },
+  { label: "Notifications", icon: BellRing, href: "notifications" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
