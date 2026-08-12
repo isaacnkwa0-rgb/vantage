@@ -32,6 +32,7 @@ import {
   Tag,
   CalendarDays,
   BookOpen,
+  FileX,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -59,6 +60,7 @@ const SELLING_NAV = [
   { label: "Pricing Tiers", icon: Tag, href: "pricing" },
   { label: "Appointments", icon: CalendarDays, href: "appointments" },
   { label: "Cashbook", icon: BookOpen, href: "cashbook" },
+  { label: "Credit Notes", icon: FileX, href: "credit-notes" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
@@ -77,6 +79,7 @@ const SERVICE_NAV = [
   { label: "Analytics", icon: TrendingUp, href: "analytics" },
   { label: "Appointments", icon: CalendarDays, href: "appointments" },
   { label: "Cashbook", icon: BookOpen, href: "cashbook" },
+  { label: "Credit Notes", icon: FileX, href: "credit-notes" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
