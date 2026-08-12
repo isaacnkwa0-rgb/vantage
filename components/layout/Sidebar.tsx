@@ -10,6 +10,7 @@ import {
   Vault,
   ActivitySquare,
   Megaphone,
+  BadgePercent,
   Users,
   Receipt,
   BarChart3,
@@ -45,6 +46,7 @@ const SELLING_NAV = [
   { label: "Expenses", icon: Receipt, href: "expenses" },
   { label: "Reports", icon: BarChart3, href: "reports" },
   { label: "Analytics", icon: TrendingUp, href: "analytics" },
+  { label: "Commissions", icon: BadgePercent, href: "commissions" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];

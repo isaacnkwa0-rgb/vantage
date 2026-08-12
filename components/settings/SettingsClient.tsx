@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer } from "lucide-react";
+import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer, Percent } from "lucide-react";
 import { BillingTab } from "@/components/subscription/BillingTab";
 
 interface Business {
@@ -143,6 +143,10 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [inviting, setInviting] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+
+  // Commission rules state: userId → {type, value}
+  const [commissionRules, setCommissionRules] = useState<Record<string, { type: "percentage" | "flat"; value: string }>>({});
+  const [savingCommission, setSavingCommission] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm<BizForm>({
     resolver: zodResolver(bizSchema),
@@ -318,6 +322,31 @@ export function SettingsClient({ business, members, locations: initialLocations,
       location_id: locationId || null,
     }).eq("id", memberId);
     router.refresh();
+  }
+
+  async function loadCommissionRules() {
+    if (Object.keys(commissionRules).length > 0) return;
+    const supabase = createClient();
+    const { data } = await supabase.from("commission_rules").select("user_id, type, value").eq("business_id", business.id);
+    if (data) {
+      const map: Record<string, { type: "percentage" | "flat"; value: string }> = {};
+      for (const r of data) map[r.user_id] = { type: r.type, value: String(r.value) };
+      setCommissionRules(map);
+    }
+  }
+
+  async function saveCommissionRule(userId: string) {
+    const rule = commissionRules[userId];
+    if (!rule) return;
+    setSavingCommission(userId);
+    const supabase = createClient();
+    await supabase.from("commission_rules").upsert({
+      business_id: business.id,
+      user_id: userId,
+      type: rule.type,
+      value: parseFloat(rule.value) || 0,
+    }, { onConflict: "business_id,user_id" });
+    setSavingCommission(null);
   }
 
   async function saveBranding() {
@@ -953,6 +982,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
       )}
 
       {/* ─── Staff & Roles ─── */}
+      {tab === "staff" && (() => { loadCommissionRules(); return null; })()}
       {tab === "staff" && (
         <div className="max-w-xl space-y-5">
           {/* Invite */}
@@ -1065,6 +1095,35 @@ export function SettingsClient({ business, members, locations: initialLocations,
                         </select>
                       </div>
                     )}
+
+                    {/* Commission */}
+                    <div className="pl-12 flex items-center gap-2">
+                      <Percent className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                      <select
+                        value={commissionRules[member.profiles.id]?.type ?? "percentage"}
+                        onChange={(e) => setCommissionRules((prev) => ({ ...prev, [member.profiles.id]: { ...prev[member.profiles.id], type: e.target.value as "percentage" | "flat" } }))}
+                        className="px-2 py-1 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-green-400"
+                      >
+                        <option value="percentage">% of sale</option>
+                        <option value="flat">Flat per sale</option>
+                      </select>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        value={commissionRules[member.profiles.id]?.value ?? ""}
+                        onChange={(e) => setCommissionRules((prev) => ({ ...prev, [member.profiles.id]: { type: prev[member.profiles.id]?.type ?? "percentage", value: e.target.value } }))}
+                        placeholder="0"
+                        className="w-20 px-2 py-1 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-400"
+                      />
+                      <button
+                        onClick={() => saveCommissionRule(member.profiles.id)}
+                        disabled={savingCommission === member.profiles.id}
+                        className="px-2.5 py-1 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                      >
+                        {savingCommission === member.profiles.id ? "..." : "Save"}
+                      </button>
+                    </div>
                   </div>
                 );
               })}
