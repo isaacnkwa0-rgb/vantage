@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer, Percent } from "lucide-react";
+import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer, Percent, Globe } from "lucide-react";
 import { BillingTab } from "@/components/subscription/BillingTab";
 
 interface Business {
@@ -36,6 +36,10 @@ interface Business {
   social_instagram: string | null;
   social_twitter: string | null;
   social_whatsapp: string | null;
+  store_shipping_enabled: boolean;
+  store_shipping_fee: number;
+  store_free_shipping_above: number | null;
+  store_delivery_note: string | null;
 }
 
 interface Member {
@@ -107,7 +111,13 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as any) ?? "business";
-  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing" | "receipt">(initialTab);
+  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing" | "receipt" | "store">(initialTab);
+
+  const [shippingEnabled, setShippingEnabled] = useState(business.store_shipping_enabled);
+  const [shippingFee, setShippingFee] = useState(String(business.store_shipping_fee ?? 0));
+  const [freeShippingAbove, setFreeShippingAbove] = useState(String(business.store_free_shipping_above ?? ""));
+  const [deliveryNote, setDeliveryNote] = useState(business.store_delivery_note ?? "");
+  const [savingShipping, setSavingShipping] = useState(false);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -366,12 +376,25 @@ export function SettingsClient({ business, members, locations: initialLocations,
     router.refresh();
   }
 
+  async function saveShippingSettings() {
+    setSavingShipping(true);
+    const sb = createClient();
+    await sb.from("businesses").update({
+      store_shipping_enabled: shippingEnabled,
+      store_shipping_fee: parseFloat(shippingFee) || 0,
+      store_free_shipping_above: freeShippingAbove ? parseFloat(freeShippingAbove) : null,
+      store_delivery_note: deliveryNote.trim() || null,
+    }).eq("id", business.id);
+    setSavingShipping(false);
+  }
+
   const tabs = [
     { key: "business", label: "Business Profile", icon: Building2 },
     { key: "categories", label: "Categories", icon: Tag },
     { key: "locations", label: "Locations", icon: MapPin },
     { key: "staff", label: "Staff & Roles", icon: Users },
     { key: "receipt", label: "Receipt & Invoice", icon: Printer },
+    { key: "store", label: "Online Store", icon: Globe },
     { key: "billing", label: "Billing & Plan", icon: CreditCard },
   ];
 
@@ -982,6 +1005,81 @@ export function SettingsClient({ business, members, locations: initialLocations,
       )}
 
       {/* ─── Staff & Roles ─── */}
+      {/* ─── Online Store ─── */}
+      {tab === "store" && (
+        <div className="max-w-xl space-y-5">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#0F172A]">Online Store</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Your store: <a href={`/store/${business.slug}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">/store/{business.slug}</a>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Shipping toggle */}
+              <div className="flex items-center justify-between py-2 border-b border-slate-100">
+                <div>
+                  <p className="text-sm font-medium text-[#0F172A]">Enable Delivery Fee</p>
+                  <p className="text-xs text-slate-400">Charge customers a delivery fee at checkout</p>
+                </div>
+                <button onClick={() => setShippingEnabled(!shippingEnabled)} className="text-slate-400 hover:text-green-600 transition">
+                  {shippingEnabled
+                    ? <ToggleRight className="w-8 h-8 text-green-600" />
+                    : <ToggleLeft className="w-8 h-8" />}
+                </button>
+              </div>
+
+              {shippingEnabled && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Flat Delivery Fee ({business.currency})</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={shippingFee}
+                      onChange={(e) => setShippingFee(e.target.value)}
+                      placeholder="0"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Free Delivery Above (optional)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={freeShippingAbove}
+                      onChange={(e) => setFreeShippingAbove(e.target.value)}
+                      placeholder="e.g. 10000 — leave blank to disable"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Delivery Note (shown at checkout)</label>
+                    <input
+                      value={deliveryNote}
+                      onChange={(e) => setDeliveryNote(e.target.value)}
+                      placeholder="e.g. Delivered within 2–3 business days"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </>
+              )}
+
+              <button
+                onClick={saveShippingSettings}
+                disabled={savingShipping}
+                className="px-5 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
+              >
+                {savingShipping ? "Saving..." : "Save Store Settings"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {tab === "staff" && (() => { loadCommissionRules(); return null; })()}
       {tab === "staff" && (
         <div className="max-w-xl space-y-5">

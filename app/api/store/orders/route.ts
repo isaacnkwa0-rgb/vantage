@@ -8,7 +8,7 @@ function nextOrderNumber(): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { businessId, businessSlug, customer, items, total } = await req.json();
+  const { businessId, businessSlug, customer, items, subtotal, shippingFee, total } = await req.json();
 
   if (!businessId || !customer?.email || !items?.length) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
       customer_email: customer.email,
       customer_phone: customer.phone || null,
       shipping_address: customer.address || null,
-      subtotal: total,
-      shipping_fee: 0,
+      subtotal: subtotal ?? total,
+      shipping_fee: shippingFee ?? 0,
       total_amount: total,
       status: "pending",
     })

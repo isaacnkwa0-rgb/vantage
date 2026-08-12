@@ -29,6 +29,10 @@ interface Business {
   city: string | null;
   social_whatsapp: string | null;
   social_instagram: string | null;
+  store_shipping_enabled: boolean;
+  store_shipping_fee: number;
+  store_free_shipping_above: number | null;
+  store_delivery_note: string | null;
 }
 
 interface CartItem {
@@ -53,7 +57,14 @@ export function StoreFront({ business, products, orderNumber, paymentStatus }: P
   const [processing, setProcessing] = useState(false);
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
-  const cartTotal = cart.reduce((s, i) => s + i.qty * i.product.selling_price, 0);
+  const cartSubtotal = cart.reduce((s, i) => s + i.qty * i.product.selling_price, 0);
+  const shippingFee =
+    business.store_shipping_enabled
+      ? business.store_free_shipping_above && cartSubtotal >= business.store_free_shipping_above
+        ? 0
+        : business.store_shipping_fee
+      : 0;
+  const cartTotal = cartSubtotal + shippingFee;
 
   function addToCart(product: Product) {
     setCart((prev) => {
@@ -91,6 +102,8 @@ export function StoreFront({ business, products, orderNumber, paymentStatus }: P
         businessSlug: business.slug,
         customer: form,
         items: cart.map((i) => ({ productId: i.product.id, name: i.product.name, price: i.product.selling_price, quantity: i.qty })),
+        subtotal: cartSubtotal,
+        shippingFee,
         total: cartTotal,
       }),
     });
@@ -311,10 +324,22 @@ export function StoreFront({ business, products, orderNumber, paymentStatus }: P
                   <span className="font-numeric font-semibold">{fmt(i.qty * i.product.selling_price)}</span>
                 </div>
               ))}
+              {business.store_shipping_enabled && (
+                <div className="flex justify-between text-xs text-slate-500 border-t border-slate-200 mt-1 pt-1">
+                  <span>Delivery fee{shippingFee === 0 ? " (free!)" : ""}</span>
+                  <span className="font-numeric">{shippingFee === 0 ? "Free" : fmt(shippingFee)}</span>
+                </div>
+              )}
+              {business.store_free_shipping_above && shippingFee > 0 && (
+                <p className="text-xs text-green-600">Free delivery on orders above {fmt(business.store_free_shipping_above)}</p>
+              )}
               <div className="flex justify-between text-sm font-bold text-[#0F172A] border-t border-slate-200 mt-2 pt-2">
                 <span>Total</span>
                 <span className="font-numeric text-green-700">{fmt(cartTotal)}</span>
               </div>
+              {business.store_delivery_note && (
+                <p className="text-xs text-slate-400 italic">{business.store_delivery_note}</p>
+              )}
             </div>
 
             <div className="space-y-3">
