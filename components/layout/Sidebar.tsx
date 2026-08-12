@@ -34,6 +34,7 @@ import {
   BookOpen,
   FileX,
   Globe,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -63,6 +64,7 @@ const SELLING_NAV = [
   { label: "Cashbook", icon: BookOpen, href: "cashbook" },
   { label: "Credit Notes", icon: FileX, href: "credit-notes" },
   { label: "Store Orders", icon: Globe, href: "store-orders" },
+  { label: "Gift Cards", icon: Gift, href: "gift-cards" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
