@@ -16,7 +16,7 @@ export default async function InvoicesPage({ params }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, currency, phone, email, address, logo_url")
+    .select("id, name, currency, phone, email, address, logo_url, invoice_accent_color, invoice_footer_notes, social_instagram, social_twitter, social_whatsapp")
     .eq("slug", businessSlug)
     .single();
   if (!business) redirect("/onboarding");

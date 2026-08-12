@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard } from "lucide-react";
+import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer } from "lucide-react";
 import { BillingTab } from "@/components/subscription/BillingTab";
 
 interface Business {
@@ -28,6 +28,14 @@ interface Business {
   loyalty_enabled: boolean | null;
   loyalty_points_per_dollar: number | null;
   loyalty_redemption_rate: number | null;
+  receipt_footer: string | null;
+  receipt_tagline: string | null;
+  receipt_show_logo: boolean;
+  invoice_accent_color: string;
+  invoice_footer_notes: string | null;
+  social_instagram: string | null;
+  social_twitter: string | null;
+  social_whatsapp: string | null;
 }
 
 interface Member {
@@ -99,7 +107,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as any) ?? "business";
-  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing">(initialTab);
+  const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing" | "receipt">(initialTab);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -110,6 +118,17 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(business.loyalty_enabled ?? false);
   const [loyaltyPtsPerDollar, setLoyaltyPtsPerDollar] = useState((business.loyalty_points_per_dollar ?? 1).toString());
   const [loyaltyRedemptionRate, setLoyaltyRedemptionRate] = useState((business.loyalty_redemption_rate ?? 100).toString());
+
+  // Receipt & Invoice branding
+  const [receiptFooter, setReceiptFooter] = useState(business.receipt_footer ?? "");
+  const [receiptTagline, setReceiptTagline] = useState(business.receipt_tagline ?? "");
+  const [receiptShowLogo, setReceiptShowLogo] = useState(business.receipt_show_logo ?? true);
+  const [invoiceAccentColor, setInvoiceAccentColor] = useState(business.invoice_accent_color ?? "#16a34a");
+  const [invoiceFooterNotes, setInvoiceFooterNotes] = useState(business.invoice_footer_notes ?? "");
+  const [socialInstagram, setSocialInstagram] = useState(business.social_instagram ?? "");
+  const [socialTwitter, setSocialTwitter] = useState(business.social_twitter ?? "");
+  const [socialWhatsapp, setSocialWhatsapp] = useState(business.social_whatsapp ?? "");
+  const [savingBranding, setSavingBranding] = useState(false);
 
   // Locations state
   const [locationsList, setLocationsList] = useState<Location[]>(initialLocations);
@@ -301,11 +320,29 @@ export function SettingsClient({ business, members, locations: initialLocations,
     router.refresh();
   }
 
+  async function saveBranding() {
+    setSavingBranding(true);
+    const supabase = createClient();
+    await supabase.from("businesses").update({
+      receipt_footer: receiptFooter || null,
+      receipt_tagline: receiptTagline || null,
+      receipt_show_logo: receiptShowLogo,
+      invoice_accent_color: invoiceAccentColor || "#16a34a",
+      invoice_footer_notes: invoiceFooterNotes || null,
+      social_instagram: socialInstagram || null,
+      social_twitter: socialTwitter || null,
+      social_whatsapp: socialWhatsapp || null,
+    }).eq("id", business.id);
+    setSavingBranding(false);
+    router.refresh();
+  }
+
   const tabs = [
     { key: "business", label: "Business Profile", icon: Building2 },
     { key: "categories", label: "Categories", icon: Tag },
     { key: "locations", label: "Locations", icon: MapPin },
     { key: "staff", label: "Staff & Roles", icon: Users },
+    { key: "receipt", label: "Receipt & Invoice", icon: Printer },
     { key: "billing", label: "Billing & Plan", icon: CreditCard },
   ];
 
@@ -763,6 +800,150 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <p className="text-slate-400 text-xs mt-1">Add your first branch or shop location above</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ─── Receipt & Invoice ─── */}
+      {tab === "receipt" && (
+        <div className="max-w-lg space-y-4">
+          {/* Receipt settings */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <h3 className="font-semibold text-[#0F172A]">Receipt Settings</h3>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-[#0F172A]">Show logo on receipts</p>
+                <p className="text-xs text-slate-400 mt-0.5">Display your business logo at the top of printed receipts</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReceiptShowLogo((v) => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${receiptShowLogo ? "bg-green-600" : "bg-slate-200"}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${receiptShowLogo ? "translate-x-5" : "translate-x-0"}`} />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">Business tagline</label>
+              <input
+                value={receiptTagline}
+                onChange={(e) => setReceiptTagline(e.target.value)}
+                placeholder="e.g. Quality you can trust"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Shown below your business name on receipts</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">Footer message</label>
+              <textarea
+                value={receiptFooter}
+                onChange={(e) => setReceiptFooter(e.target.value)}
+                placeholder="e.g. Thank you for shopping with us! No refunds after 7 days."
+                rows={3}
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Printed at the bottom of every receipt</p>
+            </div>
+          </div>
+
+          {/* Invoice settings */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <h3 className="font-semibold text-[#0F172A]">Invoice Settings</h3>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-2">Accent color</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={invoiceAccentColor}
+                  onChange={(e) => setInvoiceAccentColor(e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                />
+                <div className="flex flex-wrap gap-2">
+                  {["#16a34a", "#2563eb", "#7c3aed", "#dc2626", "#d97706", "#0891b2", "#0f172a", "#db2777"].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setInvoiceAccentColor(c)}
+                      className="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110"
+                      style={{
+                        backgroundColor: c,
+                        borderColor: invoiceAccentColor === c ? "#0F172A" : "transparent",
+                        outline: invoiceAccentColor === c ? "2px solid white" : "none",
+                        outlineOffset: "1px",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-2">Used for the invoice number and total amount</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">Footer / terms notes</label>
+              <textarea
+                value={invoiceFooterNotes}
+                onChange={(e) => setInvoiceFooterNotes(e.target.value)}
+                placeholder="e.g. Payment is due within 30 days. Late payments attract a 5% surcharge."
+                rows={3}
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Shown at the bottom of every invoice (terms, return policy, etc.)</p>
+            </div>
+          </div>
+
+          {/* Social handles */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <h3 className="font-semibold text-[#0F172A]">Social Handles</h3>
+            <p className="text-xs text-slate-400 -mt-2">Displayed on receipts and invoices to drive follow-backs</p>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">Instagram</label>
+              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-green-500">
+                <span className="px-3 py-2.5 bg-slate-50 text-slate-400 text-sm border-r border-slate-200">@</span>
+                <input
+                  value={socialInstagram}
+                  onChange={(e) => setSocialInstagram(e.target.value.replace(/^@/, ""))}
+                  placeholder="yourbusiness"
+                  className="flex-1 px-3 py-2.5 text-sm focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">X / Twitter</label>
+              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-green-500">
+                <span className="px-3 py-2.5 bg-slate-50 text-slate-400 text-sm border-r border-slate-200">@</span>
+                <input
+                  value={socialTwitter}
+                  onChange={(e) => setSocialTwitter(e.target.value.replace(/^@/, ""))}
+                  placeholder="yourbusiness"
+                  className="flex-1 px-3 py-2.5 text-sm focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#0F172A] mb-1">WhatsApp number</label>
+              <input
+                value={socialWhatsapp}
+                onChange={(e) => setSocialWhatsapp(e.target.value)}
+                placeholder="e.g. +2348012345678"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={saveBranding}
+            disabled={savingBranding}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-green-300/40"
+          >
+            {savingBranding && <Loader2 className="w-4 h-4 animate-spin" />}
+            {savingBranding ? "Saving..." : "Save changes"}
+          </button>
         </div>
       )}
 

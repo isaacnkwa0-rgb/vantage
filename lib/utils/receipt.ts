@@ -29,6 +29,12 @@ interface ReceiptBusiness {
   address?: string | null;
   currency: string;
   logo_url?: string | null;
+  receipt_footer?: string | null;
+  receipt_tagline?: string | null;
+  receipt_show_logo?: boolean | null;
+  social_instagram?: string | null;
+  social_twitter?: string | null;
+  social_whatsapp?: string | null;
 }
 
 export function generateReceiptHTML(
@@ -42,6 +48,8 @@ export function generateReceiptHTML(
     timeStyle: "short",
   });
 
+  const showLogo = business.receipt_show_logo !== false;
+
   const itemsHTML = sale.items
     .map(
       (item) => `
@@ -53,6 +61,16 @@ export function generateReceiptHTML(
       </tr>`
     )
     .join("");
+
+  const socials = [
+    business.social_instagram ? `IG: @${business.social_instagram}` : "",
+    business.social_twitter ? `X: @${business.social_twitter}` : "",
+    business.social_whatsapp ? `WA: ${business.social_whatsapp}` : "",
+  ]
+    .filter(Boolean)
+    .join("  ·  ");
+
+  const footerText = business.receipt_footer?.trim() || "Thank you for your business!";
 
   return `<!DOCTYPE html>
 <html>
@@ -73,8 +91,9 @@ export function generateReceiptHTML(
   </style>
 </head>
 <body>
-  ${business.logo_url ? `<div class="center" style="margin-bottom:8px"><img src="${business.logo_url}" alt="Logo" style="width:64px;height:64px;object-fit:cover;border-radius:8px;display:inline-block" /></div>` : ""}
+  ${showLogo && business.logo_url ? `<div class="center" style="margin-bottom:8px"><img src="${business.logo_url}" alt="Logo" style="width:64px;height:64px;object-fit:cover;border-radius:8px;display:inline-block" /></div>` : ""}
   <h1>${business.name}</h1>
+  ${business.receipt_tagline ? `<p class="center" style="font-size:11px;color:#555;margin-bottom:4px">${business.receipt_tagline}</p>` : ""}
   ${business.address ? `<p class="center">${business.address}</p>` : ""}
   ${business.phone ? `<p class="center">${business.phone}</p>` : ""}
   <div class="divider"></div>
@@ -98,7 +117,8 @@ export function generateReceiptHTML(
     ${sale.change_amount > 0 ? `<tr><td>Change</td><td style="text-align:right">${fmt(sale.change_amount)}</td></tr>` : ""}
   </table>
   <div class="divider"></div>
-  <p class="footer">Thank you for your business!<br>Powered by VANTAGE</p>
+  <p class="footer">${footerText}</p>
+  ${socials ? `<p class="footer" style="margin-top:4px;color:#555">${socials}</p>` : ""}
 </body>
 </html>`;
 }

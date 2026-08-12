@@ -16,7 +16,7 @@ export default async function POSPage({ params }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, currency, phone, address, logo_url, tax_enabled, tax_rate, tax_name, business_type, loyalty_enabled, loyalty_points_per_dollar, loyalty_redemption_rate")
+    .select("id, name, currency, phone, address, logo_url, tax_enabled, tax_rate, tax_name, business_type, loyalty_enabled, loyalty_points_per_dollar, loyalty_redemption_rate, receipt_footer, receipt_tagline, receipt_show_logo, social_instagram, social_twitter, social_whatsapp")
     .eq("slug", businessSlug)
     .single();
   if (!business) redirect("/onboarding");

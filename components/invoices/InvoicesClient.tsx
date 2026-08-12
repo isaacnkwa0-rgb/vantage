@@ -43,6 +43,11 @@ interface Business {
   email: string | null;
   address: string | null;
   logo_url: string | null;
+  invoice_accent_color?: string | null;
+  invoice_footer_notes?: string | null;
+  social_instagram?: string | null;
+  social_twitter?: string | null;
+  social_whatsapp?: string | null;
 }
 
 interface Customer {

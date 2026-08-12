@@ -33,6 +33,12 @@ interface Props {
     phone: string | null;
     address: string | null;
     logo_url?: string | null;
+    receipt_footer?: string | null;
+    receipt_tagline?: string | null;
+    receipt_show_logo?: boolean | null;
+    social_instagram?: string | null;
+    social_twitter?: string | null;
+    social_whatsapp?: string | null;
   };
   onClose: () => void;
 }
