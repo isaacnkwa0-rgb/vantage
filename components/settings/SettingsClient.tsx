@@ -40,6 +40,8 @@ interface Business {
   store_shipping_fee: number;
   store_free_shipping_above: number | null;
   store_delivery_note: string | null;
+  fb_pixel_id: string | null;
+  ga_measurement_id: string | null;
 }
 
 interface Member {
@@ -117,6 +119,8 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [shippingFee, setShippingFee] = useState(String(business.store_shipping_fee ?? 0));
   const [freeShippingAbove, setFreeShippingAbove] = useState(String(business.store_free_shipping_above ?? ""));
   const [deliveryNote, setDeliveryNote] = useState(business.store_delivery_note ?? "");
+  const [fbPixelId, setFbPixelId] = useState(business.fb_pixel_id ?? "");
+  const [gaMeasurementId, setGaMeasurementId] = useState(business.ga_measurement_id ?? "");
   const [savingShipping, setSavingShipping] = useState(false);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
@@ -384,6 +388,8 @@ export function SettingsClient({ business, members, locations: initialLocations,
       store_shipping_fee: parseFloat(shippingFee) || 0,
       store_free_shipping_above: freeShippingAbove ? parseFloat(freeShippingAbove) : null,
       store_delivery_note: deliveryNote.trim() || null,
+      fb_pixel_id: fbPixelId.trim() || null,
+      ga_measurement_id: gaMeasurementId.trim() || null,
     }).eq("id", business.id);
     setSavingShipping(false);
   }
@@ -1067,6 +1073,29 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   </div>
                 </>
               )}
+
+              {/* Analytics */}
+              <div className="border-t border-slate-100 pt-4 space-y-3">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Analytics & Tracking</p>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Facebook Pixel ID</label>
+                  <input
+                    value={fbPixelId}
+                    onChange={(e) => setFbPixelId(e.target.value)}
+                    placeholder="e.g. 1234567890123456"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Google Analytics Measurement ID</label>
+                  <input
+                    value={gaMeasurementId}
+                    onChange={(e) => setGaMeasurementId(e.target.value)}
+                    placeholder="e.g. G-XXXXXXXXXX"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              </div>
 
               <button
                 onClick={saveShippingSettings}
