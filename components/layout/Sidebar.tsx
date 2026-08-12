@@ -274,10 +274,10 @@ export function Sidebar({ slug }: { slug: string }) {
           {sidebarCollapsed && (
             <button
               onClick={toggleSidebarCollapsed}
-              title="Expand sidebar"
-              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg bg-green-600 text-white shadow-lg shadow-green-900/50 hover:bg-green-500 transition"
+              aria-label="Expand sidebar"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg bg-green-600 text-white shadow-lg shadow-green-900/50 hover:bg-green-500 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0C1526]"
             >
-              <Zap className="w-4 h-4" />
+              <Zap className="w-4 h-4" aria-hidden="true" />
             </button>
           )}
 
@@ -286,17 +286,18 @@ export function Sidebar({ slug }: { slug: string }) {
             {/* Desktop collapse */}
             <button
               onClick={toggleSidebarCollapsed}
-              className="hidden lg:flex p-1.5 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-slate-800 transition"
-              title="Collapse sidebar"
+              aria-label="Collapse sidebar"
+              className="hidden lg:flex p-1.5 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-slate-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0C1526]"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
             {/* Mobile close */}
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-slate-800 transition"
+              aria-label="Close navigation"
+              className="lg:hidden p-1.5 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-slate-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -319,13 +320,16 @@ export function Sidebar({ slug }: { slug: string }) {
                 <div className={cn(sidebarCollapsed && "lg:hidden")}>
                   <button
                     onClick={() => toggleSection(section.id)}
+                    aria-expanded={isOpen}
+                    aria-label={`${section.label.charAt(0) + section.label.slice(1).toLowerCase()} section`}
                     className={cn(
-                      "w-full flex items-center justify-between px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors",
+                      "w-full flex items-center justify-between px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-500 rounded",
                       hasActiveItem ? "text-green-400" : "text-slate-600 hover:text-slate-400"
                     )}
                   >
                     {section.label}
                     <ChevronDown
+                      aria-hidden="true"
                       className={cn(
                         "w-3 h-3 transition-transform duration-200 flex-shrink-0",
                         isOpen ? "rotate-0" : "-rotate-90"

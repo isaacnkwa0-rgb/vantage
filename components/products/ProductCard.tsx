@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Edit2, Package, AlertTriangle, X, MapPin, Plus, Minus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
@@ -67,13 +68,13 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
         {/* Image thumbnail */}
         <div
           className={cn(
-            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200",
+            "relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200",
             product.image_url ? "cursor-pointer hover:ring-2 hover:ring-green-400 hover:ring-offset-1" : ""
           )}
           onClick={() => product.image_url && setPreview(true)}
         >
           {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <Image src={product.image_url!} alt={product.name} fill className="object-cover" sizes="48px" />
           ) : (
             <Package className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
           )}

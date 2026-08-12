@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -429,9 +430,9 @@ export function SettingsClient({ business, members, locations: initialLocations,
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
             <h3 className="font-semibold text-[#0F172A]">Business Logo</h3>
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="relative w-20 h-20 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden flex-shrink-0">
                 {logoUrl ? (
-                  <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                  <Image src={logoUrl} alt="Business logo" fill className="object-cover" sizes="80px" />
                 ) : (
                   <Upload className="w-6 h-6 text-slate-300" />
                 )}

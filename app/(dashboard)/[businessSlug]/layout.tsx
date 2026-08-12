@@ -44,10 +44,17 @@ export default async function BusinessLayout({ children, params }: Props) {
   return (
     <BusinessProvider business={business} role={membership.role}>
       <CommandSearchProvider>
+        {/* Skip to main content — visible on focus for keyboard users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200] focus:px-4 focus:py-2 focus:bg-green-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
+
         <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
           <Sidebar slug={businessSlug} />
-          <main className="flex-1 flex flex-col overflow-hidden min-w-0">
-            {/* Content wrapper — flex-1 min-h-0 ensures it shrinks to leave room for BottomNav */}
+          <main id="main-content" className="flex-1 flex flex-col overflow-hidden min-w-0">
             <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
               {children}
             </div>

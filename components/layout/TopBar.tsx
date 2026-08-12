@@ -188,7 +188,8 @@ export function TopBar({ title }: TopBarProps) {
 
       <button
         onClick={toggleSidebar}
-        className="lg:hidden p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition"
+        aria-label="Open navigation menu"
+        className="lg:hidden p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:outline-none"
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -201,7 +202,8 @@ export function TopBar({ title }: TopBarProps) {
           const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
           document.dispatchEvent(event);
         }}
-        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition text-xs font-medium flex-shrink-0"
+        aria-label="Open command palette"
+        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition text-xs font-medium flex-shrink-0 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:outline-none"
       >
         <Search className="w-3.5 h-3.5" />
         <span className="hidden md:inline">Search</span>
@@ -214,13 +216,16 @@ export function TopBar({ title }: TopBarProps) {
         <div ref={bellRef} className="relative">
           <button
             onClick={() => setShowNotifications((v) => !v)}
-            className={`relative p-2 rounded-lg transition ${
+            aria-label="Notifications"
+            aria-expanded={showNotifications}
+            aria-haspopup="true"
+            className={`relative p-2 rounded-lg transition focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               showNotifications
                 ? "bg-green-600 text-white shadow-md shadow-green-200"
                 : "text-slate-500 hover:text-green-600 hover:bg-green-50"
             }`}
           >
-            <Bell className="w-5 h-5" />
+            <Bell className="w-5 h-5" aria-hidden="true" />
             {(count > 0 || liveCount > 0) && !showNotifications && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
                 {(count + liveCount) > 9 ? "9+" : count + liveCount}
@@ -272,7 +277,8 @@ export function TopBar({ title }: TopBarProps) {
               <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
                 <button
                   onClick={fetchNotifications}
-                  className="text-xs text-green-600 hover:underline font-medium"
+                  aria-label="Refresh notifications"
+                  className="text-xs text-green-600 hover:underline font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-500 rounded"
                 >
                   Refresh
                 </button>
@@ -292,10 +298,10 @@ export function TopBar({ title }: TopBarProps) {
 
         <button
           onClick={handleLogout}
-          className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-          title="Sign out"
+          aria-label="Sign out"
+          className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1 focus-visible:outline-none"
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
     </header>

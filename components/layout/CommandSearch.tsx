@@ -115,7 +115,7 @@ export function CommandSearch({ open, onClose }: Props) {
       <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
         {/* Input */}
         <div className="flex items-center gap-3 px-4 border-b border-slate-100">
-          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
           <Command.Input
             placeholder="Search pages, actions…"
             className="flex-1 py-3.5 text-sm text-slate-900 placeholder:text-slate-400 bg-transparent outline-none"
