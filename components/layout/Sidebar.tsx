@@ -38,6 +38,7 @@ import {
   Share2,
   RefreshCw,
   Barcode,
+  Thermometer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -71,6 +72,7 @@ const SELLING_NAV = [
   { label: "Referrals", icon: Share2, href: "referrals" },
   { label: "Recurring Billing", icon: RefreshCw, href: "recurring" },
   { label: "Barcode Labels", icon: Barcode, href: "barcode-labels" },
+  { label: "Thermal Printer", icon: Thermometer, href: "thermal-printer" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
