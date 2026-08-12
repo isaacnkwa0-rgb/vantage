@@ -16,7 +16,7 @@ export default async function CustomersPage({ params }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, currency, business_type")
+    .select("id, name, currency, phone, address, business_type")
     .eq("slug", businessSlug)
     .single();
   if (!business) redirect("/onboarding");
@@ -45,6 +45,9 @@ export default async function CustomersPage({ params }: Props) {
         businessId={business.id}
         userId={user.id}
         currency={business.currency}
+        businessName={business.name}
+        businessPhone={business.phone ?? null}
+        businessAddress={business.address ?? null}
         businessType={(business.business_type ?? "retail") as "retail" | "service"}
       />
     </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Users, AlertCircle, Loader2, Tag, Download } from "lucide-react";
+import { Plus, Search, Users, AlertCircle, Loader2, Tag, Download, FileText } from "lucide-react";
+import { generateStatementHTML } from "@/lib/utils/statement";
 import { formatCurrency } from "@/lib/utils/currency";
 import { CustomerForm } from "./CustomerForm";
 import { createClient } from "@/lib/supabase/client";
@@ -36,10 +37,13 @@ interface Props {
   businessId: string;
   userId: string;
   currency: string;
+  businessName: string;
+  businessPhone?: string | null;
+  businessAddress?: string | null;
   businessType?: "retail" | "service";
 }
 
-export function CustomersClient({ customers, tags: initialTags, businessId, userId, currency, businessType = "retail" }: Props) {
+export function CustomersClient({ customers, tags: initialTags, businessId, userId, currency, businessName, businessPhone, businessAddress, businessType = "retail" }: Props) {
   const isService = businessType === "service";
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -65,6 +69,62 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
 
   const fmt = (n: number) => formatCurrency(n, currency);
   const totalOutstanding = customers.reduce((s, c) => s + (c.credit_balance ?? 0), 0);
+
+  async function printStatement(customer: Customer) {
+    const supabase = createClient();
+    const fromDate = new Date();
+    fromDate.setFullYear(fromDate.getFullYear() - 1);
+
+    const [salesRes, invoicesRes] = await Promise.all([
+      supabase.from("sales")
+        .select("total_amount, amount_paid, payment_method, created_at, sale_number")
+        .eq("customer_id", customer.id)
+        .gte("created_at", fromDate.toISOString())
+        .order("created_at"),
+      supabase.from("invoices")
+        .select("total_amount, amount_paid, status, created_at, invoice_number")
+        .eq("customer_id", customer.id)
+        .gte("created_at", fromDate.toISOString())
+        .order("created_at"),
+    ]);
+
+    let balance = 0;
+    const entries: Array<{ date: string; description: string; type: string; debit: number; credit: number; balance: number }> = [];
+
+    for (const s of (salesRes.data ?? [])) {
+      if (s.payment_method === "credit") {
+        balance += s.total_amount;
+        entries.push({ date: s.created_at, description: `Sale ${s.sale_number} (credit)`, type: "sale", debit: s.total_amount, credit: 0, balance });
+      }
+    }
+    for (const inv of (invoicesRes.data ?? [])) {
+      if (inv.status !== "paid") {
+        const due = inv.total_amount - (inv.amount_paid ?? 0);
+        if (due > 0) {
+          balance += due;
+          entries.push({ date: inv.created_at, description: `Invoice ${inv.invoice_number}`, type: "invoice", debit: due, credit: 0, balance });
+        }
+        if ((inv.amount_paid ?? 0) > 0) {
+          balance -= inv.amount_paid;
+          entries.push({ date: inv.created_at, description: `Payment on ${inv.invoice_number}`, type: "payment", debit: 0, credit: inv.amount_paid, balance });
+        }
+      }
+    }
+
+    entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const html = generateStatementHTML(
+      { name: businessName, currency, phone: businessPhone, address: businessAddress },
+      { name: customer.name, phone: customer.phone, email: customer.email },
+      entries as any,
+      0,
+      fromDate.toISOString(),
+      new Date().toISOString()
+    );
+
+    const win = window.open("", "_blank");
+    if (win) { win.document.write(html); win.document.close(); setTimeout(() => win.print(), 500); }
+  }
 
   function exportCSV() {
     const headers = ["Name", "Phone", "Email", "Address", "Total Spent", "Credit Balance", "Last Purchase", "Tags"];
@@ -288,14 +348,23 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      {customer.credit_balance > 0 && (
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
                         <button
-                          onClick={() => { setRecordingPaymentFor(customer); setPaymentAmount(""); setPaymentNote(""); }}
-                          className="opacity-0 group-hover:opacity-100 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
+                          onClick={() => printStatement(customer)}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                          title="Print account statement"
                         >
-                          Record Payment
+                          <FileText className="w-3.5 h-3.5" />
                         </button>
-                      )}
+                        {customer.credit_balance > 0 && (
+                          <button
+                            onClick={() => { setRecordingPaymentFor(customer); setPaymentAmount(""); setPaymentNote(""); }}
+                            className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
+                          >
+                            Record Payment
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
