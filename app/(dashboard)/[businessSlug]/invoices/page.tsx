@@ -28,7 +28,7 @@ export default async function InvoicesPage({ params }: Props) {
         id, invoice_number, status, issue_date, due_date,
         subtotal, discount_amount, tax_amount, total_amount, amount_paid,
         notes, bank_details, client_name, client_email, client_address,
-        customers ( name, phone )
+        payment_link_token, customers ( name, phone )
       `)
       .eq("business_id", business.id)
       .order("created_at", { ascending: false }),

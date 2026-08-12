@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2, Download } from "lucide-react";
+import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2, Download, Link2, ClipboardCheck } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { generateInvoiceHTML } from "@/lib/utils/invoice";
 import { createClient } from "@/lib/supabase/client";
@@ -32,6 +32,7 @@ interface Invoice {
   client_name: string | null;
   client_email: string | null;
   client_address: string | null;
+  payment_link_token: string | null;
   customers: { name: string; phone: string | null } | null;
 }
 
@@ -80,6 +81,16 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  function copyPaymentLink(inv: Invoice) {
+    if (!inv.payment_link_token) return;
+    const url = `${window.location.origin}/pay/${inv.payment_link_token}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(inv.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  }
 
   const fmt = (n: number) => formatCurrency(n, business.currency);
 
@@ -319,6 +330,17 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
                     >
                       <Printer className="w-3.5 h-3.5" />
                     </button>
+                    {inv.payment_link_token && inv.status !== "paid" && inv.status !== "cancelled" && (
+                      <button
+                        onClick={() => copyPaymentLink(inv)}
+                        className="p-1.5 rounded-lg transition opacity-0 group-hover:opacity-100"
+                        title="Copy payment link"
+                      >
+                        {copiedId === inv.id
+                          ? <ClipboardCheck className="w-3.5 h-3.5 text-emerald-600" />
+                          : <Link2 className="w-3.5 h-3.5 text-slate-400 hover:text-blue-600" />}
+                      </button>
+                    )}
                     {inv.status !== "paid" && inv.status !== "cancelled" && (
                       <button
                         onClick={() => markAsPaid(inv)}
