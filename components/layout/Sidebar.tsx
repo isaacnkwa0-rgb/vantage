@@ -31,6 +31,7 @@ import {
   ShoppingBag,
   Tag,
   CalendarDays,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -57,6 +58,7 @@ const SELLING_NAV = [
   { label: "Purchase Orders", icon: ShoppingBag, href: "purchase-orders" },
   { label: "Pricing Tiers", icon: Tag, href: "pricing" },
   { label: "Appointments", icon: CalendarDays, href: "appointments" },
+  { label: "Cashbook", icon: BookOpen, href: "cashbook" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
@@ -74,6 +76,7 @@ const SERVICE_NAV = [
   { label: "Reports", icon: BarChart3, href: "reports" },
   { label: "Analytics", icon: TrendingUp, href: "analytics" },
   { label: "Appointments", icon: CalendarDays, href: "appointments" },
+  { label: "Cashbook", icon: BookOpen, href: "cashbook" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
