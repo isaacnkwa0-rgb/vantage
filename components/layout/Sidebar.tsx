@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   Package,
   Package2,
+  Vault,
   Users,
   Receipt,
   BarChart3,
@@ -30,6 +31,7 @@ import { useBusinessStore } from "@/store/businessStore";
 const SELLING_NAV = [
   { label: "Dashboard", icon: LayoutDashboard, href: "dashboard" },
   { label: "Point of Sale", icon: ShoppingCart, href: "pos" },
+  { label: "Cash Shifts", icon: Vault, href: "shifts" },
   { label: "Transactions", icon: ClipboardList, href: "sales" },
   { label: "Invoices", icon: FileText, href: "invoices" },
   { label: "Quotes", icon: FilePen, href: "quotes" },

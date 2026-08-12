@@ -23,7 +23,7 @@ export default async function POSPage({ params }: Props) {
 
   const isService = business.business_type === "service";
 
-  const [productsRes, customersRes, bundlesRes] = await Promise.all([
+  const [productsRes, customersRes, bundlesRes, shiftRes] = await Promise.all([
     supabase
       .from("products")
       .select("id, name, selling_price, cost_price, stock_quantity, image_url, sku, barcode, min_order_qty, max_order_qty, categories(name, color)")
@@ -41,6 +41,12 @@ export default async function POSPage({ params }: Props) {
       .eq("business_id", business.id)
       .eq("is_active", true)
       .order("name"),
+    supabase
+      .from("cash_shifts")
+      .select("id, opened_at, opening_float")
+      .eq("business_id", business.id)
+      .eq("status", "open")
+      .maybeSingle(),
   ]);
 
   const products = productsRes.data ?? [];
@@ -75,6 +81,7 @@ export default async function POSPage({ params }: Props) {
       customers={customers as any}
       business={businessData as any}
       userId={user.id}
+      currentShift={(shiftRes.data ?? null) as any}
     />
   );
 }

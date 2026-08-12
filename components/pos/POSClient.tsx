@@ -6,6 +6,7 @@ import { ProductSearchPanel } from "./ProductSearchPanel";
 import { CartPanel } from "./CartPanel";
 import { PaymentModal } from "./PaymentModal";
 import { ReceiptModal } from "./ReceiptModal";
+import { ShiftBanner } from "./ShiftBanner";
 import { useCartStore } from "@/store/cartStore";
 import { useUIStore } from "@/store/uiStore";
 import { useOfflineStore } from "@/store/offlineStore";
@@ -84,15 +85,22 @@ interface Bundle {
   }>;
 }
 
+interface Shift {
+  id: string;
+  opened_at: string;
+  opening_float: number;
+}
+
 interface Props {
   products: Product[];
   bundles: Bundle[];
   customers: Customer[];
   business: Business;
   userId: string;
+  currentShift: Shift | null;
 }
 
-export function POSClient({ products, bundles, customers, business, userId }: Props) {
+export function POSClient({ products, bundles, customers, business, userId, currentShift }: Props) {
   const [showPayment, setShowPayment] = useState(false);
   const [completedSale, setCompletedSale] = useState<CompletedSale | null>(null);
   const [mobilePanel, setMobilePanel] = useState<"products" | "cart">("products");
@@ -229,6 +237,14 @@ export function POSClient({ products, bundles, customers, business, userId }: Pr
           You&apos;re offline — sales are saved locally and will sync automatically.
         </div>
       )}
+
+      {/* Shift banner */}
+      <ShiftBanner
+        initialShift={currentShift}
+        businessId={business.id}
+        userId={userId}
+        currency={business.currency}
+      />
 
       {/* Pending sync banner (online but unsyced) */}
       {isOnline && pendingSales.length > 0 && (
