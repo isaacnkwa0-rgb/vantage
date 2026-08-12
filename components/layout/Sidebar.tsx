@@ -36,6 +36,7 @@ import {
   Globe,
   Gift,
   Share2,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -67,6 +68,7 @@ const SELLING_NAV = [
   { label: "Store Orders", icon: Globe, href: "store-orders" },
   { label: "Gift Cards", icon: Gift, href: "gift-cards" },
   { label: "Referrals", icon: Share2, href: "referrals" },
+  { label: "Recurring Billing", icon: RefreshCw, href: "recurring" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
