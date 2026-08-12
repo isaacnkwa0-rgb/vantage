@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Users, AlertCircle, Loader2, Tag } from "lucide-react";
+import { Plus, Search, Users, AlertCircle, Loader2, Tag, Download } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { CustomerForm } from "./CustomerForm";
 import { createClient } from "@/lib/supabase/client";
@@ -65,6 +65,28 @@ export function CustomersClient({ customers, tags: initialTags, businessId, curr
   const fmt = (n: number) => formatCurrency(n, currency);
   const totalOutstanding = customers.reduce((s, c) => s + (c.credit_balance ?? 0), 0);
 
+  function exportCSV() {
+    const headers = ["Name", "Phone", "Email", "Address", "Total Spent", "Credit Balance", "Last Purchase", "Tags"];
+    const rows = customers.map((c) => [
+      c.name,
+      c.phone ?? "",
+      c.email ?? "",
+      c.address ?? "",
+      c.total_spent,
+      c.credit_balance,
+      c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString() : "",
+      getCustomerTags(c).map((t) => t.name).join("; "),
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `customers-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function getCustomerTags(customer: Customer): CustomerTag[] {
     return (customer.customer_tag_assignments ?? [])
       .map((a) => a.customer_tags)
@@ -110,6 +132,13 @@ export function CustomersClient({ customers, tags: initialTags, businessId, curr
             className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
           />
         </div>
+        <button
+          onClick={exportCSV}
+          className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-3 py-2.5 rounded-lg text-sm font-medium transition"
+        >
+          <Download className="w-4 h-4" />
+          Export
+        </button>
         <button
           onClick={() => { setEditing(null); setShowForm(true); }}
           className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition"

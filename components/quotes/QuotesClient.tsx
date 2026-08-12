@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import {
   Plus, FileText, Search, Printer, CheckCircle2, Clock,
-  AlertCircle, X, Loader2, ArrowRightLeft, Send,
+  AlertCircle, X, Loader2, ArrowRightLeft, Send, Download,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { generateQuoteHTML } from "@/lib/utils/quote";
@@ -90,6 +90,29 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const fmt = (n: number) => formatCurrency(n, business.currency);
+
+  function exportCSV() {
+    const headers = ["Quote #", "Client", "Status", "Issue Date", "Valid Until", "Subtotal", "Discount", "Tax", "Total"];
+    const rows = quotes.map((q) => [
+      q.quote_number,
+      q.client_name ?? q.customers?.name ?? "",
+      q.status,
+      q.issue_date,
+      q.valid_until ?? "",
+      q.subtotal,
+      q.discount_amount,
+      q.tax_amount,
+      q.total_amount,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `quotes-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   const filtered = quotes.filter((q) => {
     const search_ = search.toLowerCase();
@@ -277,6 +300,13 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
             <option key={s} value={s}>{STATUS_CONFIG[s]?.label ?? s}</option>
           ))}
         </select>
+        <button
+          onClick={exportCSV}
+          className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-3 py-2.5 rounded-lg text-sm font-medium transition"
+        >
+          <Download className="w-4 h-4" />
+          Export
+        </button>
         <button
           onClick={() => { setEditingQuote(null); setShowForm(true); }}
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm shadow-green-300/40"

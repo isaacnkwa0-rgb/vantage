@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2 } from "lucide-react";
+import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2, Download } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { generateInvoiceHTML } from "@/lib/utils/invoice";
 import { createClient } from "@/lib/supabase/client";
@@ -82,6 +82,30 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
 
   const fmt = (n: number) => formatCurrency(n, business.currency);
+
+  function exportCSV() {
+    const headers = ["Invoice #", "Client", "Status", "Issue Date", "Due Date", "Subtotal", "Discount", "Tax", "Total", "Amount Paid"];
+    const rows = invoices.map((inv) => [
+      inv.invoice_number,
+      inv.client_name ?? inv.customers?.name ?? "",
+      inv.status,
+      inv.issue_date,
+      inv.due_date ?? "",
+      inv.subtotal,
+      inv.discount_amount,
+      inv.tax_amount,
+      inv.total_amount,
+      inv.amount_paid,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `invoices-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   const filtered = invoices.filter((inv) => {
     const q = search.toLowerCase();
@@ -211,6 +235,13 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
           <option value="paid">Paid</option>
           <option value="overdue">Overdue</option>
         </select>
+        <button
+          onClick={exportCSV}
+          className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-3 py-2.5 rounded-lg text-sm font-medium transition"
+        >
+          <Download className="w-4 h-4" />
+          Export
+        </button>
         <button
           onClick={() => { setEditingInvoice(null); setShowForm(true); }}
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm shadow-green-300/40"
