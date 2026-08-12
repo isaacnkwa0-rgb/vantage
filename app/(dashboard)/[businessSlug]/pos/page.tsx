@@ -23,7 +23,7 @@ export default async function POSPage({ params }: Props) {
 
   const isService = business.business_type === "service";
 
-  const [productsRes, customersRes] = await Promise.all([
+  const [productsRes, customersRes, bundlesRes] = await Promise.all([
     supabase
       .from("products")
       .select("id, name, selling_price, cost_price, stock_quantity, image_url, sku, barcode, min_order_qty, max_order_qty, categories(name, color)")
@@ -35,9 +35,16 @@ export default async function POSPage({ params }: Props) {
       .select("id, name, phone, loyalty_points")
       .eq("business_id", business.id)
       .order("name"),
+    supabase
+      .from("product_bundles")
+      .select("id, name, description, price, image_url, is_active, bundle_items(product_id, variant_id, quantity, products(cost_price))")
+      .eq("business_id", business.id)
+      .eq("is_active", true)
+      .order("name"),
   ]);
 
   const products = productsRes.data ?? [];
+  const bundles = bundlesRes.data ?? [];
   const customers = (customersRes.data ?? []).map((c) => ({
     ...c,
     loyalty_points: c.loyalty_points ?? 0,
@@ -64,6 +71,7 @@ export default async function POSPage({ params }: Props) {
   return (
     <POSClient
       products={products as any}
+      bundles={bundles as any}
       customers={customers as any}
       business={businessData as any}
       userId={user.id}

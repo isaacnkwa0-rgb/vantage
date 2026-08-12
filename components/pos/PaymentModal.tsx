@@ -169,8 +169,9 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
       items.map((item) => ({
         sale_id: sale.id,
         business_id: business.id,
-        product_id: item.productId,
-        variant_id: item.variantId ?? null,
+        product_id: item.isBundle ? null : item.productId,
+        variant_id: item.isBundle ? null : (item.variantId ?? null),
+        bundle_id: item.isBundle ? (item.bundleId ?? null) : null,
         product_name: item.name,
         variant_name: item.variantName ?? null,
         quantity: item.quantity,
@@ -184,6 +185,15 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
       setError(itemsErr.message);
       setLoading(false);
       return;
+    }
+
+    // Deduct stock for bundle components
+    const bundleItems = items.filter((i) => i.isBundle && i.bundleId);
+    for (const bi of bundleItems) {
+      await supabase.rpc("deduct_bundle_stock", {
+        p_bundle_id: bi.bundleId,
+        p_cart_qty: bi.quantity,
+      });
     }
 
     if (isCredit && customerId) {

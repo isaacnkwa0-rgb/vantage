@@ -22,12 +22,28 @@ interface Product {
   max_order_qty: number | null;
 }
 
+interface Bundle {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  is_active: boolean;
+  bundle_items: Array<{
+    product_id: string;
+    variant_id: string | null;
+    quantity: number;
+    products: { cost_price: number } | null;
+  }>;
+}
+
 interface Props {
   products: Product[];
+  bundles: Bundle[];
   currency: string;
 }
 
-export function ProductSearchPanel({ products, currency }: Props) {
+export function ProductSearchPanel({ products, bundles, currency }: Props) {
   const [search, setSearch] = useState("");
   const [lastKeyTime, setLastKeyTime] = useState(0);
   const [showScanner, setShowScanner] = useState(false);
@@ -87,7 +103,33 @@ export function ProductSearchPanel({ products, currency }: Props) {
     );
   });
 
+  const filteredBundles = bundles.filter((b) =>
+    b.is_active && b.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   const cartProductIds = new Set(items.map((i) => i.productId));
+
+  function addBundle(bundle: Bundle) {
+    const costPrice = bundle.bundle_items.reduce(
+      (s, bi) => s + (bi.products?.cost_price ?? 0) * bi.quantity, 0
+    );
+    addItem({
+      productId: bundle.id,
+      name: bundle.name,
+      unitPrice: bundle.price,
+      costPrice,
+      imageUrl: bundle.image_url,
+      minOrderQty: 1,
+      maxOrderQty: null,
+      isBundle: true,
+      bundleId: bundle.id,
+      bundleComponents: bundle.bundle_items.map((bi) => ({
+        productId: bi.product_id,
+        variantId: bi.variant_id ?? undefined,
+        quantity: bi.quantity,
+      })),
+    });
+  }
 
   return (
     <>
@@ -146,13 +188,53 @@ export function ProductSearchPanel({ products, currency }: Props) {
 
         {/* Products list */}
         <div className="flex-1 overflow-y-auto">
-          {filtered.length === 0 ? (
+          {filtered.length === 0 && filteredBundles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-6">
               <Package className="w-12 h-12 text-slate-200 mb-3" />
               <p className="text-slate-500 text-sm">No products found</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
+              {/* Bundles */}
+              {filteredBundles.map((bundle) => {
+                const inCart = cartProductIds.has(bundle.id);
+                const componentCount = bundle.bundle_items.reduce((s, bi) => s + bi.quantity, 0);
+                return (
+                  <button
+                    key={bundle.id}
+                    onClick={() => addBundle(bundle)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2.5 text-left transition",
+                      inCart ? "bg-violet-50" : "hover:bg-slate-50 active:bg-slate-100"
+                    )}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0 border border-violet-200">
+                      {bundle.image_url ? (
+                        <Image src={bundle.image_url} alt={bundle.name} width={40} height={40} className="object-cover w-full h-full rounded-lg" />
+                      ) : (
+                        <Package className="w-5 h-5 text-violet-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#0F172A] truncate">{bundle.name}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">Bundle</span>
+                        <span className="text-xs text-slate-400">{componentCount} item{componentCount !== 1 ? "s" : ""}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <p className="font-numeric text-sm font-bold text-violet-600">{formatCurrency(bundle.price, currency)}</p>
+                      {inCart && (
+                        <div className="w-5 h-5 bg-violet-500 rounded-full flex items-center justify-center">
+                          <ShoppingCart className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+
+              {/* Regular products */}
               {filtered.map((product) => {
                 const inCart = cartProductIds.has(product.id);
                 const outOfStock = product.stock_quantity === 0;

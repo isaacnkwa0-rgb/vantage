@@ -1,5 +1,11 @@
 import { create } from "zustand";
 
+export interface BundleComponent {
+  productId: string;
+  variantId?: string;
+  quantity: number;
+}
+
 export interface CartItem {
   productId: string;
   variantId?: string;
@@ -11,6 +17,10 @@ export interface CartItem {
   imageUrl?: string | null;
   minOrderQty: number;
   maxOrderQty: number | null;
+  // Bundle-specific (undefined for regular products)
+  isBundle?: boolean;
+  bundleId?: string;
+  bundleComponents?: BundleComponent[];
 }
 
 type DiscountType = "percent" | "fixed" | null;
@@ -32,7 +42,7 @@ interface CartState {
   loyaltyRedemptionRate: number;
 
   // Actions
-  addItem: (item: Omit<CartItem, "quantity" | "minOrderQty" | "maxOrderQty"> & { quantity?: number; minOrderQty?: number; maxOrderQty?: number | null }) => void;
+  addItem: (item: Omit<CartItem, "quantity" | "minOrderQty" | "maxOrderQty"> & { quantity?: number; minOrderQty?: number; maxOrderQty?: number | null; isBundle?: boolean; bundleId?: string; bundleComponents?: BundleComponent[] }) => void;
   removeItem: (productId: string, variantId?: string) => void;
   updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   setDiscount: (type: DiscountType, value: number) => void;
@@ -87,7 +97,18 @@ export const useCartStore = create<CartState>()((set, get) => ({
       const initialQty = Math.max(min, item.quantity ?? min);
       const clampedInitial = max !== null ? Math.min(initialQty, max) : initialQty;
       return {
-        items: [...state.items, { ...item, quantity: clampedInitial, minOrderQty: min, maxOrderQty: max }],
+        items: [
+          ...state.items,
+          {
+            ...item,
+            quantity: clampedInitial,
+            minOrderQty: min,
+            maxOrderQty: max,
+            isBundle: item.isBundle ?? false,
+            bundleId: item.bundleId,
+            bundleComponents: item.bundleComponents,
+          },
+        ],
       };
     });
   },

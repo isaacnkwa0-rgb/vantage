@@ -69,14 +69,30 @@ interface CompletedSale {
   }>;
 }
 
+interface Bundle {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  is_active: boolean;
+  bundle_items: Array<{
+    product_id: string;
+    variant_id: string | null;
+    quantity: number;
+    products: { cost_price: number } | null;
+  }>;
+}
+
 interface Props {
   products: Product[];
+  bundles: Bundle[];
   customers: Customer[];
   business: Business;
   userId: string;
 }
 
-export function POSClient({ products, customers, business, userId }: Props) {
+export function POSClient({ products, bundles, customers, business, userId }: Props) {
   const [showPayment, setShowPayment] = useState(false);
   const [completedSale, setCompletedSale] = useState<CompletedSale | null>(null);
   const [mobilePanel, setMobilePanel] = useState<"products" | "cart">("products");
@@ -258,7 +274,7 @@ export function POSClient({ products, customers, business, userId }: Props) {
 
       <div className="flex flex-1 overflow-hidden">
         <div className={`flex-1 flex-col overflow-hidden border-r border-slate-200 ${mobilePanel === "cart" ? "hidden lg:flex" : "flex"}`}>
-          <ProductSearchPanel products={products} currency={business.currency} />
+          <ProductSearchPanel products={products} bundles={bundles} currency={business.currency} />
         </div>
 
         <div className={`flex-col flex-shrink-0 bg-white w-full lg:w-96 ${mobilePanel === "products" ? "hidden lg:flex" : "flex"}`}>
