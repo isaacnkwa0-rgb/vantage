@@ -37,6 +37,7 @@ import {
   Gift,
   Share2,
   RefreshCw,
+  Barcode,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -69,6 +70,7 @@ const SELLING_NAV = [
   { label: "Gift Cards", icon: Gift, href: "gift-cards" },
   { label: "Referrals", icon: Share2, href: "referrals" },
   { label: "Recurring Billing", icon: RefreshCw, href: "recurring" },
+  { label: "Barcode Labels", icon: Barcode, href: "barcode-labels" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
