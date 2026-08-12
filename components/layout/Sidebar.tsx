@@ -28,6 +28,7 @@ import {
   FilePen,
   Target,
   Truck,
+  ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -51,6 +52,7 @@ const SELLING_NAV = [
   { label: "Targets", icon: Target, href: "targets" },
   { label: "Commissions", icon: BadgePercent, href: "commissions" },
   { label: "Suppliers", icon: Truck, href: "suppliers" },
+  { label: "Purchase Orders", icon: ShoppingBag, href: "purchase-orders" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
