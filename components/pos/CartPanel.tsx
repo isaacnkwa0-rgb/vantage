@@ -211,15 +211,25 @@ export function CartPanel({
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => updateQuantity(item.productId, item.quantity - 1, item.variantId)}
-                  className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-green-400 transition"
+                  onClick={() => updateQuantity(item.productId, item.quantity - (item.minOrderQty ?? 1), item.variantId)}
+                  title={item.quantity <= (item.minOrderQty ?? 1) ? "Remove item" : undefined}
+                  className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-red-300 hover:text-red-500 transition"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="font-numeric text-sm font-semibold w-6 text-center">{item.quantity}</span>
+                <div className="text-center">
+                  <span className="font-numeric text-sm font-semibold w-6 block text-center">{item.quantity}</span>
+                  {item.minOrderQty > 1 && item.quantity === item.minOrderQty && (
+                    <span className="text-[9px] text-amber-500 font-semibold leading-none">min</span>
+                  )}
+                  {item.maxOrderQty !== null && item.quantity === item.maxOrderQty && (
+                    <span className="text-[9px] text-slate-400 font-semibold leading-none">max</span>
+                  )}
+                </div>
                 <button
-                  onClick={() => updateQuantity(item.productId, item.quantity + 1, item.variantId)}
-                  className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-green-400 transition"
+                  onClick={() => updateQuantity(item.productId, item.quantity + (item.minOrderQty ?? 1), item.variantId)}
+                  disabled={item.maxOrderQty !== null && item.quantity >= item.maxOrderQty}
+                  className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-green-400 transition disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Plus className="w-3 h-3" />
                 </button>

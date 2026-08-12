@@ -21,6 +21,8 @@ interface Product {
   sku: string | null;
   barcode: string | null;
   categories: { name: string; color: string } | null;
+  min_order_qty: number;
+  max_order_qty: number | null;
 }
 
 interface Customer {

@@ -9,6 +9,8 @@ export interface CartItem {
   unitPrice: number;
   costPrice: number;
   imageUrl?: string | null;
+  minOrderQty: number;
+  maxOrderQty: number | null;
 }
 
 type DiscountType = "percent" | "fixed" | null;
@@ -30,7 +32,7 @@ interface CartState {
   loyaltyRedemptionRate: number;
 
   // Actions
-  addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
+  addItem: (item: Omit<CartItem, "quantity" | "minOrderQty" | "maxOrderQty"> & { quantity?: number; minOrderQty?: number; maxOrderQty?: number | null }) => void;
   removeItem: (productId: string, variantId?: string) => void;
   updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   setDiscount: (type: DiscountType, value: number) => void;
@@ -68,19 +70,25 @@ export const useCartStore = create<CartState>()((set, get) => ({
   loyaltyRedemptionRate: 100,
 
   addItem: (item) => {
+    const min = item.minOrderQty ?? 1;
+    const max = item.maxOrderQty ?? null;
     set((state) => {
       const key = item.variantId ?? item.productId;
       const existing = state.items.find((i) => (i.variantId ?? i.productId) === key);
       if (existing) {
+        const newQty = existing.quantity + (item.quantity ?? min);
+        const clamped = max !== null ? Math.min(newQty, max) : newQty;
         return {
           items: state.items.map((i) =>
-            (i.variantId ?? i.productId) === key
-              ? { ...i, quantity: i.quantity + (item.quantity ?? 1) }
-              : i
+            (i.variantId ?? i.productId) === key ? { ...i, quantity: clamped } : i
           ),
         };
       }
-      return { items: [...state.items, { ...item, quantity: item.quantity ?? 1 }] };
+      const initialQty = Math.max(min, item.quantity ?? min);
+      const clampedInitial = max !== null ? Math.min(initialQty, max) : initialQty;
+      return {
+        items: [...state.items, { ...item, quantity: clampedInitial, minOrderQty: min, maxOrderQty: max }],
+      };
     });
   },
 
@@ -93,13 +101,19 @@ export const useCartStore = create<CartState>()((set, get) => ({
   },
 
   updateQuantity: (productId, quantity, variantId) => {
-    if (quantity <= 0) { get().removeItem(productId, variantId); return; }
+    const item = get().items.find((i) =>
+      variantId ? i.variantId === variantId : i.productId === productId && !i.variantId
+    );
+    const min = item?.minOrderQty ?? 1;
+    const max = item?.maxOrderQty ?? null;
+    if (quantity <= 0 || quantity < min) { get().removeItem(productId, variantId); return; }
+    const clamped = max !== null ? Math.min(quantity, max) : quantity;
     set((state) => ({
       items: state.items.map((i) => {
         const match = variantId
           ? i.variantId === variantId
           : i.productId === productId && !i.variantId;
-        return match ? { ...i, quantity } : i;
+        return match ? { ...i, quantity: clamped } : i;
       }),
     }));
   },

@@ -18,6 +18,8 @@ interface Product {
   sku: string | null;
   barcode: string | null;
   categories: { name: string; color: string } | null;
+  min_order_qty: number;
+  max_order_qty: number | null;
 }
 
 interface Props {
@@ -41,6 +43,8 @@ export function ProductSearchPanel({ products, currency }: Props) {
       unitPrice: product.selling_price,
       costPrice: product.cost_price,
       imageUrl: product.image_url,
+      minOrderQty: product.min_order_qty ?? 1,
+      maxOrderQty: product.max_order_qty ?? null,
     });
   }
 
@@ -191,6 +195,16 @@ export function ProductSearchPanel({ products, currency }: Props) {
                         <span className="text-xs text-slate-400">
                           {outOfStock ? "Out of stock" : `${product.stock_quantity} left`}
                         </span>
+                        {product.min_order_qty > 1 && (
+                          <span className="text-[10px] font-semibold px-1 py-0.5 rounded bg-amber-100 text-amber-700">
+                            Min {product.min_order_qty}
+                          </span>
+                        )}
+                        {product.max_order_qty && (
+                          <span className="text-[10px] font-semibold px-1 py-0.5 rounded bg-slate-100 text-slate-500">
+                            Max {product.max_order_qty}
+                          </span>
+                        )}
                       </div>
                     </div>
 

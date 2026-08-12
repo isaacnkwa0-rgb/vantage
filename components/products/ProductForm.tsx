@@ -15,6 +15,8 @@ const schema = z.object({
   cost_price: z.coerce.number().min(0, "Cost cannot be negative").default(0),
   stock_quantity: z.coerce.number().int().min(0).default(0),
   low_stock_threshold: z.coerce.number().int().min(0).default(5),
+  min_order_qty: z.coerce.number().int().min(1).default(1),
+  max_order_qty: z.coerce.number().int().min(1).optional().or(z.literal(0)).transform(v => v || undefined),
   category_id: z.string().optional(),
   location_id: z.string().optional(),
   sku: z.string().optional(),
@@ -69,6 +71,8 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           cost_price: editingProduct.cost_price,
           stock_quantity: editingProduct.stock_quantity,
           low_stock_threshold: editingProduct.low_stock_threshold,
+          min_order_qty: editingProduct.min_order_qty ?? 1,
+          max_order_qty: editingProduct.max_order_qty ?? undefined,
           category_id: editingProduct.category_id ?? undefined,
           location_id: editingProduct.location_id ?? undefined,
           sku: editingProduct.sku ?? undefined,
@@ -76,7 +80,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           description: editingProduct.description ?? undefined,
           track_inventory: editingProduct.track_inventory,
         }
-      : { track_inventory: true, cost_price: 0, stock_quantity: 0, low_stock_threshold: 5 },
+      : { track_inventory: true, cost_price: 0, stock_quantity: 0, low_stock_threshold: 5, min_order_qty: 1 },
   });
 
   async function handleBarcodeScan(barcode: string) {
@@ -153,6 +157,8 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
       cost_price: data.cost_price,
       stock_quantity: data.stock_quantity,
       low_stock_threshold: data.low_stock_threshold,
+      min_order_qty: data.min_order_qty ?? 1,
+      max_order_qty: data.max_order_qty || null,
       category_id: data.category_id || null,
       sku: data.sku || null,
       barcode: data.barcode || null,
@@ -421,6 +427,37 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   </div>
                 </div>
               )}
+
+              {/* MoQ / MaxOQ — applies regardless of inventory tracking */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-[#0F172A] mb-1">
+                    Min Order Qty
+                    <span className="ml-1 text-xs text-slate-400 font-normal">(MoQ)</span>
+                  </label>
+                  <input
+                    {...register("min_order_qty")}
+                    type="number"
+                    min="1"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Minimum units per sale</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#0F172A] mb-1">
+                    Max Order Qty
+                    <span className="ml-1 text-xs text-slate-400 font-normal">(MaxOQ)</span>
+                  </label>
+                  <input
+                    {...register("max_order_qty")}
+                    type="number"
+                    min="1"
+                    placeholder="No limit"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Leave blank for no limit</p>
+                </div>
+              </div>
             </>
           )}
 
