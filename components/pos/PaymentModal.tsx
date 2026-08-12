@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useOfflineStore } from "@/store/offlineStore";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
+import { logAudit } from "@/lib/utils/audit";
 
 interface Business {
   id: string;
@@ -215,6 +216,14 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
       const newPoints = Math.max(0, (cust?.loyalty_points ?? 0) + pointsToEarn - loyaltyPointsToRedeem);
       await supabase.from("customers").update({ loyalty_points: newPoints }).eq("id", customerId);
     }
+
+    // Fire-and-forget audit log
+    logAudit({
+      businessId: business.id, userId,
+      action: "sale.created", entityType: "sale",
+      entityId: sale.id, entityName: sale.sale_number,
+      meta: { total: tot, method: paymentMethod },
+    });
 
     clearCart();
     onSuccess({

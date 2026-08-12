@@ -34,11 +34,12 @@ interface Props {
   customers: Customer[];
   tags: CustomerTag[];
   businessId: string;
+  userId: string;
   currency: string;
   businessType?: "retail" | "service";
 }
 
-export function CustomersClient({ customers, tags: initialTags, businessId, currency, businessType = "retail" }: Props) {
+export function CustomersClient({ customers, tags: initialTags, businessId, userId, currency, businessType = "retail" }: Props) {
   const isService = businessType === "service";
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -307,6 +308,7 @@ export function CustomersClient({ customers, tags: initialTags, businessId, curr
       {showForm && (
         <CustomerForm
           businessId={businessId}
+          userId={userId}
           editingCustomer={editing}
           tags={tags}
           onClose={handleFormClose}

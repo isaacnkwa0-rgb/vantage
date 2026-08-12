@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
+import { logAudit } from "@/lib/utils/audit";
 import { X, Loader2, Plus, Tag } from "lucide-react";
 
 const TAG_COLORS = [
@@ -29,12 +30,13 @@ interface CustomerTag {
 
 interface Props {
   businessId: string;
+  userId: string;
   editingCustomer: any | null;
   tags: CustomerTag[];
   onClose: (newTags?: CustomerTag[]) => void;
 }
 
-export function CustomerForm({ businessId, editingCustomer, tags: initialTags, onClose }: Props) {
+export function CustomerForm({ businessId, userId, editingCustomer, tags: initialTags, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<CustomerTag[]>(initialTags);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
@@ -100,10 +102,12 @@ export function CustomerForm({ businessId, editingCustomer, tags: initialTags, o
     if (editingCustomer) {
       const { error: err } = await supabase.from("customers").update(payload).eq("id", customerId);
       if (err) { setError(err.message); return; }
+      logAudit({ businessId, userId, action: "customer.updated", entityType: "customer", entityId: customerId, entityName: data.name });
     } else {
       const { data: inserted, error: err } = await supabase.from("customers").insert(payload).select().single();
       if (err || !inserted) { setError(err?.message ?? "Failed to add customer"); return; }
       customerId = inserted.id;
+      logAudit({ businessId, userId, action: "customer.created", entityType: "customer", entityId: customerId, entityName: data.name });
     }
 
     // Sync tag assignments: delete existing, insert selected

@@ -8,6 +8,7 @@ import {
   Package,
   Package2,
   Vault,
+  ActivitySquare,
   Users,
   Receipt,
   BarChart3,
@@ -42,6 +43,7 @@ const SELLING_NAV = [
   { label: "Expenses", icon: Receipt, href: "expenses" },
   { label: "Reports", icon: BarChart3, href: "reports" },
   { label: "Analytics", icon: TrendingUp, href: "analytics" },
+  { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
 
@@ -57,6 +59,7 @@ const SERVICE_NAV = [
   { label: "Expenses", icon: Receipt, href: "expenses" },
   { label: "Reports", icon: BarChart3, href: "reports" },
   { label: "Analytics", icon: TrendingUp, href: "analytics" },
+  { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
 

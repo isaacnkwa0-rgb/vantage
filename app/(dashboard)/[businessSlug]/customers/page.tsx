@@ -43,6 +43,7 @@ export default async function CustomersPage({ params }: Props) {
         customers={(customersRes.data ?? []) as any}
         tags={(tagsRes.data ?? []) as any}
         businessId={business.id}
+        userId={user.id}
         currency={business.currency}
         businessType={(business.business_type ?? "retail") as "retail" | "service"}
       />
