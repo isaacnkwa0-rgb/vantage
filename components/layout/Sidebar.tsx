@@ -33,6 +33,7 @@ import {
   CalendarDays,
   BookOpen,
   FileX,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -61,6 +62,7 @@ const SELLING_NAV = [
   { label: "Appointments", icon: CalendarDays, href: "appointments" },
   { label: "Cashbook", icon: BookOpen, href: "cashbook" },
   { label: "Credit Notes", icon: FileX, href: "credit-notes" },
+  { label: "Store Orders", icon: Globe, href: "store-orders" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
 ];
