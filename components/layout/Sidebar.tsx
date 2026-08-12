@@ -26,6 +26,7 @@ import {
   UserCheck,
   Ticket,
   FilePen,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/uiStore";
@@ -46,6 +47,7 @@ const SELLING_NAV = [
   { label: "Expenses", icon: Receipt, href: "expenses" },
   { label: "Reports", icon: BarChart3, href: "reports" },
   { label: "Analytics", icon: TrendingUp, href: "analytics" },
+  { label: "Targets", icon: Target, href: "targets" },
   { label: "Commissions", icon: BadgePercent, href: "commissions" },
   { label: "Activity", icon: ActivitySquare, href: "activity" },
   { label: "Settings", icon: Settings, href: "settings" },
