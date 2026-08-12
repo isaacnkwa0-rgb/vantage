@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2, Download, Link2, ClipboardCheck } from "lucide-react";
+import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2, Download, Link2, ClipboardCheck, MessageCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { generateInvoiceHTML } from "@/lib/utils/invoice";
 import { createClient } from "@/lib/supabase/client";
@@ -330,6 +330,24 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
                     >
                       <Printer className="w-3.5 h-3.5" />
                     </button>
+                    {(inv.client_email || inv.customers?.name) && inv.payment_link_token && (
+                      <a
+                        href={(() => {
+                          const phone = (inv.customers as any)?.phone ?? "";
+                          let p = phone.replace(/\s+/g, "");
+                          if (p.startsWith("0")) p = "234" + p.slice(1);
+                          if (p.startsWith("+")) p = p.slice(1);
+                          const msg = `Hello${inv.client_name ? ` ${inv.client_name}` : ""}, please find your invoice ${inv.invoice_number} for ${fmt(inv.total_amount)} here: ${typeof window !== "undefined" ? window.location.origin : ""}/pay/${inv.payment_link_token}`;
+                          return `https://wa.me/${p}?text=${encodeURIComponent(msg)}`;
+                        })()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                        title="Send via WhatsApp"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                     {inv.payment_link_token && inv.status !== "paid" && inv.status !== "cancelled" && (
                       <button
                         onClick={() => copyPaymentLink(inv)}
