@@ -17,6 +17,9 @@ interface CartState {
   items: CartItem[];
   discountType: DiscountType;
   discountValue: number;
+  // Promo code metadata (null when using manual discount)
+  promoCodeId: string | null;
+  promoCodeLabel: string | null; // e.g. "SAVE20"
   customerId: string | null;
   customerName: string | null;
   note: string;
@@ -24,24 +27,22 @@ interface CartState {
   taxRate: number;
   taxName: string;
   loyaltyPointsToRedeem: number;
-  loyaltyRedemptionRate: number; // points per $1 off
+  loyaltyRedemptionRate: number;
 
   // Actions
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (productId: string, variantId?: string) => void;
-  updateQuantity: (
-    productId: string,
-    quantity: number,
-    variantId?: string
-  ) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   setDiscount: (type: DiscountType, value: number) => void;
+  setPromoCode: (id: string, label: string, type: "percent" | "fixed", value: number) => void;
+  clearPromoCode: () => void;
   setCustomer: (id: string | null, name: string | null) => void;
   setNote: (note: string) => void;
   setTaxConfig: (enabled: boolean, rate: number, name: string) => void;
   setLoyaltyRedemption: (pts: number, rate: number) => void;
   clearCart: () => void;
 
-  // Computed (derived from items + discount + tax + loyalty)
+  // Computed
   subtotal: () => number;
   discountAmount: () => number;
   taxAmount: () => number;
@@ -55,6 +56,8 @@ export const useCartStore = create<CartState>()((set, get) => ({
   items: [],
   discountType: null,
   discountValue: 0,
+  promoCodeId: null,
+  promoCodeLabel: null,
   customerId: null,
   customerName: null,
   note: "",
@@ -67,9 +70,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
   addItem: (item) => {
     set((state) => {
       const key = item.variantId ?? item.productId;
-      const existing = state.items.find(
-        (i) => (i.variantId ?? i.productId) === key
-      );
+      const existing = state.items.find((i) => (i.variantId ?? i.productId) === key);
       if (existing) {
         return {
           items: state.items.map((i) =>
@@ -79,9 +80,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
           ),
         };
       }
-      return {
-        items: [...state.items, { ...item, quantity: item.quantity ?? 1 }],
-      };
+      return { items: [...state.items, { ...item, quantity: item.quantity ?? 1 }] };
     });
   },
 
@@ -94,10 +93,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
   },
 
   updateQuantity: (productId, quantity, variantId) => {
-    if (quantity <= 0) {
-      get().removeItem(productId, variantId);
-      return;
-    }
+    if (quantity <= 0) { get().removeItem(productId, variantId); return; }
     set((state) => ({
       items: state.items.map((i) => {
         const match = variantId
@@ -108,7 +104,18 @@ export const useCartStore = create<CartState>()((set, get) => ({
     }));
   },
 
-  setDiscount: (type, value) => set({ discountType: type, discountValue: value }),
+  // Manual discount — clears any applied promo code
+  setDiscount: (type, value) =>
+    set({ discountType: type, discountValue: value, promoCodeId: null, promoCodeLabel: null }),
+
+  // Apply a validated promo code — replaces any manual discount
+  setPromoCode: (id, label, type, value) =>
+    set({ promoCodeId: id, promoCodeLabel: label, discountType: type, discountValue: value }),
+
+  // Remove promo code and clear its discount
+  clearPromoCode: () =>
+    set({ promoCodeId: null, promoCodeLabel: null, discountType: null, discountValue: 0 }),
+
   setCustomer: (id, name) => set({ customerId: id, customerName: name }),
   setNote: (note) => set({ note }),
   setTaxConfig: (enabled, rate, name) => set({ taxEnabled: enabled, taxRate: rate, taxName: name }),
@@ -119,11 +126,12 @@ export const useCartStore = create<CartState>()((set, get) => ({
       items: [],
       discountType: null,
       discountValue: 0,
+      promoCodeId: null,
+      promoCodeLabel: null,
       customerId: null,
       customerName: null,
       note: "",
       loyaltyPointsToRedeem: 0,
-      // Preserve configs across sales
       taxEnabled: state.taxEnabled,
       taxRate: state.taxRate,
       taxName: state.taxName,
@@ -157,8 +165,6 @@ export const useCartStore = create<CartState>()((set, get) => ({
     return Math.max(0, base - get().loyaltyDiscountValue());
   },
 
-  totalCost: () =>
-    get().items.reduce((s, i) => s + i.costPrice * i.quantity, 0),
-
+  totalCost: () => get().items.reduce((s, i) => s + i.costPrice * i.quantity, 0),
   itemCount: () => get().items.reduce((s, i) => s + i.quantity, 0),
 }));

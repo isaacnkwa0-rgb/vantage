@@ -35,7 +35,7 @@ const PAYMENT_METHODS = [
 export function PaymentModal({ business, userId, customers, loyaltyEnabled, loyaltyPointsPerDollar, onClose, onSuccess }: Props) {
   const {
     items, discountType, discountValue, discountAmount, customerId, customerName,
-    subtotal, taxAmount, total, clearCart, loyaltyPointsToRedeem,
+    promoCodeId, subtotal, taxAmount, total, clearCart, loyaltyPointsToRedeem,
   } = useCartStore();
 
   const { addPendingSale } = useOfflineStore();
@@ -153,6 +153,7 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
         payment_method: paymentMethod,
         payment_reference: reference || null,
         payment_status: isCredit ? "unpaid" : "paid",
+        discount_code_id: promoCodeId ?? null,
         served_by: userId,
       })
       .select()
@@ -191,6 +192,11 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
       await supabase.from("customers").update({
         credit_balance: (cust?.credit_balance ?? 0) + tot,
       }).eq("id", customerId);
+    }
+
+    // Atomically increment promo code usage count
+    if (promoCodeId) {
+      await supabase.rpc("increment_promo_uses", { p_code_id: promoCodeId });
     }
 
     if (loyaltyEnabled && customerId && !isCredit) {

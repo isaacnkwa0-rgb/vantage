@@ -37,12 +37,26 @@ export default async function SalesPage({ params }: Props) {
     .gte("created_at", since.toISOString())
     .order("created_at", { ascending: false });
 
+  // Fetch which sales already have a return recorded
+  const saleIds = (sales ?? []).map(s => s.id);
+  let returnedSaleIds: string[] = [];
+  if (saleIds.length > 0) {
+    const { data: existingReturns } = await supabase
+      .from("returns")
+      .select("original_sale_id")
+      .eq("business_id", business.id)
+      .in("original_sale_id", saleIds);
+    returnedSaleIds = (existingReturns ?? []).map(r => r.original_sale_id);
+  }
+
   return (
     <div className="flex flex-col h-full overflow-auto">
       <TopBar title="Transactions" />
       <SalesClient
         sales={(sales ?? []) as any}
         business={business as any}
+        userId={user.id}
+        returnedSaleIds={returnedSaleIds}
       />
     </div>
   );

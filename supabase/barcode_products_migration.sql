@@ -31,3 +31,6 @@ CREATE POLICY "barcode_products_auth_update"
 
 -- Index for fast barcode lookups
 CREATE INDEX IF NOT EXISTS idx_barcode_products_barcode ON barcode_products (barcode);
+
+
+            

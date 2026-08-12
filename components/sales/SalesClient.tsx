@@ -4,11 +4,12 @@ import { useState, useMemo } from "react";
 import {
   Search, Receipt, Printer, TrendingUp, ShoppingBag,
   CreditCard, Banknote, ArrowLeftRight, Loader2, Calendar,
-  User, Download, BookOpen,
+  User, Download, BookOpen, RotateCcw,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
 import { ReceiptModal } from "@/components/pos/ReceiptModal";
+import { ReturnModal, type ReturnSaleItem } from "@/components/returns/ReturnModal";
 import { cn } from "@/lib/utils";
 
 interface Sale {
@@ -38,6 +39,8 @@ interface Business {
 interface Props {
   sales: Sale[];
   business: Business;
+  userId: string;
+  returnedSaleIds: string[];
 }
 
 const PAYMENT_ICONS: Record<string, React.ElementType> = {
@@ -54,11 +57,21 @@ const PAYMENT_COLORS: Record<string, string> = {
   credit: "bg-amber-50 text-amber-700",
 };
 
-export function SalesClient({ sales, business }: Props) {
-  const [search, setSearch] = useState("");
+export function SalesClient({ sales, business, userId, returnedSaleIds }: Props) {
+  const [search, setSearch]             = useState("");
   const [paymentFilter, setPaymentFilter] = useState("all");
-  const [reprinting, setReprinting] = useState<string | null>(null);
-  const [receiptSale, setReceiptSale] = useState<any | null>(null);
+  const [reprinting, setReprinting]     = useState<string | null>(null);
+  const [receiptSale, setReceiptSale]   = useState<any | null>(null);
+
+  // Return modal state
+  const [loadingReturn, setLoadingReturn] = useState<string | null>(null);
+  const [returnSale, setReturnSale]       = useState<Sale | null>(null);
+  const [returnItems, setReturnItems]     = useState<ReturnSaleItem[]>([]);
+  // Track returns processed in this session so UI updates without full reload
+  const [localReturned, setLocalReturned] = useState<Set<string>>(
+    () => new Set(returnedSaleIds)
+  );
+
   const fmt = (n: number) => formatCurrency(n, business.currency);
 
   const filtered = useMemo(() => {
@@ -75,20 +88,24 @@ export function SalesClient({ sales, business }: Props) {
   const totalRevenue = filtered.reduce((sum, s) => sum + s.total_amount, 0);
   const avgSale = filtered.length > 0 ? totalRevenue / filtered.length : 0;
 
+  async function fetchSaleItems(saleId: string): Promise<ReturnSaleItem[]> {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("sale_items")
+      .select("id, product_id, variant_id, product_name, variant_name, quantity, unit_price, line_total")
+      .eq("sale_id", saleId);
+    return (data ?? []) as ReturnSaleItem[];
+  }
+
   async function handleReprint(sale: Sale) {
     setReprinting(sale.id);
-    const supabase = createClient();
-    const { data: items } = await supabase
-      .from("sale_items")
-      .select("product_name, variant_name, quantity, unit_price, line_total")
-      .eq("sale_id", sale.id);
-
+    const items = await fetchSaleItems(sale.id);
     setReprinting(null);
     setReceiptSale({
       ...sale,
       customer_name: sale.customers?.name ?? null,
       customer_phone: sale.customers?.phone ?? null,
-      items: (items ?? []).map((i) => ({
+      items: items.map(i => ({
         product_name: i.product_name,
         variant_name: i.variant_name ?? null,
         quantity: i.quantity,
@@ -96,6 +113,20 @@ export function SalesClient({ sales, business }: Props) {
         line_total: i.line_total,
       })),
     });
+  }
+
+  async function handleReturn(sale: Sale) {
+    setLoadingReturn(sale.id);
+    const items = await fetchSaleItems(sale.id);
+    setLoadingReturn(null);
+    setReturnItems(items);
+    setReturnSale(sale);
+  }
+
+  function onReturnSuccess() {
+    if (returnSale) {
+      setLocalReturned(prev => new Set([...prev, returnSale.id]));
+    }
   }
 
   function formatDate(iso: string) {
@@ -109,7 +140,7 @@ export function SalesClient({ sales, business }: Props) {
   }
 
   function exportCSV() {
-    const headers = ["Sale #", "Customer", "Date", "Payment Method", "Subtotal", "Discount", "Tax", "Total"];
+    const headers = ["Sale #", "Customer", "Date", "Payment Method", "Subtotal", "Discount", "Tax", "Total", "Status"];
     const rows = filtered.map((s) => [
       s.sale_number,
       s.customers?.name ?? "Walk-in",
@@ -119,6 +150,7 @@ export function SalesClient({ sales, business }: Props) {
       s.discount_amount.toFixed(2),
       s.tax_amount.toFixed(2),
       s.total_amount.toFixed(2),
+      localReturned.has(s.id) ? "Returned" : "Paid",
     ]);
     const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -223,25 +255,35 @@ export function SalesClient({ sales, business }: Props) {
             <div className="w-44 flex-shrink-0 hidden sm:block">Date & Time</div>
             <div className="w-24 flex-shrink-0 hidden md:block">Method</div>
             <div className="w-28 text-right flex-shrink-0">Total</div>
-            <div className="w-20 flex-shrink-0" />
+            <div className="w-32 flex-shrink-0" />
           </div>
 
           <div className="divide-y divide-slate-50">
             {filtered.map((sale) => {
               const PayIcon = PAYMENT_ICONS[sale.payment_method] ?? Receipt;
               const payColor = PAYMENT_COLORS[sale.payment_method] ?? "bg-slate-50 text-slate-600";
-              const isReprinting = reprinting === sale.id;
+              const isReprinting   = reprinting === sale.id;
+              const isLoadingReturn = loadingReturn === sale.id;
+              const isReturned     = localReturned.has(sale.id);
 
               return (
                 <div
                   key={sale.id}
-                  className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition group"
+                  className={cn(
+                    "flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition group",
+                    isReturned && "bg-orange-50/40"
+                  )}
                 >
                   {/* Sale number */}
-                  <div className="w-28 flex-shrink-0">
+                  <div className="w-28 flex-shrink-0 space-y-0.5">
                     <span className="text-sm font-bold text-[#0F172A] font-numeric">
                       {sale.sale_number}
                     </span>
+                    {isReturned && (
+                      <span className="block text-[10px] font-semibold text-orange-500 uppercase tracking-wide">
+                        Returned
+                      </span>
+                    )}
                   </div>
 
                   {/* Customer */}
@@ -273,27 +315,49 @@ export function SalesClient({ sales, business }: Props) {
 
                   {/* Total */}
                   <div className="w-28 text-right flex-shrink-0">
-                    <p className="font-numeric font-bold text-sm text-[#0F172A]">
+                    <p className={cn(
+                      "font-numeric font-bold text-sm",
+                      isReturned ? "text-slate-400 line-through" : "text-[#0F172A]"
+                    )}>
                       {fmt(sale.total_amount)}
                     </p>
-                    {sale.discount_amount > 0 && (
+                    {sale.discount_amount > 0 && !isReturned && (
                       <p className="text-xs text-emerald-600">-{fmt(sale.discount_amount)} disc.</p>
                     )}
                   </div>
 
-                  {/* Reprint button */}
-                  <div className="w-20 flex-shrink-0 flex justify-end">
+                  {/* Actions */}
+                  <div className="w-32 flex-shrink-0 flex items-center justify-end gap-1.5">
+                    {/* Reprint */}
                     <button
                       onClick={() => handleReprint(sale)}
                       disabled={isReprinting}
-                      className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-green-300 hover:text-green-600 hover:bg-green-50 transition opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                      className="flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-green-300 hover:text-green-600 hover:bg-green-50 transition opacity-0 group-hover:opacity-100 disabled:opacity-50"
                     >
                       {isReprinting ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : (
                         <Printer className="w-3.5 h-3.5" />
                       )}
-                      {isReprinting ? "" : "Print"}
+                    </button>
+
+                    {/* Return — disabled once returned */}
+                    <button
+                      onClick={() => !isReturned && handleReturn(sale)}
+                      disabled={isReturned || isLoadingReturn}
+                      title={isReturned ? "Already returned" : "Process return"}
+                      className={cn(
+                        "flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg border transition opacity-0 group-hover:opacity-100",
+                        isReturned
+                          ? "border-orange-100 text-orange-300 cursor-default"
+                          : "border-slate-200 text-slate-600 hover:border-orange-300 hover:text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                      )}
+                    >
+                      {isLoadingReturn ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -304,16 +368,39 @@ export function SalesClient({ sales, business }: Props) {
           {/* Footer count */}
           <div className="px-4 py-3 border-t border-slate-100 bg-slate-50 text-xs text-slate-400">
             Showing {filtered.length} of {sales.length} transactions (last 90 days)
+            {localReturned.size > 0 && (
+              <span className="ml-2 text-orange-400">
+                · {localReturned.size} returned
+              </span>
+            )}
           </div>
         </div>
       )}
 
-      {/* Receipt modal for reprint */}
+      {/* Receipt reprint modal */}
       {receiptSale && (
         <ReceiptModal
           sale={receiptSale}
           business={business}
           onClose={() => setReceiptSale(null)}
+        />
+      )}
+
+      {/* Return modal */}
+      {returnSale && (
+        <ReturnModal
+          sale={{
+            id:              returnSale.id,
+            sale_number:     returnSale.sale_number,
+            business_id:     business.id,
+            created_at:      returnSale.created_at,
+            customers:       returnSale.customers ? { name: returnSale.customers.name } : null,
+          }}
+          items={returnItems}
+          business={{ currency: business.currency, name: business.name }}
+          userId={userId}
+          onClose={() => setReturnSale(null)}
+          onSuccess={onReturnSuccess}
         />
       )}
     </div>

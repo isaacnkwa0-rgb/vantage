@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Trash2, Plus, Minus, ShoppingBag, Tag, UserCheck, X, ChevronDown, Star } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, Tag, UserCheck, X, ChevronDown, Star, Ticket, Loader2, CheckCircle2 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
@@ -36,8 +36,9 @@ export function CartPanel({
 }: Props) {
   const router = useRouter();
   const {
-    items, removeItem, updateQuantity, setDiscount, setCustomer,
-    discountType, discountValue, customerId, customerName,
+    items, removeItem, updateQuantity, setDiscount, setPromoCode, clearPromoCode,
+    setCustomer, discountType, discountValue, promoCodeId, promoCodeLabel,
+    customerId, customerName,
     subtotal, discountAmount, taxAmount, loyaltyDiscountValue, total,
     clearCart, setTaxConfig, setLoyaltyRedemption, loyaltyPointsToRedeem,
   } = useCartStore();
@@ -49,6 +50,10 @@ export function CartPanel({
   const [showDiscount, setShowDiscount] = useState(false);
   const [discountInput, setDiscountInput] = useState(discountValue.toString());
   const [discountTypeInput, setDiscountTypeInput] = useState<"percent" | "fixed">(discountType ?? "percent");
+  const [showPromoInput, setShowPromoInput]   = useState(false);
+  const [promoInput, setPromoInput]           = useState("");
+  const [promoLoading, setPromoLoading]       = useState(false);
+  const [promoError, setPromoError]           = useState<string | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [showCustomerSearch, setShowCustomerSearch] = useState(false);
   const [showAddCustomer, setShowAddCustomer] = useState(false);
@@ -91,6 +96,52 @@ export function CartPanel({
     const val = parseFloat(discountInput) || 0;
     setDiscount(val > 0 ? discountTypeInput : null, val);
     setShowDiscount(false);
+  }
+
+  async function applyPromoCode() {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+    setPromoLoading(true);
+    setPromoError(null);
+
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("discount_codes")
+      .select("id, code, name, discount_type, discount_value, min_order_amount, max_uses, uses_count, is_active, expires_at")
+      .eq("business_id", businessId)
+      .eq("code", code)
+      .single();
+
+    if (error || !data) {
+      setPromoError("Code not found.");
+      setPromoLoading(false);
+      return;
+    }
+    if (!data.is_active) {
+      setPromoError("This code is inactive.");
+      setPromoLoading(false);
+      return;
+    }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      setPromoError("This code has expired.");
+      setPromoLoading(false);
+      return;
+    }
+    if (data.max_uses !== null && data.uses_count >= data.max_uses) {
+      setPromoError("This code has reached its usage limit.");
+      setPromoLoading(false);
+      return;
+    }
+    if (data.min_order_amount > 0 && subtotal() < data.min_order_amount) {
+      setPromoError(`Minimum order of ${fmt(data.min_order_amount)} required.`);
+      setPromoLoading(false);
+      return;
+    }
+
+    setPromoCode(data.id, data.code, data.discount_type as "percent" | "fixed", data.discount_value);
+    setShowPromoInput(false);
+    setPromoInput("");
+    setPromoLoading(false);
   }
 
   async function addNewCustomer() {
@@ -299,39 +350,95 @@ export function CartPanel({
           </div>
         )}
 
-        {/* Discount */}
-        {!showDiscount ? (
-          <button
-            onClick={() => setShowDiscount(true)}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-green-500 hover:bg-green-50 rounded-lg transition"
-          >
-            <Tag className="w-4 h-4" />
-            {disc > 0 ? `Discount applied: -${fmt(disc)}` : "Add discount"}
-          </button>
-        ) : (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+        {/* Promo Code (shown when a code is applied) */}
+        {promoCodeId && (
+          <div className="flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-violet-700">{promoCodeLabel}</p>
+              <p className="text-[10px] text-violet-500">Promo code · -{fmt(disc)}</p>
+            </div>
+            <button
+              onClick={clearPromoCode}
+              className="p-0.5 rounded hover:bg-violet-100 transition flex-shrink-0"
+            >
+              <X className="w-3.5 h-3.5 text-violet-400" />
+            </button>
+          </div>
+        )}
+
+        {/* Promo code input */}
+        {!promoCodeId && showPromoInput && (
+          <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 space-y-2">
             <div className="flex gap-2">
-              <select
-                value={discountTypeInput}
-                onChange={(e) => setDiscountTypeInput(e.target.value as "percent" | "fixed")}
-                className="px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none"
-              >
-                <option value="percent">%</option>
-                <option value="fixed">Fixed</option>
-              </select>
               <input
-                type="number"
-                min="0"
-                value={discountInput}
-                onChange={(e) => setDiscountInput(e.target.value)}
-                placeholder="0"
-                className="flex-1 px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                autoFocus
+                value={promoInput}
+                onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
+                onKeyDown={(e) => e.key === "Enter" && applyPromoCode()}
+                placeholder="Enter code e.g. SAVE20"
+                className="flex-1 px-2.5 py-1.5 text-sm border border-violet-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white font-mono uppercase tracking-wider"
               />
+              <button
+                onClick={applyPromoCode}
+                disabled={promoLoading || !promoInput.trim()}
+                className="px-3 py-1.5 text-xs bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold disabled:opacity-60 flex items-center gap-1"
+              >
+                {promoLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+              </button>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => { setDiscount(null, 0); setShowDiscount(false); }} className="flex-1 py-1.5 text-xs border border-slate-200 rounded-lg text-slate-500">Remove</button>
-              <button onClick={applyDiscount} className="flex-1 py-1.5 text-xs bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold">Apply</button>
-            </div>
+            {promoError && <p className="text-xs text-red-500">{promoError}</p>}
+            <button onClick={() => { setShowPromoInput(false); setPromoError(null); }} className="text-xs text-slate-400 hover:text-slate-600">Cancel</button>
+          </div>
+        )}
+
+        {/* Discount / Promo toggle row */}
+        {!promoCodeId && (
+          <div className="flex gap-2">
+            {!showDiscount && !showPromoInput && (
+              <>
+                <button
+                  onClick={() => setShowDiscount(true)}
+                  className="flex-1 flex items-center gap-1.5 px-3 py-2 text-xs text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition"
+                >
+                  <Tag className="w-3.5 h-3.5" />
+                  {disc > 0 && !promoCodeId ? `Discount -${fmt(disc)}` : "Discount"}
+                </button>
+                <button
+                  onClick={() => setShowPromoInput(true)}
+                  className="flex-1 flex items-center gap-1.5 px-3 py-2 text-xs text-slate-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition"
+                >
+                  <Ticket className="w-3.5 h-3.5" />
+                  Promo Code
+                </button>
+              </>
+            )}
+            {showDiscount && (
+              <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                <div className="flex gap-2">
+                  <select
+                    value={discountTypeInput}
+                    onChange={(e) => setDiscountTypeInput(e.target.value as "percent" | "fixed")}
+                    className="px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none"
+                  >
+                    <option value="percent">%</option>
+                    <option value="fixed">Fixed</option>
+                  </select>
+                  <input
+                    type="number"
+                    min="0"
+                    value={discountInput}
+                    onChange={(e) => setDiscountInput(e.target.value)}
+                    placeholder="0"
+                    className="flex-1 px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => { setDiscount(null, 0); setShowDiscount(false); }} className="flex-1 py-1.5 text-xs border border-slate-200 rounded-lg text-slate-500">Remove</button>
+                  <button onClick={applyDiscount} className="flex-1 py-1.5 text-xs bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold">Apply</button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
