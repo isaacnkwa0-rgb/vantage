@@ -37,7 +37,7 @@ export default async function BankAccountsPage({ params }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Bank Accounts" />
       <BankAccountsClient
         accounts={(accountsRes.data ?? []) as any}

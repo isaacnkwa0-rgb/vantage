@@ -35,7 +35,7 @@ export default async function RecurringPage({ params }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Recurring Billing" />
       <RecurringClient
         schedules={(schedRes.data ?? []) as any}

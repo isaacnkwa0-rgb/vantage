@@ -29,7 +29,7 @@ export default async function ShiftsPage({ params }: Props) {
     .limit(100);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Cash Shifts" />
       <ShiftsClient
         shifts={(shifts ?? []) as any}

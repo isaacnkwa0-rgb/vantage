@@ -37,7 +37,7 @@ export default async function PurchaseOrdersPage({ params }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Purchase Orders" />
       <PurchaseOrdersClient
         orders={(posRes.data ?? []) as any}

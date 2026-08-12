@@ -36,7 +36,7 @@ export default async function CashbookPage({ params, searchParams }: Props) {
     .order("entry_date", { ascending: false });
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Cashbook" />
       <CashbookClient
         entries={(entries ?? []) as any}

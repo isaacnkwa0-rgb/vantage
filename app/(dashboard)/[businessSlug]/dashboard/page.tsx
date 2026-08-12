@@ -154,7 +154,7 @@ export default async function DashboardPage({ params }: Props) {
   const newCustomers = newCustomersRes.count ?? 0;
 
   return (
-    <div className="flex flex-col h-full overflow-auto bg-[#F7F9FC]">
+    <div className="flex flex-col flex-1 overflow-auto bg-[#F7F9FC]">
       <TopBar title="Dashboard" />
       <div className="flex-1 p-4 sm:p-6 space-y-5 max-w-screen-2xl mx-auto w-full">
 

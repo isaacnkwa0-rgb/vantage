@@ -28,7 +28,7 @@ export default async function DiscountsPage({ params }: Props) {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Discounts & Promo Codes" />
       <DiscountsClient
         codes={codes ?? []}

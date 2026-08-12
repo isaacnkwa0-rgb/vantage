@@ -43,7 +43,7 @@ export default async function CampaignsPage({ params }: Props) {
   const phoneCount = customers.filter((c) => c.phone).length;
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Campaigns" />
       <CampaignsClient
         campaigns={(campaignsRes.data ?? []) as any}

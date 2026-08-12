@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BusinessProvider } from "@/components/layout/BusinessProvider";
 import { CommandSearchProvider } from "@/components/layout/CommandSearch";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 interface Props {
   children: React.ReactNode;
@@ -45,8 +46,12 @@ export default async function BusinessLayout({ children, params }: Props) {
       <CommandSearchProvider>
         <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
           <Sidebar slug={businessSlug} />
-          <main className="flex-1 flex flex-col overflow-hidden">
-            {children}
+          <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+            {/* Content wrapper — flex-1 min-h-0 ensures it shrinks to leave room for BottomNav */}
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+              {children}
+            </div>
+            <BottomNav slug={businessSlug} />
           </main>
         </div>
       </CommandSearchProvider>

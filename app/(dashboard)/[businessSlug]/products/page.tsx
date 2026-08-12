@@ -44,7 +44,7 @@ export default async function ProductsPage({ params }: Props) {
   const isService = business.business_type === "service";
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title={isService ? "Services" : "Products"} />
       <ProductsClient
         products={(products ?? []) as any}

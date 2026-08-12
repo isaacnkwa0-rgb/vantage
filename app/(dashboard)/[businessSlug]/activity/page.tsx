@@ -29,7 +29,7 @@ export default async function ActivityPage({ params }: Props) {
     .limit(500);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Activity Log" />
       <ActivityClient logs={(logs ?? []) as any} />
     </div>

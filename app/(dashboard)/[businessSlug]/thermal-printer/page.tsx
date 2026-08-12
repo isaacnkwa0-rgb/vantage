@@ -29,7 +29,7 @@ export default async function ThermalPrinterPage({ params }: Props) {
     .limit(20);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Thermal Printer" />
       <ThermalPrinterClient
         business={business as any}

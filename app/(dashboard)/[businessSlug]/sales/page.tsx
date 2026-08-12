@@ -50,7 +50,7 @@ export default async function SalesPage({ params }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Transactions" />
       <SalesClient
         sales={(sales ?? []) as any}

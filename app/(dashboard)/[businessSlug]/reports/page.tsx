@@ -22,7 +22,7 @@ export default async function ReportsPage({ params }: Props) {
   if (!business) redirect("/onboarding");
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Reports" />
       <ReportsClient businessId={business.id} currency={business.currency} />
     </div>

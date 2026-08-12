@@ -48,7 +48,7 @@ export default async function AppointmentsPage({ params }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Appointments" />
       <AppointmentsClient
         appointments={(apptRes.data ?? []) as any}

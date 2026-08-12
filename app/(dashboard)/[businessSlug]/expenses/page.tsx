@@ -28,7 +28,7 @@ export default async function ExpensesPage({ params }: Props) {
     .order("expense_date", { ascending: false });
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Expenses" />
       <ExpensesClient
         expenses={expenses ?? []}

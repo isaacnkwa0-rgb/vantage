@@ -29,7 +29,7 @@ export default async function StoreOrdersPage({ params }: Props) {
     .limit(100);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Online Store Orders" />
       <StoreOrdersClient
         orders={(orders ?? []) as any}

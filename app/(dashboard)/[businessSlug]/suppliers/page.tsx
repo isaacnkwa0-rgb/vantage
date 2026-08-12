@@ -29,7 +29,7 @@ export default async function SuppliersPage({ params }: Props) {
     .order("name", { ascending: true });
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Suppliers" />
       <SuppliersClient
         suppliers={(suppliers ?? []) as any}

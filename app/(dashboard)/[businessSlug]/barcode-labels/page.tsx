@@ -28,7 +28,7 @@ export default async function BarcodeLabelsPage({ params }: Props) {
     .order("name");
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Barcode Labels" />
       <BarcodeLabelsClient
         products={(products ?? []) as any}

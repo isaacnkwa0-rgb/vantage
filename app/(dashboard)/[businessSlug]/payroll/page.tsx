@@ -37,7 +37,7 @@ export default async function PayrollPage({ params }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Staff Payroll" />
       <PayrollClient
         staff={(staffRes.data ?? []) as any}

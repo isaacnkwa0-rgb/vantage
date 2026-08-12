@@ -45,7 +45,7 @@ export default async function TargetsPage({ params }: Props) {
   const unitsThisMonth = salesThisMonth.length;
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col flex-1 overflow-auto">
       <TopBar title="Sales Targets" />
       <TargetsClient
         targets={(targetsRes.data ?? []) as any}

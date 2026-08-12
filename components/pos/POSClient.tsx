@@ -208,7 +208,7 @@ export function POSClient({ products, bundles, customers, business, userId, curr
   }, [isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden">
       {/* Mobile header */}
       <div className="lg:hidden flex items-center gap-3 px-4 h-14 bg-white border-b border-slate-200 flex-shrink-0">
         <button
