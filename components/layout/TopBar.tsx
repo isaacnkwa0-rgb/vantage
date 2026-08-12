@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Menu, Bell, LogOut, AlertTriangle, FileText, BookOpen, Loader2 } from "lucide-react";
+import { Menu, Bell, LogOut, AlertTriangle, FileText, BookOpen, Loader2, Search } from "lucide-react";
 import { useUIStore } from "@/store/uiStore";
 import { useBusinessStore } from "@/store/businessStore";
 import { createClient } from "@/lib/supabase/client";
@@ -193,7 +193,22 @@ export function TopBar({ title }: TopBarProps) {
         <Menu className="w-5 h-5" />
       </button>
 
-      <h2 className="text-base font-bold text-[#0F172A] flex-1 truncate">{title}</h2>
+      <h2 className="text-base font-bold text-[#0F172A] flex-1 min-w-0 truncate">{title}</h2>
+
+      {/* Command search trigger */}
+      <button
+        onClick={() => {
+          const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
+          document.dispatchEvent(event);
+        }}
+        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition text-xs font-medium flex-shrink-0"
+      >
+        <Search className="w-3.5 h-3.5" />
+        <span className="hidden md:inline">Search</span>
+        <kbd className="hidden md:flex items-center gap-0.5 text-[10px] text-slate-400 font-mono">
+          <span>⌘</span><span>K</span>
+        </kbd>
+      </button>
 
       <div className="flex items-center gap-1">
         <div ref={bellRef} className="relative">

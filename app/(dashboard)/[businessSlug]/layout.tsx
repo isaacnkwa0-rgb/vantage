@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BusinessProvider } from "@/components/layout/BusinessProvider";
+import { CommandSearchProvider } from "@/components/layout/CommandSearch";
 
 interface Props {
   children: React.ReactNode;
@@ -41,12 +42,14 @@ export default async function BusinessLayout({ children, params }: Props) {
 
   return (
     <BusinessProvider business={business} role={membership.role}>
-      <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
-        <Sidebar slug={businessSlug} />
-        <main className="flex-1 flex flex-col overflow-hidden">
-          {children}
-        </main>
-      </div>
+      <CommandSearchProvider>
+        <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
+          <Sidebar slug={businessSlug} />
+          <main className="flex-1 flex flex-col overflow-hidden">
+            {children}
+          </main>
+        </div>
+      </CommandSearchProvider>
     </BusinessProvider>
   );
 }
