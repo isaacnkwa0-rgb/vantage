@@ -23,7 +23,7 @@ function pct(current: number, previous: number): number | null {
 }
 
 function TrendBadge({ value }: { value: number | null }) {
-  if (value === null) return <span className="trend-neutral"><Minus className="w-3 h-3" />No prior data</span>;
+  if (value === null) return null;
   if (value > 0) return <span className="trend-up"><TrendingUp className="w-3 h-3" />+{value.toFixed(1)}%</span>;
   if (value < 0) return <span className="trend-down"><TrendingDown className="w-3 h-3" />{value.toFixed(1)}%</span>;
   return <span className="trend-neutral"><Minus className="w-3 h-3" />0%</span>;
