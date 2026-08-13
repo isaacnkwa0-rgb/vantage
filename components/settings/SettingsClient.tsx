@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer, Percent, Globe } from "lucide-react";
+import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer, Percent, Globe, Copy, ExternalLink, Share2, Check } from "lucide-react";
 import { BillingTab } from "@/components/subscription/BillingTab";
 
 interface Business {
@@ -122,6 +122,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [deliveryNote, setDeliveryNote] = useState(business.store_delivery_note ?? "");
   const [fbPixelId, setFbPixelId] = useState(business.fb_pixel_id ?? "");
   const [gaMeasurementId, setGaMeasurementId] = useState(business.ga_measurement_id ?? "");
+  const [storeLinkCopied, setStoreLinkCopied] = useState(false);
   const [savingShipping, setSavingShipping] = useState(false);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
@@ -1015,13 +1016,67 @@ export function SettingsClient({ business, members, locations: initialLocations,
       {/* ─── Online Store ─── */}
       {tab === "store" && (
         <div className="max-w-xl space-y-5">
+
+          {/* ── Shareable store link card ── */}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Globe className="w-4 h-4 text-green-600" />
+              <p className="text-sm font-semibold text-green-800">Your Store Link</p>
+            </div>
+            <p className="text-xs text-green-700 mb-3">
+              Share this link on WhatsApp, Instagram, or anywhere — customers can browse your products and place orders directly.
+            </p>
+            <div className="flex items-center gap-2 bg-white border border-green-200 rounded-lg px-3 py-2 mb-3">
+              <span className="flex-1 text-sm text-slate-700 truncate font-mono select-all">
+                {typeof window !== "undefined" ? window.location.origin : "https://vantage-mu-ten.vercel.app"}/store/{business.slug}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  const url = `${window.location.origin}/store/${business.slug}`;
+                  await navigator.clipboard.writeText(url);
+                  setStoreLinkCopied(true);
+                  setTimeout(() => setStoreLinkCopied(false), 2000);
+                }}
+                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+              >
+                {storeLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {storeLinkCopied ? "Copied!" : "Copy Link"}
+              </button>
+              <a
+                href={`/store/${business.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 border border-green-300 text-green-700 hover:bg-green-100 text-xs font-semibold px-3 py-2 rounded-lg transition"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Visit Store
+              </a>
+              <button
+                onClick={async () => {
+                  const url = `${window.location.origin}/store/${business.slug}`;
+                  if (navigator.share) {
+                    await navigator.share({ title: `${business.name} — Online Store`, url });
+                  } else {
+                    await navigator.clipboard.writeText(url);
+                    setStoreLinkCopied(true);
+                    setTimeout(() => setStoreLinkCopied(false), 2000);
+                  }
+                }}
+                className="flex items-center gap-1.5 border border-green-300 text-green-700 hover:bg-green-100 text-xs font-semibold px-3 py-2 rounded-lg transition"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                Share
+              </button>
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-[#0F172A]">Online Store</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Your store: <a href={`/store/${business.slug}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">/store/{business.slug}</a>
-                </p>
+                <p className="text-xs text-slate-400 mt-0.5">Configure delivery, tracking, and analytics for your store.</p>
               </div>
             </div>
 
