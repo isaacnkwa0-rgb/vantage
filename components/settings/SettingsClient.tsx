@@ -43,6 +43,7 @@ interface Business {
   store_delivery_note: string | null;
   fb_pixel_id: string | null;
   ga_measurement_id: string | null;
+  custom_domain?: string | null;
 }
 
 interface Member {
@@ -123,6 +124,9 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [fbPixelId, setFbPixelId] = useState(business.fb_pixel_id ?? "");
   const [gaMeasurementId, setGaMeasurementId] = useState(business.ga_measurement_id ?? "");
   const [storeLinkCopied, setStoreLinkCopied] = useState(false);
+  const [customDomain, setCustomDomain] = useState(business.custom_domain ?? "");
+  const [savingDomain, setSavingDomain] = useState(false);
+  const [domainSaved, setDomainSaved] = useState(false);
   const [savingShipping, setSavingShipping] = useState(false);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
@@ -380,6 +384,19 @@ export function SettingsClient({ business, members, locations: initialLocations,
     }).eq("id", business.id);
     setSavingBranding(false);
     router.refresh();
+  }
+
+  async function saveCustomDomain() {
+    setSavingDomain(true);
+    const supabase = createClient();
+    const domain = customDomain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/$/, "");
+    await supabase.from("businesses").update({
+      custom_domain: domain || null,
+    }).eq("id", business.id);
+    setCustomDomain(domain);
+    setSavingDomain(false);
+    setDomainSaved(true);
+    setTimeout(() => setDomainSaved(false), 3000);
   }
 
   async function saveShippingSettings() {
@@ -1069,6 +1086,58 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 <Share2 className="w-3.5 h-3.5" />
                 Share
               </button>
+            </div>
+          </div>
+
+          {/* Custom Domain */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div>
+              <h3 className="font-semibold text-[#0F172A]">Custom Domain</h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Point your own domain (e.g. <span className="font-mono">shop.yourbrand.com</span>) to your store.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Your Custom Domain</label>
+                <input
+                  value={customDomain}
+                  onChange={(e) => setCustomDomain(e.target.value)}
+                  placeholder="shop.yourbrand.com"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                />
+              </div>
+
+              <button
+                onClick={saveCustomDomain}
+                disabled={savingDomain}
+                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+              >
+                {domainSaved ? <Check className="w-3.5 h-3.5" /> : null}
+                {savingDomain ? "Saving…" : domainSaved ? "Saved!" : "Save Domain"}
+              </button>
+
+              <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 space-y-2">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">DNS Setup Instructions</p>
+                <p className="text-xs text-slate-600">
+                  In your domain registrar, add the following <span className="font-semibold">CNAME record</span>:
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="bg-white border border-slate-200 rounded p-2">
+                    <p className="text-slate-400 text-[10px] uppercase font-bold mb-0.5">Name / Host</p>
+                    <p className="font-mono text-slate-800">shop</p>
+                    <p className="text-slate-400 text-[10px] mt-0.5">(or @ for apex domain)</p>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded p-2">
+                    <p className="text-slate-400 text-[10px] uppercase font-bold mb-0.5">Value / Target</p>
+                    <p className="font-mono text-slate-800">cname.vercel-dns.com</p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500">
+                  DNS changes can take up to 24 hours to propagate. Once saved here and DNS is set, your store will be live at your custom domain.
+                </p>
+              </div>
             </div>
           </div>
 
