@@ -8,8 +8,10 @@ interface KpiGridProps {
   yesterdayRevenue: number;
   yesterdaySalesCount: number;
   monthRevenue: number;
+  monthCOGS: number;
   monthExpenses: number;
   lastMonthRevenue: number;
+  lastMonthCOGS: number;
   lastMonthExpenses: number;
   currency: string;
   businessType: "retail" | "service" | "restaurant";
@@ -58,14 +60,19 @@ export function KpiGrid({
   yesterdayRevenue,
   yesterdaySalesCount,
   monthRevenue,
+  monthCOGS,
   monthExpenses,
   lastMonthRevenue,
+  lastMonthCOGS,
   lastMonthExpenses,
   currency,
   businessType,
 }: KpiGridProps) {
   const fmt = (n: number) => formatCurrency(n, currency);
-  const netProfit = monthRevenue - monthExpenses;
+
+  // Gross profit = Revenue − Cost of Goods Sold − Operating Expenses
+  const netProfit = monthRevenue - monthCOGS - monthExpenses;
+  const lastMonthProfit = lastMonthRevenue - lastMonthCOGS - lastMonthExpenses;
   const margin = monthRevenue > 0 ? (netProfit / monthRevenue) * 100 : null;
 
   const txLabel = businessType === "service" ? "services" : businessType === "restaurant" ? "orders" : "sales";
@@ -100,7 +107,7 @@ export function KpiGrid({
         label="Net Profit"
         value={monthRevenue > 0 ? fmt(netProfit) : "—"}
         sub={margin !== null ? `${margin.toFixed(1)}% margin` : "this month"}
-        trend={pct(netProfit, lastMonthRevenue - lastMonthExpenses)}
+        trend={pct(netProfit, lastMonthProfit)}
         trendLabel="vs last month"
         accentClass={netProfit >= 0 ? "text-emerald-600" : "text-red-600"}
       />

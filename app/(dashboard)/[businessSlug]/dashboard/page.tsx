@@ -50,6 +50,8 @@ export default async function DashboardPage({ params }: Props) {
     monthExpensesRes,
     lastMonthExpensesRes,
     lastMonthSalesRes,
+    monthCOGSRes,
+    lastMonthCOGSRes,
     productsRes,
     customersRes,
     newCustomersRes,
@@ -102,6 +104,22 @@ export default async function DashboardPage({ params }: Props) {
       .gte("created_at", lastMonthStart.toISOString())
       .lte("created_at", lastMonthEnd.toISOString()),
 
+    // This month's COGS — cost_price × quantity from sale_items
+    supabase
+      .from("sales")
+      .select("sale_items(cost_price, quantity)")
+      .eq("business_id", business.id)
+      .gte("created_at", monthStart.toISOString())
+      .lte("created_at", todayEnd.toISOString()),
+
+    // Last month's COGS
+    supabase
+      .from("sales")
+      .select("sale_items(cost_price, quantity)")
+      .eq("business_id", business.id)
+      .gte("created_at", lastMonthStart.toISOString())
+      .lte("created_at", lastMonthEnd.toISOString()),
+
     // Products (all active)
     supabase
       .from("products")
@@ -147,6 +165,15 @@ export default async function DashboardPage({ params }: Props) {
   const lastMonthExpenses = (lastMonthExpensesRes.data ?? []).reduce((s, e) => s + e.amount, 0);
   const lastMonthRevenue = (lastMonthSalesRes.data ?? []).reduce((s, r) => s + r.total_amount, 0);
 
+  // COGS = sum of (cost_price × quantity) across all sale_items for each sale
+  const monthCOGS = (monthCOGSRes.data ?? [])
+    .flatMap((s) => (s.sale_items as { cost_price: number; quantity: number }[] | null) ?? [])
+    .reduce((sum, item) => sum + item.cost_price * item.quantity, 0);
+
+  const lastMonthCOGS = (lastMonthCOGSRes.data ?? [])
+    .flatMap((s) => (s.sale_items as { cost_price: number; quantity: number }[] | null) ?? [])
+    .reduce((sum, item) => sum + item.cost_price * item.quantity, 0);
+
   const products = productsRes.data ?? [];
   const lowStockProducts = products.filter((p) => p.stock_quantity <= p.low_stock_threshold);
 
@@ -172,8 +199,10 @@ export default async function DashboardPage({ params }: Props) {
           yesterdayRevenue={yesterdayRevenue}
           yesterdaySalesCount={yesterdayCount}
           monthRevenue={monthRevenue}
+          monthCOGS={monthCOGS}
           monthExpenses={monthExpenses}
           lastMonthRevenue={lastMonthRevenue}
+          lastMonthCOGS={lastMonthCOGS}
           lastMonthExpenses={lastMonthExpenses}
           currency={business.currency}
           businessType={businessType}
