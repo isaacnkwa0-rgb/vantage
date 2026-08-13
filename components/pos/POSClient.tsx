@@ -46,6 +46,12 @@ interface Business {
   loyalty_enabled: boolean;
   loyalty_points_per_dollar: number;
   loyalty_redemption_rate: number;
+  receipt_footer?: string | null;
+  receipt_tagline?: string | null;
+  receipt_show_logo?: boolean | null;
+  social_instagram?: string | null;
+  social_twitter?: string | null;
+  social_whatsapp?: string | null;
 }
 
 interface CompletedSale {

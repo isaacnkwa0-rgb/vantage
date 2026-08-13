@@ -85,11 +85,13 @@ export function generateReceiptHTML(
   const paymentMethod =
     sale.payment_method.charAt(0).toUpperCase() + sale.payment_method.slice(1);
 
+  const pdfTitle = `${business.name} - Receipt - ${date}`;
+
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Receipt ${sale.sale_number}</title>
+  <title>${pdfTitle}</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size:14px; color:#374151; background:#fff; }
