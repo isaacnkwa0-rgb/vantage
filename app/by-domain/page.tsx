@@ -31,11 +31,26 @@ export default async function ByDomainPage() {
     .gt("selling_price", 0)
     .order("name");
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id, name")
-    .eq("business_id", business.id)
-    .order("name");
+  const productCategoryIds = [...new Set(
+    (products ?? []).map((p) => p.category_id).filter(Boolean) as string[]
+  )];
+
+  let categories: { id: string; name: string }[] = [];
+  if (productCategoryIds.length > 0) {
+    const { data: cats } = await supabase
+      .from("categories")
+      .select("id, name")
+      .in("id", productCategoryIds)
+      .order("name");
+
+    const nameToIds = new Map<string, string[]>();
+    for (const cat of cats ?? []) {
+      const ids = nameToIds.get(cat.name) ?? [];
+      ids.push(cat.id);
+      nameToIds.set(cat.name, ids);
+    }
+    categories = [...nameToIds.entries()].map(([name, ids]) => ({ id: ids.join(","), name }));
+  }
 
   return (
     <StoreFront

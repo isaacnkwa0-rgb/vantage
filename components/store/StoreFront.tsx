@@ -95,7 +95,7 @@ export function StoreFront({ business, products, categories, orderNumber, paymen
   const filteredProducts = useMemo(() =>
     products.filter((p) => {
       const matchesSearch = !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = !selectedCategory || p.category_id === selectedCategory;
+      const matchesCategory = !selectedCategory || selectedCategory.split(",").includes(p.category_id ?? "");
       return matchesSearch && matchesCategory;
     }),
     [products, search, selectedCategory]
