@@ -257,7 +257,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           <button className="justify-self-start p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition">
             <Menu className="w-5 h-5" />
           </button>
-          <div className="justify-self-center">{logoMark(40)}</div>
+          <div className="justify-self-center">{logoMark(52)}</div>
           <button
             onClick={() => setCartOpen(true)}
             className="justify-self-end relative p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition"
