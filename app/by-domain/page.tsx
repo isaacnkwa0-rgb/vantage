@@ -25,16 +25,23 @@ export default async function ByDomainPage() {
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, description, image_url, selling_price, stock_quantity, track_inventory")
+    .select("id, name, description, image_url, selling_price, stock_quantity, track_inventory, category_id")
     .eq("business_id", business.id)
     .eq("is_active", true)
     .gt("selling_price", 0)
+    .order("name");
+
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id, name")
+    .eq("business_id", business.id)
     .order("name");
 
   return (
     <StoreFront
       business={business as any}
       products={(products ?? []) as any}
+      categories={(categories ?? []) as any}
     />
   );
 }

@@ -38,10 +38,16 @@ export default async function StorePage({ params, searchParams }: Props) {
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, description, image_url, selling_price, stock_quantity, track_inventory")
+    .select("id, name, description, image_url, selling_price, stock_quantity, track_inventory, category_id")
     .eq("business_id", business.id)
     .eq("is_active", true)
     .gt("selling_price", 0)
+    .order("name");
+
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id, name")
+    .eq("business_id", business.id)
     .order("name");
 
   return (
@@ -73,6 +79,7 @@ export default async function StorePage({ params, searchParams }: Props) {
       <StoreFront
         business={business as any}
         products={(products ?? []) as any}
+        categories={(categories ?? []) as any}
         orderNumber={order}
         paymentStatus={status}
       />
