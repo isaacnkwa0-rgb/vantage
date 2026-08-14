@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PUBLIC_PATHS = ["/login", "/register", "/verify", "/invite", "/pricing", "/pay", "/portal", "/store", "/by-domain", "/api/sys-mig-9f3j7"];
+const PUBLIC_PATHS = ["/login", "/register", "/verify", "/invite", "/pricing", "/pay", "/portal", "/store", "/by-domain", "/api/store", "/api/sys-mig-9f3j7"];
 const AUTH_PATHS = ["/login", "/register"];
 
 // Set STORE_DOMAIN to your platform domain, e.g. "getvantage.app"

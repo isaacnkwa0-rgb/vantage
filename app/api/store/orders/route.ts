@@ -30,8 +30,7 @@ export async function POST(req: NextRequest) {
       subtotal: subtotal ?? total,
       shipping_fee: shippingFee ?? 0,
       total_amount: total,
-      status: method === "bank_transfer" ? "pending_transfer" : "pending",
-      payment_method: method,
+      status: "pending",
     })
     .select("id")
     .single();

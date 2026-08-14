@@ -148,28 +148,35 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
   async function checkout() {
     if (!form.name.trim() || !form.email.trim() || cart.length === 0) return;
     setProcessing(true);
-    const res = await fetch("/api/store/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        businessId: business.id,
-        businessSlug: business.slug,
-        customer: form,
-        items: cart.map((i) => ({ productId: i.product.id, name: i.product.name, price: i.product.selling_price, quantity: i.qty })),
-        subtotal: cartSubtotal,
-        shippingFee,
-        total: cartTotal,
-        paymentMethod,
-      }),
-    });
-    const data = await res.json();
-    setProcessing(false);
-    if (data.authorizationUrl) {
-      window.location.href = data.authorizationUrl;
-    } else if (data.bankTransfer) {
-      setCheckoutOpen(false);
-      setBankTransferResult({ orderNumber: data.orderNumber, bankDetails: data.bankDetails, total: cartTotal });
-      setCart([]);
+    try {
+      const res = await fetch("/api/store/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessId: business.id,
+          businessSlug: business.slug,
+          customer: form,
+          items: cart.map((i) => ({ productId: i.product.id, name: i.product.name, price: i.product.selling_price, quantity: i.qty })),
+          subtotal: cartSubtotal,
+          shippingFee,
+          total: cartTotal,
+          paymentMethod,
+        }),
+      });
+      const data = await res.json();
+      if (data.authorizationUrl) {
+        window.location.href = data.authorizationUrl;
+      } else if (data.bankTransfer) {
+        setCheckoutOpen(false);
+        setBankTransferResult({ orderNumber: data.orderNumber, bankDetails: data.bankDetails, total: cartTotal });
+        setCart([]);
+      } else {
+        alert(data.error ?? "Something went wrong. Please try again.");
+      }
+    } catch {
+      alert("Network error. Please check your connection and try again.");
+    } finally {
+      setProcessing(false);
     }
   }
 
