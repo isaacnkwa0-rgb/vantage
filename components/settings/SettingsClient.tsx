@@ -1089,6 +1089,52 @@ export function SettingsClient({ business, members, locations: initialLocations,
             </div>
           </div>
 
+          {/* Store Brand Color */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div>
+              <h3 className="font-semibold text-[#0F172A]">Store Brand Color</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Applied to buttons, prices, and accents on your storefront.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={invoiceAccentColor}
+                onChange={(e) => setInvoiceAccentColor(e.target.value)}
+                className="w-10 h-10 rounded-lg cursor-pointer border-2 border-slate-200 p-0.5 bg-white"
+              />
+              <div>
+                <p className="text-sm font-mono font-semibold text-[#0F172A]">{invoiceAccentColor}</p>
+                <p className="text-xs text-slate-400">Click swatch to change</p>
+              </div>
+              <button
+                onClick={saveBranding}
+                disabled={savingBranding}
+                className="ml-auto text-xs font-semibold px-4 py-2 rounded-lg text-white transition disabled:opacity-50"
+                style={{ backgroundColor: invoiceAccentColor || "#16a34a" }}
+              >
+                {savingBranding ? "Saving…" : "Save Color"}
+              </button>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wide mb-2">Preview</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold border"
+                  style={{ color: invoiceAccentColor || "#16a34a", borderColor: invoiceAccentColor || "#16a34a" }}
+                >
+                  Add To Cart
+                </button>
+                <span className="text-sm font-bold" style={{ color: invoiceAccentColor || "#16a34a" }}>₦25,000.00</span>
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white"
+                  style={{ backgroundColor: invoiceAccentColor || "#16a34a" }}
+                >
+                  3 items
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Custom Domain */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
             <div>

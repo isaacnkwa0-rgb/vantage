@@ -29,7 +29,7 @@ export default async function StorePage({ params, searchParams }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, slug, description, logo_url, currency, phone, email, address, city, social_whatsapp, social_instagram, store_shipping_enabled, store_shipping_fee, store_free_shipping_above, store_delivery_note, fb_pixel_id, ga_measurement_id")
+    .select("id, name, slug, description, logo_url, currency, phone, email, address, city, social_whatsapp, social_instagram, store_shipping_enabled, store_shipping_fee, store_free_shipping_above, store_delivery_note, fb_pixel_id, ga_measurement_id, invoice_accent_color")
     .eq("slug", businessSlug)
     .eq("is_active", true)
     .single();
