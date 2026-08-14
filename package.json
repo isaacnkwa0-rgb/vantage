@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.117.1",
     "@hookform/resolvers": "^3.10.0",
     "@paystack/inline-js": "^2.22.8",
     "@radix-ui/react-alert-dialog": "^1.1.6",
