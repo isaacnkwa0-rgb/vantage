@@ -404,7 +404,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                       key={product.id}
                       className={cn("bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow", oos && "opacity-50")}
                     >
-                      <div className="aspect-square bg-slate-50 relative">
+                      <div className="aspect-square bg-slate-50 relative rounded-b-2xl overflow-hidden">
                         {product.image_url ? (
                           <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                         ) : (
