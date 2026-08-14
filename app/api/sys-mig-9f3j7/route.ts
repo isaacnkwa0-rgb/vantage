@@ -11,11 +11,7 @@ export async function POST(req: NextRequest) {
   }
 
   const pool = new Pool({
-    host: "db.iidzwpfjfujfelfacmjo.supabase.co",
-    port: 5432,
-    database: "postgres",
-    user: "postgres",
-    password: pw,
+    connectionString: `postgresql://postgres.iidzwpfjfujfelfacmjo:${encodeURIComponent(pw)}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres`,
     ssl: { rejectUnauthorized: false },
     connectionTimeoutMillis: 15000,
   });
