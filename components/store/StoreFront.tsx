@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   ShoppingCart, X, Package, Phone, Mail, Instagram,
   CheckCircle2, Loader2, Store, Search, Menu, ChevronLeft, ChevronRight,
+  Landmark, CreditCard, Copy, Check,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
@@ -58,17 +59,30 @@ interface Business {
   invoice_accent_color: string | null;
 }
 
+interface BankAccount {
+  account_name: string;
+  bank_name: string;
+  account_number: string;
+}
+
 interface CartItem { product: Product; qty: number; }
+
+interface BankTransferResult {
+  orderNumber: string;
+  bankDetails: BankAccount | null;
+  total: number;
+}
 
 interface Props {
   business: Business;
   products: Product[];
   categories: Category[];
+  bankAccount?: BankAccount | null;
   orderNumber?: string;
   paymentStatus?: string;
 }
 
-export function StoreFront({ business, products, categories, orderNumber, paymentStatus }: Props) {
+export function StoreFront({ business, products, categories, bankAccount, orderNumber, paymentStatus }: Props) {
   const fmt = (n: number) => formatCurrency(n, business.currency);
   const brand = business.invoice_accent_color || "#16a34a";
   const flag = CURRENCY_FLAGS[business.currency] ?? "";
@@ -81,6 +95,9 @@ export function StoreFront({ business, products, categories, orderNumber, paymen
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState<"paystack" | "bank_transfer">("paystack");
+  const [bankTransferResult, setBankTransferResult] = useState<BankTransferResult | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartSubtotal = cart.reduce((s, i) => s + i.qty * i.product.selling_price, 0);
@@ -142,11 +159,25 @@ export function StoreFront({ business, products, categories, orderNumber, paymen
         subtotal: cartSubtotal,
         shippingFee,
         total: cartTotal,
+        paymentMethod,
       }),
     });
     const data = await res.json();
     setProcessing(false);
-    if (data.authorizationUrl) window.location.href = data.authorizationUrl;
+    if (data.authorizationUrl) {
+      window.location.href = data.authorizationUrl;
+    } else if (data.bankTransfer) {
+      setCheckoutOpen(false);
+      setBankTransferResult({ orderNumber: data.orderNumber, bankDetails: data.bankDetails, total: cartTotal });
+      setCart([]);
+    }
+  }
+
+  function copyToClipboard(text: string, key: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(key);
+      setTimeout(() => setCopied(null), 2000);
+    });
   }
 
   const waLink = business.social_whatsapp
@@ -590,13 +621,115 @@ export function StoreFront({ business, products, categories, orderNumber, paymen
                 </div>
               ))}
             </div>
+
+            {/* Payment method selector — only shown when business has a bank account */}
+            {bankAccount && (
+              <div>
+                <p className="text-xs font-medium text-slate-600 mb-2">Payment Method</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { key: "paystack" as const, icon: <CreditCard className="w-4 h-4" />, label: "Pay Online" },
+                    { key: "bank_transfer" as const, icon: <Landmark className="w-4 h-4" />, label: "Bank Transfer" },
+                  ].map(({ key, icon, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setPaymentMethod(key)}
+                      className="flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-semibold transition"
+                      style={
+                        paymentMethod === key
+                          ? { backgroundColor: brand, color: "#fff", borderColor: brand }
+                          : { backgroundColor: "#fff", color: "#64748b", borderColor: "#cbd5e1" }
+                      }
+                    >
+                      {icon}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {paymentMethod === "bank_transfer" && (
+                  <div className="mt-3 bg-slate-50 rounded-xl p-3 text-xs text-slate-600 space-y-1.5">
+                    <p className="font-semibold text-[#111] text-xs mb-1">Transfer to this account after placing your order:</p>
+                    <p><span className="text-slate-400">Bank</span> — <span className="font-medium">{bankAccount.bank_name}</span></p>
+                    <p><span className="text-slate-400">Account Name</span> — <span className="font-medium">{bankAccount.account_name}</span></p>
+                    <p><span className="text-slate-400">Account Number</span> — <span className="font-bold tracking-widest">{bankAccount.account_number}</span></p>
+                  </div>
+                )}
+              </div>
+            )}
+
             <button
               onClick={checkout}
               disabled={processing || !form.name.trim() || !form.email.trim()}
               className="w-full py-3 rounded-xl text-sm font-bold text-white transition disabled:opacity-50 flex items-center justify-center gap-2"
               style={{ backgroundColor: brand }}
             >
-              {processing ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : `Pay ${fmt(cartTotal)}`}
+              {processing
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+                : paymentMethod === "bank_transfer"
+                  ? `Place Order — ${fmt(cartTotal)}`
+                  : `Pay ${fmt(cartTotal)} Online`}
+            </button>
+          </div>
+        </div>
+      )}
+      {/* ── BANK TRANSFER SUCCESS MODAL ── */}
+      {bankTransferResult && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md p-6 space-y-5">
+            <div className="flex flex-col items-center gap-2 text-center">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: `${brand}18` }}>
+                <CheckCircle2 className="w-7 h-7" style={{ color: brand }} />
+              </div>
+              <h3 className="text-lg font-bold text-[#111]">Order Placed!</h3>
+              <p className="text-xs text-slate-500">
+                Order <span className="font-semibold text-[#111]">#{bankTransferResult.orderNumber}</span> received.
+                Complete your payment by transferring <span className="font-semibold" style={{ color: brand }}>{fmt(bankTransferResult.total)}</span> to the account below.
+              </p>
+            </div>
+
+            {bankTransferResult.bankDetails ? (
+              <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Transfer Details</p>
+                {[
+                  { label: "Bank", value: bankTransferResult.bankDetails.bank_name, key: "bank" },
+                  { label: "Account Name", value: bankTransferResult.bankDetails.account_name, key: "name" },
+                  { label: "Account Number", value: bankTransferResult.bankDetails.account_number, key: "number" },
+                ].map(({ label, value, key }) => (
+                  <div key={key} className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wide">{label}</p>
+                      <p className={cn("text-sm font-bold text-[#111]", key === "number" && "tracking-widest text-base")}>{value}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(value, key)}
+                      className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 transition flex-shrink-0"
+                    >
+                      {copied === key
+                        ? <Check className="w-3.5 h-3.5 text-green-500" />
+                        : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-amber-50 rounded-xl p-3 text-xs text-amber-700 text-center">
+                Bank account details not available. Please contact the store to complete your payment.
+              </div>
+            )}
+
+            <p className="text-xs text-slate-400 text-center">
+              Your order will be confirmed once payment is received.{" "}
+              {business.social_whatsapp && (
+                <>Send proof of payment on <a href={`https://wa.me/${business.social_whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: brand }}>WhatsApp</a>.</>
+              )}
+            </p>
+
+            <button
+              onClick={() => setBankTransferResult(null)}
+              className="w-full py-3 rounded-xl text-sm font-bold text-white transition"
+              style={{ backgroundColor: brand }}
+            >
+              Done
             </button>
           </div>
         </div>

@@ -52,11 +52,20 @@ export default async function ByDomainPage() {
     categories = [...nameToIds.entries()].map(([name, ids]) => ({ id: ids.join(","), name }));
   }
 
+  const { data: bankAccount } = await supabase
+    .from("bank_accounts")
+    .select("account_name, bank_name, account_number")
+    .eq("business_id", business.id)
+    .eq("is_active", true)
+    .eq("is_primary", true)
+    .maybeSingle();
+
   return (
     <StoreFront
       business={business as any}
       products={(products ?? []) as any}
       categories={(categories ?? []) as any}
+      bankAccount={bankAccount ?? null}
     />
   );
 }

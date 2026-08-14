@@ -68,6 +68,14 @@ export default async function StorePage({ params, searchParams }: Props) {
     categories = [...nameToIds.entries()].map(([name, ids]) => ({ id: ids.join(","), name }));
   }
 
+  const { data: bankAccount } = await supabase
+    .from("bank_accounts")
+    .select("account_name, bank_name, account_number")
+    .eq("business_id", business.id)
+    .eq("is_active", true)
+    .eq("is_primary", true)
+    .maybeSingle();
+
   return (
     <>
       {/* Facebook Pixel */}
@@ -98,6 +106,7 @@ export default async function StorePage({ params, searchParams }: Props) {
         business={business as any}
         products={(products ?? []) as any}
         categories={(categories ?? []) as any}
+        bankAccount={bankAccount ?? null}
         orderNumber={order}
         paymentStatus={status}
       />

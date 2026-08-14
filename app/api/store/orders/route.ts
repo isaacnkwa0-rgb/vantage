@@ -8,15 +8,15 @@ function nextOrderNumber(): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { businessId, businessSlug, customer, items, subtotal, shippingFee, total } = await req.json();
+  const { businessId, businessSlug, customer, items, subtotal, shippingFee, total, paymentMethod } = await req.json();
 
   if (!businessId || !customer?.email || !items?.length) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   const supabase = createServiceClient();
-
   const order_number = nextOrderNumber();
+  const method: string = paymentMethod === "bank_transfer" ? "bank_transfer" : "paystack";
 
   const { data: order, error } = await supabase
     .from("store_orders")
@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
       subtotal: subtotal ?? total,
       shipping_fee: shippingFee ?? 0,
       total_amount: total,
-      status: "pending",
+      status: method === "bank_transfer" ? "pending_transfer" : "pending",
+      payment_method: method,
     })
     .select("id")
     .single();
@@ -50,7 +51,24 @@ export async function POST(req: NextRequest) {
     }))
   );
 
-  // Initialize Paystack payment
+  // Bank transfer: return order confirmation + bank account details
+  if (method === "bank_transfer") {
+    const { data: bankAccount } = await supabase
+      .from("bank_accounts")
+      .select("account_name, bank_name, account_number")
+      .eq("business_id", businessId)
+      .eq("is_active", true)
+      .eq("is_primary", true)
+      .maybeSingle();
+
+    return NextResponse.json({
+      bankTransfer: true,
+      orderNumber: order_number,
+      bankDetails: bankAccount ?? null,
+    });
+  }
+
+  // Paystack: initialize payment
   const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/store/verify?orderId=${order.id}&slug=${businessSlug}`;
   const amountKobo = Math.round(total * 100);
 
