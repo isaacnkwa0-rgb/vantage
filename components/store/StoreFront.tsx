@@ -227,76 +227,141 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-[#f8f9fa] font-sans">
 
-      {/* ── TOP BAR ── */}
-      <div className="border-b border-slate-100 bg-white">
-        <div className="max-w-lg mx-auto px-4 py-2 flex items-center justify-between">
-          {waLink ? (
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-opacity hover:opacity-80"
-              style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5" />
-              Contact Us
-            </a>
-          ) : <div />}
-          <span className="text-xs font-semibold text-slate-600 flex items-center gap-1">
-            {flag && <span>{flag}</span>}
-            <span>{business.currency}</span>
-          </span>
-        </div>
-      </div>
-
-      {/* ── HEADER ── */}
+      {/* ── HEADER — mobile: logo centered; desktop: logo left, search center, actions right ── */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-lg mx-auto px-4 py-3 grid grid-cols-3 items-center">
-          <button className="justify-self-start p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition">
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="justify-self-center">{logoMark(52)}</div>
-          <button
-            onClick={() => setCartOpen(true)}
-            className="justify-self-end relative p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            {cartCount > 0 && (
-              <span
-                className="absolute -top-1 -right-1 text-white text-[10px] font-bold flex items-center justify-center"
-                style={{ minWidth: 18, height: 18, borderRadius: 9, backgroundColor: brand, padding: "0 4px" }}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-4">
+
+          {/* Logo + name */}
+          <div className="flex items-center gap-2.5 flex-shrink-0">
+            {logoMark(44)}
+            <span className="hidden md:block text-base font-extrabold text-[#111] tracking-tight">{business.name}</span>
+          </div>
+
+          {/* Search — full width on desktop, hidden on mobile (shown below) */}
+          <div className="hidden md:flex flex-1 relative mx-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search products…"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+              onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 2px ${brand}55`)}
+              onBlur={(e) => (e.currentTarget.style.boxShadow = "")}
+            />
+          </div>
+
+          {/* Spacer on mobile to push cart right */}
+          <div className="flex-1 md:hidden" />
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Currency */}
+            <span className="hidden md:flex items-center gap-1 text-xs font-semibold text-slate-500 px-2 py-1 bg-slate-50 rounded-lg border border-slate-200">
+              {flag && <span>{flag}</span>}
+              <span>{business.currency}</span>
+            </span>
+            {/* WhatsApp */}
+            {waLink && (
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-opacity hover:opacity-80"
+                style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}
               >
-                {cartCount}
-              </span>
+                <WhatsAppIcon className="w-3.5 h-3.5" />
+                Contact Us
+              </a>
             )}
-          </button>
+            {/* Cart */}
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 text-white text-[10px] font-bold flex items-center justify-center"
+                  style={{ minWidth: 18, height: 18, borderRadius: 9, backgroundColor: brand, padding: "0 4px" }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile search row */}
+        <div className="md:hidden px-4 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Find Products"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+              onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 2px ${brand}55`)}
+              onBlur={(e) => (e.currentTarget.style.boxShadow = "")}
+            />
+          </div>
         </div>
       </header>
 
-      {/* ── SEARCH ── */}
-      <div className="bg-white border-b border-slate-100 px-4 py-3">
-        <div className="max-w-lg mx-auto relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Find Products"
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
-            onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 2px ${brand}55`)}
-            onBlur={(e) => (e.currentTarget.style.boxShadow = "")}
-          />
-        </div>
+      {/* ── MOBILE: WhatsApp + currency top bar ── */}
+      <div className="md:hidden bg-white border-b border-slate-100 px-4 py-2 flex items-center justify-between">
+        {waLink ? (
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-opacity hover:opacity-80"
+            style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5" />
+            Contact Us
+          </a>
+        ) : <div />}
+        <span className="text-xs font-semibold text-slate-600 flex items-center gap-1">
+          {flag && <span>{flag}</span>}
+          <span>{business.currency}</span>
+        </span>
       </div>
 
+      {/* ── CATEGORY BAR ── */}
+      {categories.length > 0 && (
+        <div className="bg-white border-b border-slate-100">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold rounded-full border transition"
+              style={pillStyle(!selectedCategory)}
+            >
+              All
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold rounded-full border transition"
+                style={pillStyle(selectedCategory === cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── MAIN ── */}
-      <main className="max-w-lg mx-auto px-4 py-5">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-6">
 
         {/* Banners */}
         {succeeded && (
-          <div className="mb-4 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="mb-5 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
             <div>
               <p className="text-sm font-semibold text-green-700">Order placed successfully!</p>
@@ -305,98 +370,68 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           </div>
         )}
         {failed && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4">
+          <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-4">
             <p className="text-sm font-semibold text-red-700">Payment failed. Please try again.</p>
           </div>
         )}
 
         {products.length === 0 ? (
-          <div className="py-24 text-center">
-            <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">No products available yet.</p>
+          <div className="py-32 text-center">
+            <Package className="w-14 h-14 text-slate-300 mx-auto mb-4" />
+            <p className="text-slate-400">No products available yet.</p>
           </div>
         ) : (
           <>
-            {/* Products header + category filter */}
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <h2 className="text-base font-bold text-[#111] flex-shrink-0">Products</h2>
-              {categories.length > 0 && (
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 max-w-[70%]" style={{ scrollbarWidth: "none" }}>
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className="flex-shrink-0 px-3 py-1 text-xs font-semibold rounded-full border transition"
-                    style={pillStyle(!selectedCategory)}
-                  >
-                    All
-                  </button>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                      className="flex-shrink-0 px-3 py-1 text-xs font-semibold rounded-full border transition"
-                      style={pillStyle(selectedCategory === cat.id)}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-[#111]">
+                Products
+                <span className="ml-2 text-sm font-normal text-slate-400">({filteredProducts.length})</span>
+              </h2>
             </div>
 
             {pagedProducts.length === 0 ? (
-              <div className="py-16 text-center">
+              <div className="py-24 text-center">
                 <Search className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-400 text-sm">No products match your search.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {pagedProducts.map((product) => {
                   const qty = getQty(product.id);
                   const oos = isOutOfStock(product);
                   return (
                     <div
                       key={product.id}
-                      className={cn("bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col", oos && "opacity-50")}
+                      className={cn("bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow", oos && "opacity-50")}
                     >
                       <div className="aspect-square bg-slate-50 relative">
                         {product.image_url ? (
                           <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Package className="w-8 h-8 text-slate-300" />
+                            <Package className="w-10 h-10 text-slate-200" />
                           </div>
                         )}
                       </div>
-                      <div className="p-2.5 flex flex-col flex-1 gap-1">
-                        <p className="text-xs text-slate-800 leading-snug line-clamp-2">{product.name}</p>
-                        <p className="text-sm font-bold" style={{ color: brand }}>{fmt(product.selling_price)}</p>
-                        <div className="mt-auto pt-1.5">
+                      <div className="p-3 flex flex-col flex-1 gap-1.5">
+                        <p className="text-sm text-slate-800 leading-snug line-clamp-2 font-medium">{product.name}</p>
+                        <p className="text-base font-bold" style={{ color: brand }}>{fmt(product.selling_price)}</p>
+                        <div className="mt-auto pt-2">
                           {oos ? (
                             <p className="text-xs text-red-500 font-medium">Out of stock</p>
                           ) : qty === 0 ? (
                             <button
                               onClick={() => addToCart(product)}
-                              className="w-full py-1.5 rounded-lg text-xs font-semibold border transition active:scale-95"
+                              className="w-full py-2 rounded-xl text-sm font-semibold border transition hover:opacity-90 active:scale-95"
                               style={{ color: brand, borderColor: brand, backgroundColor: "transparent" }}
                             >
                               Add To Cart
                             </button>
                           ) : (
-                            <div className="flex rounded-lg border overflow-hidden" style={{ borderColor: brand }}>
-                              <button
-                                onClick={() => updateQty(product.id, -1)}
-                                className="flex-1 py-1.5 text-sm font-bold hover:bg-slate-50 transition"
-                                style={{ color: brand }}
-                              >−</button>
-                              <span
-                                className="px-2 py-1.5 text-xs font-bold flex items-center justify-center border-l border-r"
-                                style={{ color: brand, borderColor: brand }}
-                              >{qty}</span>
-                              <button
-                                onClick={() => updateQty(product.id, 1)}
-                                className="flex-1 py-1.5 text-sm font-bold text-white transition"
-                                style={{ backgroundColor: brand }}
-                              >+</button>
+                            <div className="flex rounded-xl border overflow-hidden" style={{ borderColor: brand }}>
+                              <button onClick={() => updateQty(product.id, -1)} className="flex-1 py-1.5 text-base font-bold hover:bg-slate-50 transition" style={{ color: brand }}>−</button>
+                              <span className="px-3 py-1.5 text-sm font-bold flex items-center justify-center border-l border-r" style={{ color: brand, borderColor: brand }}>{qty}</span>
+                              <button onClick={() => updateQty(product.id, 1)} className="flex-1 py-1.5 text-base font-bold text-white transition" style={{ backgroundColor: brand }}>+</button>
                             </div>
                           )}
                         </div>
@@ -409,11 +444,11 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-1.5 mt-6">
+              <div className="flex items-center justify-center gap-2 mt-8">
                 <button
                   onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   disabled={page === 0}
-                  className="p-2 rounded-lg border border-slate-200 disabled:opacity-30 hover:bg-slate-50 transition"
+                  className="p-2 rounded-xl border border-slate-200 disabled:opacity-30 hover:bg-white transition"
                 >
                   <ChevronLeft className="w-4 h-4 text-slate-600" />
                 </button>
@@ -421,7 +456,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                   <button
                     key={i}
                     onClick={() => { setPage(i); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    className="w-8 h-8 rounded-lg text-xs font-semibold border transition"
+                    className="w-9 h-9 rounded-xl text-sm font-semibold border transition"
                     style={pillStyle(page === i)}
                   >
                     {i + 1}
@@ -430,7 +465,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                 <button
                   onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   disabled={page === totalPages - 1}
-                  className="p-2 rounded-lg border border-slate-200 disabled:opacity-30 hover:bg-slate-50 transition"
+                  className="p-2 rounded-xl border border-slate-200 disabled:opacity-30 hover:bg-white transition"
                 >
                   <ChevronRight className="w-4 h-4 text-slate-600" />
                 </button>
@@ -440,50 +475,72 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
         )}
 
         {/* ── FOOTER ── */}
-        <footer className="border-t border-slate-100 mt-10 pt-8">
-          {/* Logo centered */}
-          <div className="flex flex-col items-center gap-2 mb-7">
-            {logoMark(52)}
-            <p className="text-sm font-bold text-[#111]">{business.name}</p>
-            {business.description && (
-              <p className="text-xs text-slate-400 text-center max-w-xs leading-relaxed">{business.description}</p>
-            )}
-          </div>
+        <footer className="border-t border-slate-200 mt-16 pt-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand column */}
+            <div className="md:col-span-1 flex flex-col gap-3">
+              {logoMark(56)}
+              <p className="text-base font-bold text-[#111]">{business.name}</p>
+              {business.description && (
+                <p className="text-sm text-slate-400 leading-relaxed">{business.description}</p>
+              )}
+              {(igLink || waLink) && (
+                <div className="flex gap-3 mt-1">
+                  {igLink && (
+                    <a href={igLink} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-pink-500 transition">
+                      <Instagram className="w-5 h-5" />
+                    </a>
+                  )}
+                  {waLink && (
+                    <a href={waLink} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:opacity-70 transition">
+                      <WhatsAppIcon className="w-5 h-5" />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
 
-          {/* 2-col */}
-          <div className="grid grid-cols-2 gap-5 mb-6 text-xs text-slate-500">
+            {/* Contact */}
             <div>
-              <p className="font-bold text-[#111] mb-2.5">Learn More</p>
-              <ul className="space-y-2">
-                {business.store_shipping_enabled && (
-                  <li>Delivery fee: {business.store_free_shipping_above
-                    ? `${fmt(business.store_shipping_fee)} (free above ${fmt(business.store_free_shipping_above)})`
-                    : fmt(business.store_shipping_fee)}</li>
-                )}
-                {business.store_delivery_note && <li className="italic">{business.store_delivery_note}</li>}
-                {business.phone && (
-                  <li className="flex items-center gap-1"><Phone className="w-3 h-3 flex-shrink-0" />{business.phone}</li>
-                )}
-                {business.email && (
-                  <li className="flex items-start gap-1 break-all"><Mail className="w-3 h-3 flex-shrink-0 mt-0.5" />{business.email}</li>
-                )}
-                {business.address && (
-                  <li>{business.address}{business.city ? `, ${business.city}` : ""}</li>
-                )}
-                {!business.store_shipping_enabled && !business.phone && !business.email && !business.address && (
-                  <li className="text-slate-300 italic">No info available</li>
+              <p className="text-sm font-bold text-[#111] mb-3">Contact Us</p>
+              <ul className="space-y-2 text-sm text-slate-500">
+                {business.phone && <li className="flex items-center gap-2"><Phone className="w-4 h-4 flex-shrink-0" />{business.phone}</li>}
+                {business.email && <li className="flex items-start gap-2 break-all"><Mail className="w-4 h-4 flex-shrink-0 mt-0.5" />{business.email}</li>}
+                {business.address && <li>{business.address}{business.city ? `, ${business.city}` : ""}</li>}
+                {waLink && (
+                  <li>
+                    <a href={waLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-80 transition" style={{ color: brand }}>
+                      <WhatsAppIcon className="w-4 h-4" /> WhatsApp Us
+                    </a>
+                  </li>
                 )}
               </ul>
             </div>
+
+            {/* Shipping */}
             <div>
-              <p className="font-bold text-[#111] mb-2.5">Supported Payment Methods</p>
-              <ul className="space-y-2">
-                {[
-                  "Cards (Mastercard, Visa, Verve)",
-                  "Bank Transfers",
-                  "Direct Debit",
-                ].map((m) => (
-                  <li key={m} className="flex items-center gap-1.5">
+              <p className="text-sm font-bold text-[#111] mb-3">Delivery</p>
+              <ul className="space-y-2 text-sm text-slate-500">
+                {business.store_shipping_enabled ? (
+                  <>
+                    <li>Delivery fee: {fmt(business.store_shipping_fee)}</li>
+                    {business.store_free_shipping_above && (
+                      <li style={{ color: brand }}>Free above {fmt(business.store_free_shipping_above)}</li>
+                    )}
+                    {business.store_delivery_note && <li className="italic">{business.store_delivery_note}</li>}
+                  </>
+                ) : (
+                  <li className="text-slate-400 italic">Contact us for delivery info</li>
+                )}
+              </ul>
+            </div>
+
+            {/* Payment */}
+            <div>
+              <p className="text-sm font-bold text-[#111] mb-3">Payment Methods</p>
+              <ul className="space-y-2 text-sm text-slate-500">
+                {["Cards (Mastercard, Visa, Verve)", "Bank Transfers", "Direct Debit"].map((m) => (
+                  <li key={m} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full flex items-center justify-center text-white flex-shrink-0 text-[10px] font-bold" style={{ backgroundColor: brand }}>✓</span>
                     {m}
                   </li>
@@ -492,24 +549,8 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
             </div>
           </div>
 
-          {/* Social icons */}
-          {(igLink || waLink) && (
-            <div className="flex justify-center gap-4 mb-5">
-              {igLink && (
-                <a href={igLink} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-pink-500 transition">
-                  <Instagram className="w-5 h-5" />
-                </a>
-              )}
-              {waLink && (
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:opacity-70 transition">
-                  <WhatsAppIcon className="w-5 h-5" />
-                </a>
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-100 pt-4">
-            <p>© {new Date().getFullYear()} - {business.name}</p>
+          <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-100 pt-5">
+            <p>© {new Date().getFullYear()} {business.name}. All rights reserved.</p>
             <p>Powered by <span className="font-semibold" style={{ color: brand }}>VANTAGE</span></p>
           </div>
         </footer>
