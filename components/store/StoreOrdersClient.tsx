@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Store, ExternalLink, ChevronDown, ChevronUp, Copy, CheckCheck } from "lucide-react";
@@ -41,7 +41,15 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: "bg-red-100 text-red-500",
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Accept Order",
+  paid: "Mark as Processing",
+  processing: "Mark as Shipped",
+  shipped: "Mark as Delivered",
+};
+
 const STATUS_FLOW: Record<string, string> = {
+  pending: "processing",
   paid: "processing",
   processing: "shipped",
   shipped: "delivered",
@@ -54,6 +62,34 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
   const [orders, setOrders] = useState<StoreOrder[]>(initialOrders);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Request notification permission and subscribe to new orders via Realtime
+  useEffect(() => {
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    const businessId = initialOrders[0]?.id ? undefined : undefined; // fetched from orders
+    const channel = supabase
+      .channel("store-orders-new")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "store_orders" },
+        (payload) => {
+          const newOrder = payload.new as StoreOrder;
+          setOrders((prev) => [newOrder, ...prev]);
+          if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+            new Notification("New Store Order!", {
+              body: `${newOrder.customer_name} placed an order — ${formatCurrency(newOrder.total_amount, currency)}`,
+              icon: "/favicon.ico",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const storeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/store/${businessSlug}`;
 
@@ -160,9 +196,9 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
                     {nextStatus && (
                       <button
                         onClick={() => updateStatus(order.id, nextStatus)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition capitalize"
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition"
                       >
-                        Mark as {nextStatus}
+                        {STATUS_LABELS[order.status] ?? `Mark as ${nextStatus}`}
                       </button>
                     )}
                     {order.status !== "cancelled" && order.status !== "delivered" && (
