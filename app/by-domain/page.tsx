@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { StoreFront } from "@/components/store/StoreFront";
 
@@ -12,7 +12,7 @@ export default async function ByDomainPage() {
 
   if (!host) notFound();
 
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
   const { data: business } = await supabase
     .from("businesses")

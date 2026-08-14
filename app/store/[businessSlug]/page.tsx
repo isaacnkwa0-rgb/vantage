@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { StoreFront } from "@/components/store/StoreFront";
@@ -10,7 +10,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { businessSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data: business } = await supabase
     .from("businesses")
     .select("name, description")
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props) {
 export default async function StorePage({ params, searchParams }: Props) {
   const { businessSlug } = await params;
   const { order, status } = await searchParams;
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
   const { data: business } = await supabase
     .from("businesses")
