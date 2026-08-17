@@ -1,0 +1,42 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Mask = hard boundary; everything outside the rounded square is invisible -->
+    <mask id="sq-mask">
+      <rect width="100" height="100" rx="22" fill="white"/>
+    </mask>
+    <clipPath id="arm">
+      <polygon points="66,18 82,18 59,82 43,82"/>
+    </clipPath>
+  </defs>
+
+  <!-- Green rounded square -->
+  <rect width="100" height="100" rx="22" fill="#1a9c38"/>
+
+  <!-- V mark — masked so nothing can escape the square -->
+  <g mask="url(#sq-mask)">
+
+    <!-- Left arm: solid white -->
+    <polygon points="18,18 34,18 59,82 43,82" fill="white"/>
+
+    <!-- Right arm: pixel grid clipped to arm shape -->
+    <g clip-path="url(#arm)" fill="white">
+      <rect x="47" y="74" width="6" height="6"/><rect x="55" y="74" width="6" height="6"/>
+      <rect x="50" y="66" width="6" height="6"/><rect x="58" y="66" width="6" height="6"/>
+      <rect x="52" y="58" width="6" height="6"/><rect x="60" y="58" width="6" height="6"/>
+      <rect x="55" y="50" width="6" height="6"/><rect x="63" y="50" width="6" height="6"/>
+      <rect x="58" y="42" width="6" height="6"/><rect x="66" y="42" width="6" height="6"/>
+      <rect x="61" y="34" width="6" height="6"/><rect x="69" y="34" width="6" height="6"/>
+      <!-- dissolving: top rows get sparser -->
+      <rect x="64" y="26" width="6" height="6"/><rect x="72" y="26" width="6" height="6" opacity=".45"/>
+      <rect x="67" y="18" width="6" height="6"/>
+    </g>
+
+    <!-- Escaped squares — drawn inside mask so they can't overflow the green square -->
+    <rect x="83" y="14" width="5" height="5" fill="white" opacity=".58"/>
+    <rect x="84" y="22" width="4" height="4" fill="white" opacity=".36"/>
+    <rect x="84" y="29" width="3" height="3" fill="white" opacity=".18"/>
+    <rect x="88" y="8"  width="4" height="4" fill="white" opacity=".40"/>
+    <rect x="89" y="15" width="3" height="3" fill="white" opacity=".22"/>
+
+  </g>
+</svg>

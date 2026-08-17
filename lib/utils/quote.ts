@@ -41,7 +41,7 @@ interface QuoteBusiness {
 export function generateQuoteHTML(quote: QuoteData, business: QuoteBusiness): string {
   const currency = business.currency || "NGN";
   const fmt = (n: number) => formatCurrency(n, currency);
-  const accent = business.invoice_accent_color || "#16a34a";
+  const accent = business.invoice_accent_color || "#1a9c38";
   const issueDate = new Date(quote.issue_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const validUntil = quote.valid_until
     ? new Date(quote.valid_until).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })

@@ -9,7 +9,7 @@ import { logAudit } from "@/lib/utils/audit";
 import { X, Loader2, Plus, Tag } from "lucide-react";
 
 const TAG_COLORS = [
-  "#16a34a", "#2563eb", "#9333ea", "#dc2626", "#ea580c",
+  "#1a9c38", "#2563eb", "#9333ea", "#dc2626", "#ea580c",
   "#ca8a04", "#0891b2", "#db2777", "#64748b", "#0d9488",
 ];
 

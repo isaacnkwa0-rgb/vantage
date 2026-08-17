@@ -42,7 +42,7 @@ interface InvoiceBusiness {
 export function generateInvoiceHTML(invoice: InvoiceData, business: InvoiceBusiness): string {
   const currency = business.currency || "NGN";
   const fmt = (n: number) => formatCurrency(n, currency);
-  const accent = business.invoice_accent_color || "#16a34a";
+  const accent = business.invoice_accent_color || "#1a9c38";
   const issueDate = new Date(invoice.issue_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const dueDate = invoice.due_date
     ? new Date(invoice.due_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })

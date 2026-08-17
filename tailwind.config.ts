@@ -19,8 +19,8 @@ const config: Config = {
           accent: "#166534",
         },
         brand: {
-          DEFAULT: "#16a34a",
-          hover: "#15803d",
+          DEFAULT: "#1a9c38",
+          hover: "#158030",
           foreground: "#FFFFFF",
         },
         profit: "#10B981",

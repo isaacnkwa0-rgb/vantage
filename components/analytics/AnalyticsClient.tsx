@@ -14,7 +14,7 @@ interface Props {
   currency: string;
 }
 
-const COLORS = ["#16a34a", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#F97316", "#84CC16"];
+const COLORS = ["#1a9c38", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#F97316", "#84CC16"];
 
 export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props) {
   const fmt = (n: number) => formatCurrency(n, currency);
@@ -94,15 +94,15 @@ export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props)
             <AreaChart data={revenueData}>
               <defs>
                 <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#16a34a" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#1a9c38" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#1a9c38" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => fmt(v).replace(/\.00$/, "")} />
               <Tooltip formatter={(v: number) => [fmt(v), "Revenue"]} contentStyle={{ borderRadius: "8px", border: "1px solid #E2E8F0", fontSize: 12 }} />
-              <Area type="monotone" dataKey="revenue" stroke="#16a34a" strokeWidth={2} fill="url(#colorRevenue)" />
+              <Area type="monotone" dataKey="revenue" stroke="#1a9c38" strokeWidth={2} fill="url(#colorRevenue)" />
             </AreaChart>
           </ResponsiveContainer>
         )}
@@ -121,7 +121,7 @@ export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props)
                 <XAxis type="number" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => fmt(v).replace(/\.00$/, "")} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
                 <Tooltip formatter={(v: number) => [fmt(v), "Revenue"]} contentStyle={{ borderRadius: "8px", border: "1px solid #E2E8F0", fontSize: 12 }} />
-                <Bar dataKey="revenue" fill="#16a34a" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="revenue" fill="#1a9c38" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}

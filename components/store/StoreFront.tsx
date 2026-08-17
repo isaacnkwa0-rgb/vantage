@@ -84,7 +84,7 @@ interface Props {
 
 export function StoreFront({ business, products, categories, bankAccount, orderNumber, paymentStatus }: Props) {
   const fmt = (n: number) => formatCurrency(n, business.currency);
-  const brand = business.invoice_accent_color || "#16a34a";
+  const brand = business.invoice_accent_color || "#1a9c38";
   const flag = CURRENCY_FLAGS[business.currency] ?? "";
 
   const [cart, setCart] = useState<CartItem[]>([]);

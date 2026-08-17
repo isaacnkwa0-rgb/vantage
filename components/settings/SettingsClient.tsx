@@ -143,7 +143,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [receiptFooter, setReceiptFooter] = useState(business.receipt_footer ?? "");
   const [receiptTagline, setReceiptTagline] = useState(business.receipt_tagline ?? "");
   const [receiptShowLogo, setReceiptShowLogo] = useState(business.receipt_show_logo ?? true);
-  const [invoiceAccentColor, setInvoiceAccentColor] = useState(business.invoice_accent_color ?? "#16a34a");
+  const [invoiceAccentColor, setInvoiceAccentColor] = useState(business.invoice_accent_color ?? "#1a9c38");
   const [invoiceFooterNotes, setInvoiceFooterNotes] = useState(business.invoice_footer_notes ?? "");
   const [socialInstagram, setSocialInstagram] = useState(business.social_instagram ?? "");
   const [socialTwitter, setSocialTwitter] = useState(business.social_twitter ?? "");
@@ -376,7 +376,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
       receipt_footer: receiptFooter || null,
       receipt_tagline: receiptTagline || null,
       receipt_show_logo: receiptShowLogo,
-      invoice_accent_color: invoiceAccentColor || "#16a34a",
+      invoice_accent_color: invoiceAccentColor || "#1a9c38",
       invoice_footer_notes: invoiceFooterNotes || null,
       social_instagram: socialInstagram || null,
       social_twitter: socialTwitter || null,
@@ -939,7 +939,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer p-0.5"
                 />
                 <div className="flex flex-wrap gap-2">
-                  {["#16a34a", "#2563eb", "#7c3aed", "#dc2626", "#d97706", "#0891b2", "#0f172a", "#db2777"].map((c) => (
+                  {["#1a9c38", "#2563eb", "#7c3aed", "#dc2626", "#d97706", "#0891b2", "#0f172a", "#db2777"].map((c) => (
                     <button
                       key={c}
                       type="button"
@@ -1110,7 +1110,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 onClick={saveBranding}
                 disabled={savingBranding}
                 className="ml-auto text-xs font-semibold px-4 py-2 rounded-lg text-white transition disabled:opacity-50"
-                style={{ backgroundColor: invoiceAccentColor || "#16a34a" }}
+                style={{ backgroundColor: invoiceAccentColor || "#1a9c38" }}
               >
                 {savingBranding ? "Saving…" : "Save Color"}
               </button>
@@ -1120,14 +1120,14 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <div className="flex items-center gap-3 flex-wrap">
                 <button
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold border"
-                  style={{ color: invoiceAccentColor || "#16a34a", borderColor: invoiceAccentColor || "#16a34a" }}
+                  style={{ color: invoiceAccentColor || "#1a9c38", borderColor: invoiceAccentColor || "#1a9c38" }}
                 >
                   Add To Cart
                 </button>
-                <span className="text-sm font-bold" style={{ color: invoiceAccentColor || "#16a34a" }}>₦25,000.00</span>
+                <span className="text-sm font-bold" style={{ color: invoiceAccentColor || "#1a9c38" }}>₦25,000.00</span>
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white"
-                  style={{ backgroundColor: invoiceAccentColor || "#16a34a" }}
+                  style={{ backgroundColor: invoiceAccentColor || "#1a9c38" }}
                 >
                   3 items
                 </span>

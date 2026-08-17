@@ -100,7 +100,7 @@
 
 /* ── Focus ring ── */
 :focus-visible {
-  outline: 2px solid #16a34a;
+  outline: 2px solid #1a9c38;
   outline-offset: 2px;
 }
 
@@ -109,8 +109,8 @@
   @apply flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 w-full;
 }
 .nav-item-active {
-  background: rgba(22, 163, 74, 0.15);
-  color: #16a34a;
+  background: rgba(26, 156, 56, 0.15);
+  color: #1a9c38;
 }
 .nav-item-inactive {
   color: rgb(var(--sidebar-text));
