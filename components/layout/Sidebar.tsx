@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -259,9 +260,7 @@ export function Sidebar({ slug }: { slug: string }) {
         >
           {/* Expanded: logo + name */}
           <div className={cn("flex items-center gap-2.5 min-w-0", sidebarCollapsed && "lg:hidden")}>
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-900/50">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
+            <Image src="/vantage-icon.svg" alt="VANTAGE" width={32} height={32} className="flex-shrink-0 rounded-lg" />
             <div className="min-w-0">
               <p className="text-[13px] font-extrabold tracking-tight text-white leading-tight">VANTAGE</p>
               <p className="text-[11px] text-slate-500 truncate leading-tight">
@@ -275,9 +274,9 @@ export function Sidebar({ slug }: { slug: string }) {
             <button
               onClick={toggleSidebarCollapsed}
               aria-label="Expand sidebar"
-              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg bg-green-600 text-white shadow-lg shadow-green-900/50 hover:bg-green-500 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0C1526]"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg hover:opacity-80 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0C1526]"
             >
-              <Zap className="w-4 h-4" aria-hidden="true" />
+              <Image src="/vantage-icon.svg" alt="VANTAGE" width={36} height={36} className="rounded-lg" />
             </button>
           )}
 

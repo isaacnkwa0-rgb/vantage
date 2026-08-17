@@ -8,8 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import {
-  Loader2, Zap, ShoppingCart, Users, BarChart3, Package,
+  Loader2, ShoppingCart, Users, BarChart3, Package,
   TrendingUp, Receipt, CheckCircle2, Clock,
 } from "lucide-react";
 
@@ -274,9 +275,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="relative flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
+          <Image src="/vantage-icon.svg" alt="VANTAGE" width={40} height={40} className="rounded-xl" />
           <span className="text-2xl font-extrabold tracking-tight text-white">VANTAGE</span>
         </div>
 
@@ -394,9 +393,7 @@ export default function LoginPage() {
         {/* Mobile header */}
         <div className="lg:hidden bg-gradient-to-br from-green-900 to-green-700 px-6 pt-10 pb-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
+            <Image src="/vantage-icon.svg" alt="VANTAGE" width={32} height={32} className="rounded-lg" />
             <span className="text-xl font-extrabold text-white tracking-tight">VANTAGE</span>
           </div>
           <p className="text-green-200 text-sm">Business management, simplified</p>

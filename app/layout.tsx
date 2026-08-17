@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   description:
     "The all-in-one business management platform for modern businesses. POS, inventory, customers, expenses, and analytics in one place.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/vantage-icon.svg",
+    apple: "/vantage-icon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
