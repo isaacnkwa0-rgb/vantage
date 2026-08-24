@@ -65,7 +65,7 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="relative flex items-center gap-3 mb-12">
           <Image src="/vantage-icon.svg" alt="VANTAGE" width={40} height={40} className="rounded-xl" />
-          <span className="text-2xl font-extrabold tracking-tight text-white">VANTAGE</span>
+          <span className="text-2xl font-extrabold tracking-tight text-white">Vantage</span>
         </div>
 
         {/* Headline */}
@@ -76,7 +76,7 @@ export default function RegisterPage() {
           </h2>
           <p className="text-green-200 mt-3 text-base leading-relaxed">
             Whether you sell products or offer services,<br />
-            VANTAGE gives you the tools to grow.
+            Vantage gives you the tools to grow.
           </p>
         </div>
 
@@ -191,7 +191,7 @@ export default function RegisterPage() {
               <p className="text-white text-xs font-semibold">
                 Join <span className="text-emerald-300">1,200+</span> businesses
               </p>
-              <p className="text-green-300 text-[10px]">already growing with VANTAGE</p>
+              <p className="text-green-300 text-[10px]">already growing with Vantage</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
@@ -213,7 +213,7 @@ export default function RegisterPage() {
         <div className="lg:hidden bg-gradient-to-br from-green-900 to-green-700 px-6 pt-10 pb-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Image src="/vantage-icon.svg" alt="VANTAGE" width={32} height={32} className="rounded-lg" />
-            <span className="text-xl font-extrabold text-white tracking-tight">VANTAGE</span>
+            <span className="text-xl font-extrabold text-white tracking-tight">Vantage</span>
           </div>
           <p className="text-green-200 text-sm">Business management for shops & services</p>
         </div>
