@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { generateBusinessSlug } from "@/lib/utils/slugify";
-import { Loader2, Building2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_CATEGORIES: Record<string, { name: string; color: string }[]> = {
   retail: [
@@ -36,97 +34,88 @@ const DEFAULT_CATEGORIES: Record<string, { name: string; color: string }[]> = {
   ],
 };
 
-const CURRENCIES = [
-  { value: "NGN", label: "Nigerian Naira (₦)" },
-  { value: "USD", label: "US Dollar ($)" },
-  { value: "GHS", label: "Ghanaian Cedi (₵)" },
-  { value: "KES", label: "Kenyan Shilling (KSh)" },
-  { value: "ZAR", label: "South African Rand (R)" },
-  { value: "GBP", label: "British Pound (£)" },
-  { value: "EUR", label: "Euro (€)" },
+const COUNTRY_OPTIONS = [
+  { label: "Nigeria", flag: "🇳🇬", currency: "NGN" },
+  { label: "Kenya",  flag: "🇰🇪", currency: "KES" },
 ];
 
-const BUSINESS_MODES = [
-  {
-    value: "retail",
-    label: "I sell products",
-    description: "Shops, stores, wholesale, supermarkets, pharmacies",
-    icon: "🛍️",
-  },
-  {
-    value: "service",
-    label: "I offer services",
-    description: "Salons, barbershops, clinics, laundry, freelancers",
-    icon: "✂️",
-  },
+const BUSINESS_TYPES = [
+  { value: "retail",     label: "I sell products"  },
+  { value: "service",    label: "I offer services" },
+  { value: "restaurant", label: "Restaurant / Food" },
 ];
 
-const schema = z.object({
-  name: z.string().min(2, "Business name must be at least 2 characters"),
-  business_type: z.string().min(1, "Select a business type"),
-  currency: z.string().min(1, "Select a currency"),
-  country: z.string().min(2, "Enter your country"),
-  phone: z.string().optional(),
-});
-type FormData = z.infer<typeof schema>;
+const WEEKLY_ORDERS = ["0-50", "51-100", "101-1000", "1001+"];
+
+const STAFF_OPTIONS = ["None", "1-3", "4-5", "6-10", "11+"];
+
+function Chip({
+  label, selected, onClick,
+}: { label: string; selected: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "px-5 py-2.5 rounded-lg text-[14px] font-medium transition",
+        selected ? "bg-[#1a9c38] text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+      )}
+    >
+      {label}
+    </button>
+  );
+}
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const [businessName, setBusinessName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [country, setCountry] = useState(COUNTRY_OPTIONS[0]);
+  const [businessType, setBusinessType] = useState("retail");
+  const [weeklyOrders, setWeeklyOrders] = useState("");
+  const [staffCount, setStaffCount] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: { currency: "NGN", business_type: "retail" },
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedType = watch("business_type");
-
-  async function onSubmit(data: FormData) {
-    setError(null);
-    const supabase = createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      router.push("/login");
+  async function onSubmit() {
+    if (!businessName.trim() || businessName.trim().length < 2) {
+      setNameError("Enter your business name (at least 2 characters)");
       return;
     }
+    setNameError(null);
+    setError(null);
+    setIsSubmitting(true);
 
-    // Ensure profile exists
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { router.push("/login"); return; }
+
     await supabase.from("profiles").upsert({
       id: user.id,
       full_name: user.user_metadata?.full_name ?? "Business Owner",
       email: user.email!,
     });
 
-    // Create business
-    const slug = generateBusinessSlug(data.name);
+    const slug = generateBusinessSlug(businessName.trim());
     const { data: business, error: bizError } = await supabase
       .from("businesses")
       .insert({
         owner_id: user.id,
-        name: data.name,
+        name: businessName.trim(),
         slug,
-        business_type: data.business_type,
-        currency: data.currency,
-        country: data.country,
-        phone: data.phone || null,
+        business_type: businessType,
+        currency: country.currency,
+        country: country.label,
       })
       .select()
       .single();
 
     if (bizError || !business) {
       setError(bizError?.message ?? "Failed to create business");
+      setIsSubmitting(false);
       return;
     }
 
-    // Add owner as member
     await supabase.from("business_members").insert({
       business_id: business.id,
       user_id: user.id,
@@ -134,8 +123,7 @@ export default function OnboardingPage() {
       is_active: true,
     });
 
-    // Seed default categories based on business type
-    const defaultCats = DEFAULT_CATEGORIES[data.business_type] ?? DEFAULT_CATEGORIES.retail;
+    const defaultCats = DEFAULT_CATEGORIES[businessType] ?? DEFAULT_CATEGORIES.retail;
     await supabase.from("categories").insert(
       defaultCats.map((c) => ({ business_id: business.id, name: c.name, color: c.color }))
     );
@@ -144,142 +132,127 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-green-700 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">
-            VANTAGE
-          </h1>
-          <p className="text-green-200 mt-1 text-sm">
-            Let&apos;s set up your business
+    <div className="min-h-screen bg-white flex flex-col px-5 pt-14 pb-10 overflow-auto">
+
+      {/* Heading */}
+      <div className="text-center mb-8">
+        <h1 className="text-[28px] font-bold text-slate-900 leading-tight">
+          You&apos;re almost done
+        </h1>
+        <p className="text-slate-400 text-[15px] mt-2">
+          Tell us a little bit about your business.
+        </p>
+      </div>
+
+      <div className="space-y-8">
+
+        {/* Business Name */}
+        <div>
+          <input
+            type="text"
+            value={businessName}
+            onChange={(e) => { setBusinessName(e.target.value); setNameError(null); }}
+            placeholder="Business Name"
+            autoComplete="organization"
+            className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+          />
+          {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
+        </div>
+
+        {/* Country */}
+        <div>
+          <p className="text-[15px] font-semibold text-slate-900 mb-3">
+            Where is your business situated?
+          </p>
+          <div className="flex gap-3">
+            {COUNTRY_OPTIONS.map((c) => (
+              <button
+                key={c.label}
+                type="button"
+                onClick={() => setCountry(c)}
+                className={cn(
+                  "flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-medium transition",
+                  country.label === c.label
+                    ? "bg-[#1a9c38] text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                )}
+              >
+                <span>{c.flag}</span> {c.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[12px] text-slate-400 mt-2 leading-relaxed">
+            This determines the currency your app will display. You can change it later.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-green-500" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-[#0F172A]">
-                Create your business
-              </h2>
-              <p className="text-slate-500 text-sm">
-                You can add more businesses later
-              </p>
-            </div>
+        {/* Business type */}
+        <div>
+          <p className="text-[15px] font-semibold text-slate-900 mb-3">
+            What does your business do?
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {BUSINESS_TYPES.map((t) => (
+              <Chip
+                key={t.value}
+                label={t.label}
+                selected={businessType === t.value}
+                onClick={() => setBusinessType(t.value)}
+              />
+            ))}
           </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Business Name */}
-            <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-1">
-                Business Name *
-              </label>
-              <input
-                {...register("name")}
-                placeholder="e.g. Mama's Store"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              />
-              {errors.name && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-
-            {/* Business Mode */}
-            <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-2">
-                What does your business do? *
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {BUSINESS_MODES.map((mode) => (
-                  <button
-                    key={mode.value}
-                    type="button"
-                    onClick={() => setValue("business_type", mode.value)}
-                    className={`p-4 border-2 rounded-xl text-left transition ${
-                      selectedType === mode.value
-                        ? "border-green-500 bg-green-50"
-                        : "border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">{mode.icon}</div>
-                    <div className={`font-semibold text-sm mb-1 ${selectedType === mode.value ? "text-green-700" : "text-[#0F172A]"}`}>
-                      {mode.label}
-                    </div>
-                    <div className="text-xs text-slate-400 leading-snug">{mode.description}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Currency */}
-            <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-1">
-                Currency *
-              </label>
-              <select
-                {...register("currency")}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition bg-white"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Country */}
-            <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-1">
-                Country *
-              </label>
-              <input
-                {...register("country")}
-                placeholder="e.g. Nigeria"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              />
-              {errors.country && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.country.message}
-                </p>
-              )}
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-1">
-                Business Phone{" "}
-                <span className="text-slate-400 font-normal">(optional)</span>
-              </label>
-              <input
-                {...register("phone")}
-                type="tel"
-                placeholder="+234 800 000 0000"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
-            >
-              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isSubmitting ? "Setting up..." : "Launch my business →"}
-            </button>
-          </form>
         </div>
+
+        {/* Weekly orders */}
+        <div>
+          <p className="text-[15px] font-semibold text-slate-900 mb-3">
+            How many orders do you get weekly?
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {WEEKLY_ORDERS.map((o) => (
+              <Chip
+                key={o}
+                label={o}
+                selected={weeklyOrders === o}
+                onClick={() => setWeeklyOrders(weeklyOrders === o ? "" : o)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Staff count */}
+        <div>
+          <p className="text-[15px] font-semibold text-slate-900 mb-3">
+            How many staff do you have?
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {STAFF_OPTIONS.map((s) => (
+              <Chip
+                key={s}
+                label={s}
+                selected={staffCount === s}
+                onClick={() => setStaffCount(staffCount === s ? "" : s)}
+              />
+            ))}
+          </div>
+        </div>
+
       </div>
+
+      {error && (
+        <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl mt-6">{error}</div>
+      )}
+
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={isSubmitting}
+        className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60 mt-10"
+      >
+        {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+        {isSubmitting ? "Setting up..." : "Continue"}
+      </button>
+
     </div>
   );
 }
