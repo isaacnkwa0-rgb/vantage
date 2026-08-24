@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Menu, Bell, LogOut, AlertTriangle, FileText, BookOpen, Loader2, Search } from "lucide-react";
-import { useUIStore } from "@/store/uiStore";
+import { Bell, LogOut, AlertTriangle, FileText, BookOpen, Loader2, Search } from "lucide-react";
 import { useBusinessStore } from "@/store/businessStore";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -22,7 +21,6 @@ interface Notification {
 }
 
 export function TopBar({ title }: TopBarProps) {
-  const { toggleSidebar } = useUIStore();
   const { clearBusiness, activeBusiness } = useBusinessStore();
   const router = useRouter();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -185,14 +183,6 @@ export function TopBar({ title }: TopBarProps) {
   return (
     <header className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 flex-shrink-0 relative">
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-600 via-green-400 to-transparent pointer-events-none" />
-
-      <button
-        onClick={toggleSidebar}
-        aria-label="Open navigation menu"
-        className="lg:hidden p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:outline-none"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
 
       <h2 className="text-base font-bold text-[#0F172A] flex-1 min-w-0 truncate">{title}</h2>
 

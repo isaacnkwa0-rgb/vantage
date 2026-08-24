@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Sidebar } from "@/components/layout/Sidebar";
 import { BusinessProvider } from "@/components/layout/BusinessProvider";
 import { CommandSearchProvider } from "@/components/layout/CommandSearch";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -53,7 +52,6 @@ export default async function BusinessLayout({ children, params }: Props) {
         </a>
 
         <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
-          <Sidebar slug={businessSlug} />
           <main id="main-content" className="flex-1 flex flex-col overflow-hidden min-w-0">
             <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
               {children}
