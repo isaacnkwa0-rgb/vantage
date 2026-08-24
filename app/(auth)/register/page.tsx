@@ -7,16 +7,35 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import Image from "next/image";
-import { Loader2, CheckCircle2, ShoppingCart, Package, TrendingUp, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, ShoppingCart, Package, TrendingUp, Mail, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const schema = z.object({
-  fullName: z.string().min(2, "Enter your full name"),
+  firstName: z.string().min(1, "Enter your first name"),
+  lastName: z.string().min(1, "Enter your last name"),
   email: z.string().email("Enter a valid email"),
   password: z.string().min(8, "At least 8 characters"),
+  phone: z.string().optional(),
+  referral: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
+
+const COUNTRIES = [
+  { flag: "🇳🇬", code: "+234", name: "Nigeria" },
+  { flag: "🇰🇪", code: "+254", name: "Kenya" },
+];
+
+const REFERRAL_OPTIONS = [
+  "Friend/Family",
+  "Twitter/X",
+  "Instagram",
+  "TikTok",
+  "Google Search",
+  "Facebook/Instagram Ads",
+  "Google Ads",
+  "Referral",
+  "Others",
+];
 
 const SLIDES = [
   {
@@ -165,6 +184,10 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [country, setCountry] = useState(COUNTRIES[0]);
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(true);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -177,7 +200,7 @@ export default function RegisterPage() {
       email: data.email,
       password: data.password,
       options: {
-        data: { full_name: data.fullName },
+        data: { full_name: `${data.firstName} ${data.lastName}` },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -214,67 +237,178 @@ export default function RegisterPage() {
 
   // ── Email form ─────────────────────────────────────────────
   if (step === "email-form") {
+    const filteredCountries = COUNTRIES.filter((c) =>
+      c.name.toLowerCase().includes(countrySearch.toLowerCase())
+    );
+
     return (
       <div className="min-h-screen bg-white flex flex-col">
-        <div className="px-5 pt-12 pb-6">
-          <button onClick={() => setStep("methods")} className="text-slate-400 text-sm font-medium">
-            ← Back
+        {/* Country picker modal */}
+        {showCountryPicker && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex flex-col justify-end">
+            <div className="bg-white rounded-t-2xl pt-4 pb-10">
+              <div className="flex items-center gap-3 px-5 pb-3 border-b border-slate-100">
+                <button type="button" onClick={() => { setShowCountryPicker(false); setCountrySearch(""); }}>
+                  <X className="w-5 h-5 text-slate-700" />
+                </button>
+                <input
+                  type="text"
+                  placeholder="Enter country name"
+                  value={countrySearch}
+                  onChange={(e) => setCountrySearch(e.target.value)}
+                  className="flex-1 text-[15px] text-slate-700 focus:outline-none placeholder:text-slate-400"
+                  autoFocus
+                />
+              </div>
+              {filteredCountries.map((c) => (
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={() => { setCountry(c); setShowCountryPicker(false); setCountrySearch(""); }}
+                  className="w-full flex items-center gap-4 px-5 py-4 border-b border-slate-50 text-[16px] text-slate-800 hover:bg-slate-50 text-left"
+                >
+                  <span className="text-2xl">{c.flag}</span>
+                  {c.name} ({c.code})
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Back pill */}
+        <div className="px-5 pt-12 pb-4">
+          <button
+            onClick={() => setStep("methods")}
+            className="flex items-center gap-1 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full"
+          >
+            ‹ Back
           </button>
         </div>
-        <div className="flex-1 px-5">
-          <div className="flex items-center gap-2.5 mb-6">
-            <Image src="/vantage-icon.svg" alt="Vantage" width={32} height={32} className="rounded-xl" />
-            <span className="text-lg font-extrabold text-slate-900">Vantage</span>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-1">Create your account</h2>
-          <p className="text-slate-400 text-sm mb-6">Start managing your business in minutes</p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
-              <input
-                {...register("fullName")}
-                type="text"
-                autoComplete="name"
-                placeholder="Isaac Nkwa"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-              {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
+        <div className="flex-1 px-5 pb-10 overflow-auto">
+          <h2 className="text-[26px] font-bold text-slate-900 leading-snug mb-1">
+            Start doing business like a Pro today.
+          </h2>
+          <p className="text-slate-400 text-[14px] mb-6">Manage your business smarter with Vantage</p>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+            {/* Name row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <input
+                  {...register("firstName")}
+                  type="text"
+                  autoComplete="given-name"
+                  placeholder="First Name*"
+                  className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                />
+                {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
+              </div>
+              <div>
+                <input
+                  {...register("lastName")}
+                  type="text"
+                  autoComplete="family-name"
+                  placeholder="Surname*"
+                  className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                />
+                {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
+              </div>
             </div>
+
+            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
               <input
                 {...register("email")}
                 type="email"
                 autoComplete="email"
-                placeholder="you@business.com"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Email Address*"
+                className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
+
+            {/* Phone with country picker */}
+            <div className="h-11 flex border border-slate-200 rounded-[4px] overflow-hidden focus-within:ring-2 focus-within:ring-[#1a9c38]">
+              <button
+                type="button"
+                onClick={() => setShowCountryPicker(true)}
+                className="flex items-center gap-1.5 px-3 border-r border-slate-200 bg-white flex-shrink-0"
+              >
+                <span className="text-xl leading-none">{country.flag}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+              <input
+                {...register("phone")}
+                type="tel"
+                autoComplete="tel"
+                placeholder={`${country.code} 8012345678`}
+                className="flex-1 px-3 text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-white"
+              />
+            </div>
+
+            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
               <input
                 {...register("password")}
                 type="password"
                 autoComplete="new-password"
-                placeholder="At least 8 characters"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Password*"
+                className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
               />
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
+
+            {/* How did you hear dropdown */}
+            <div className="relative">
+              <select
+                {...register("referral")}
+                className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent appearance-none bg-white text-slate-400"
+                defaultValue=""
+              >
+                <option value="" disabled>How did you hear about Vantage?</option>
+                {REFERRAL_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt} className="text-slate-800">{opt}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+
+            {/* Marketing consent checkbox */}
+            <label className="flex items-start gap-3 cursor-pointer py-1">
+              <input
+                type="checkbox"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+                className="mt-0.5 w-5 h-5 rounded accent-[#1a9c38] cursor-pointer flex-shrink-0"
+              />
+              <span className="text-[13px] text-slate-500 leading-snug">
+                I&apos;ll like to receive marketing communication and tips from Vantage
+              </span>
+            </label>
+
             {error && <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">{error}</div>}
+
+            {/* Continue button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold py-3.5 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 mt-2"
+              className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isSubmitting ? "Creating account..." : "Create account"}
+              {isSubmitting ? "Creating account..." : "Continue"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-6">
+          {/* Terms */}
+          <p className="text-center text-[12px] text-slate-400 mt-5 leading-relaxed px-2">
+            By continuing, I agree to Vantage&apos;s{" "}
+            <Link href="/terms" className="text-[#1a9c38]">Terms of Use</Link>
+            {" "}&amp;{" "}
+            <Link href="/privacy" className="text-[#1a9c38]">Privacy Policy</Link>
+          </p>
+
+          <p className="text-center text-[14px] text-slate-400 mt-3">
             Already have an account?{" "}
             <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
           </p>
@@ -286,45 +420,47 @@ export default function RegisterPage() {
   // ── Auth method selection ──────────────────────────────────
   if (step === "methods") {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
-        <div className="px-5 pt-12 pb-6">
-          <button onClick={() => setStep("carousel")} className="text-slate-400 text-sm font-medium">
-            ← Back
+      <div className="min-h-screen bg-white flex flex-col px-5">
+        {/* Back */}
+        <div className="pt-12 pb-2">
+          <button onClick={() => setStep("carousel")} className="flex items-center gap-1 text-slate-500 text-sm font-medium">
+            ‹ Back
           </button>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-5 pb-10">
-          <div className="flex items-center gap-2.5 mb-8">
-            <Image src="/vantage-icon.svg" alt="Vantage" width={36} height={36} className="rounded-xl" />
-            <span className="text-xl font-extrabold text-slate-900">Vantage</span>
-          </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Create your account</h2>
-          <p className="text-slate-400 text-sm mb-8">Choose how you want to get started</p>
-
-          <div className="space-y-3">
-            <button
-              onClick={signInWithGoogle}
-              disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 border-2 border-slate-200 rounded-xl py-3.5 text-[15px] font-semibold text-slate-800 hover:border-slate-300 hover:bg-slate-50 transition disabled:opacity-60"
-            >
-              {googleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
-              Continue with Google
-            </button>
-
-            <button
-              onClick={() => setStep("email-form")}
-              className="w-full flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-xl py-3.5 text-[15px] font-semibold text-white transition"
-            >
-              <Mail className="w-5 h-5" />
-              Continue with Email
-            </button>
-          </div>
-
-          <p className="text-center text-sm text-slate-400 mt-8">
-            Already have an account?{" "}
-            <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
-          </p>
+        {/* Headline */}
+        <div className="text-center mt-10 mb-10 px-2">
+          <h2 className="text-[26px] font-bold text-slate-900 leading-snug">
+            Start doing business like a Pro today.
+          </h2>
+          <p className="text-slate-400 text-[14px] mt-2">Manage your business smarter with Vantage</p>
         </div>
+
+        {/* Auth buttons */}
+        <div className="space-y-3">
+          <button
+            onClick={() => setStep("email-form")}
+            className="w-full h-11 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[15px] font-semibold text-white transition"
+          >
+            <Mail className="w-5 h-5" />
+            Continue with Email
+          </button>
+
+          <button
+            onClick={signInWithGoogle}
+            disabled={googleLoading}
+            className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
+          >
+            {googleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
+            Continue with Google
+          </button>
+        </div>
+
+        {/* Sign in link */}
+        <p className="text-center text-[14px] text-slate-400 mt-8">
+          Already have an account?{" "}
+          <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
+        </p>
       </div>
     );
   }
@@ -376,13 +512,13 @@ export default function RegisterPage() {
       <div className="px-5 pb-10 pt-6 space-y-3">
         <Link
           href="/login"
-          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold py-3.5 rounded-xl flex items-center justify-center text-[15px] transition"
+          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] transition"
         >
           Sign In
         </Link>
         <button
           onClick={() => setStep("methods")}
-          className="w-full border-2 border-slate-200 text-slate-800 font-semibold py-3.5 rounded-xl flex items-center justify-center text-[15px] hover:border-slate-300 transition"
+          className="w-full border border-black text-slate-900 font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] hover:bg-slate-50 transition"
         >
           Create an account
         </button>
