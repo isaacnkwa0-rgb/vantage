@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, ShoppingCart, ClipboardList, Users, MoreHorizontal, X, Zap,
+  LayoutDashboard, ShoppingCart, ClipboardList, Users, MoreHorizontal, Zap,
   Package, Package2, Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
   ShoppingBag, Tag, CalendarDays, BookOpen, FileX, Globe, Gift, Share2,
   RefreshCw, Barcode, Thermometer, BellRing, Landmark, Wallet,
+  ChevronRight, ChevronDown, UserCircle,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,26 +33,26 @@ interface NavSection {
 const NAV_SECTIONS: NavSection[] = [
   {
     id: "overview",
-    label: "Overview",
+    label: "OVERVIEW",
     items: [
       { label: "Dashboard", icon: LayoutDashboard, href: "dashboard" },
     ],
   },
   {
     id: "sales",
-    label: "Sales",
+    label: "SALES",
     items: [
       { label: "Point of Sale", serviceLabel: "Record Service", icon: ShoppingCart, href: "pos" },
       { label: "Transactions", icon: ClipboardList, href: "sales" },
       { label: "Invoices", icon: FileText, href: "invoices" },
       { label: "Quotes", icon: FilePen, href: "quotes" },
       { label: "Discounts", icon: Ticket, href: "discounts" },
-      { label: "Recurring", icon: RefreshCw, href: "recurring" },
+      { label: "Recurring Billing", icon: RefreshCw, href: "recurring" },
     ],
   },
   {
     id: "catalog",
-    label: "Catalog",
+    label: "CATALOG",
     items: [
       { label: "Products", serviceLabel: "Services", icon: Package, href: "products" },
       { label: "Bundles", icon: Package2, href: "bundles", retailOnly: true },
@@ -62,7 +62,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "customers",
-    label: "Customers",
+    label: "CUSTOMERS",
     items: [
       { label: "Customers", serviceLabel: "Clients", icon: Users, href: "customers" },
       { label: "Campaigns", icon: Megaphone, href: "campaigns" },
@@ -72,7 +72,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "inventory",
-    label: "Inventory",
+    label: "INVENTORY",
     retailOnly: true,
     items: [
       { label: "Suppliers", icon: Truck, href: "suppliers" },
@@ -82,7 +82,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "finance",
-    label: "Finance",
+    label: "FINANCE",
     items: [
       { label: "Expenses", icon: Receipt, href: "expenses" },
       { label: "Cashbook", icon: BookOpen, href: "cashbook" },
@@ -92,7 +92,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "insights",
-    label: "Insights",
+    label: "INSIGHTS",
     items: [
       { label: "Reports", icon: BarChart3, href: "reports" },
       { label: "Analytics", icon: TrendingUp, href: "analytics" },
@@ -102,7 +102,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "operations",
-    label: "Operations",
+    label: "OPERATIONS",
     items: [
       { label: "Cash Shifts", icon: Vault, href: "shifts" },
       { label: "Appointments", icon: CalendarDays, href: "appointments" },
@@ -112,7 +112,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "system",
-    label: "System",
+    label: "SYSTEM",
     items: [
       { label: "Notifications", icon: BellRing, href: "notifications" },
       { label: "Activity", icon: ActivitySquare, href: "activity" },
@@ -128,135 +128,145 @@ const BOTTOM_TABS = [
   { label: "Customers", icon: Users, href: "customers" },
 ] as const;
 
-function MoreSheet({ slug, onClose }: { slug: string; onClose: () => void }) {
+function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
   const pathname = usePathname();
   const { activeBusiness } = useBusinessStore();
   const isService = activeBusiness?.business_type === "service";
 
+  const [openSections, setOpenSections] = useState<Set<string>>(
+    () => new Set(NAV_SECTIONS.map((s) => s.id))
+  );
+
+  function toggleSection(id: string) {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   const visibleSections = NAV_SECTIONS.filter((s) => !(s.retailOnly && isService));
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[1px]"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Sheet */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation menu"
-        className="fixed bottom-0 inset-x-0 z-50 bg-white rounded-t-2xl max-h-[88vh] flex flex-col shadow-2xl"
-      >
-        {/* Drag handle */}
-        <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mt-3 mb-1 flex-shrink-0" />
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/vantage-icon.svg"
-              alt="VANTAGE"
-              width={28}
-              height={28}
-              className="rounded-lg flex-shrink-0"
-            />
-            <div className="min-w-0">
-              <p className="text-[13px] font-extrabold text-slate-900 leading-tight">VANTAGE</p>
-              <p className="text-[11px] text-slate-400 truncate leading-tight">
-                {activeBusiness?.name ?? ""}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close navigation menu"
-            className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
-          >
-            <X className="w-5 h-5" aria-hidden="true" />
-          </button>
+    /* Covers full viewport except the bottom nav (h-16 = 64px) */
+    <div className="fixed inset-x-0 top-0 bottom-16 z-50 bg-[#F5F6F8] flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-12 pb-4 bg-[#F5F6F8] flex-shrink-0">
+        <div className="w-9" /> {/* balance the avatar */}
+        <h1 className="text-base font-bold text-slate-900 truncate max-w-[60%] text-center">
+          {activeBusiness?.name ?? ""}
+        </h1>
+        <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+          <UserCircle className="w-5 h-5 text-slate-400" aria-hidden="true" />
         </div>
-
-        {/* Scrollable nav sections */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
-          {visibleSections.map((section) => {
-            const items = section.items.filter((item) => !(item.retailOnly && isService));
-            if (!items.length) return null;
-
-            return (
-              <div key={section.id}>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 px-1">
-                  {section.label}
-                </p>
-                <div className="grid grid-cols-4 gap-1">
-                  {items.map((item) => {
-                    const label = isService && item.serviceLabel ? item.serviceLabel : item.label;
-                    const href = `/${slug}/${item.href}`;
-                    const isActive = pathname === href || pathname.startsWith(`${href}/`);
-                    const Icon = item.icon;
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={href}
-                        onClick={onClose}
-                        aria-current={isActive ? "page" : undefined}
-                        className={cn(
-                          "flex flex-col items-center gap-1.5 p-2.5 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
-                          isActive
-                            ? "bg-green-50"
-                            : "hover:bg-slate-50 active:bg-slate-100"
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0",
-                            isActive ? "bg-green-600 shadow-md shadow-green-900/25" : "bg-slate-100"
-                          )}
-                        >
-                          <Icon
-                            aria-hidden="true"
-                            className={cn(
-                              "w-5 h-5",
-                              isActive ? "text-white" : "text-slate-500"
-                            )}
-                          />
-                        </div>
-                        <span
-                          className={cn(
-                            "text-[10px] font-medium text-center leading-tight line-clamp-2",
-                            isActive ? "text-green-700" : "text-slate-600"
-                          )}
-                        >
-                          {label}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Upgrade CTA */}
-        {activeBusiness?.subscription_tier === "free" && (
-          <div className="flex-shrink-0 p-3 border-t border-slate-100">
-            <Link
-              href={`/${slug}/settings?tab=billing`}
-              onClick={onClose}
-              className="flex items-center gap-2.5 w-full px-4 py-3 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white rounded-xl text-sm font-bold transition shadow-md shadow-green-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2"
-            >
-              <Zap className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-              <span>Upgrade to Starter</span>
-            </Link>
-          </div>
-        )}
       </div>
-    </>
+
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-3">
+
+        {/* Upgrade CTA — free tier only */}
+        {activeBusiness?.subscription_tier === "free" && (
+          <Link
+            href={`/${slug}/settings?tab=billing`}
+            onClick={onClose}
+            className="flex items-center gap-3 bg-white rounded-2xl px-4 py-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full border-2 border-green-500 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-5 h-5 text-green-500" aria-hidden="true" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-slate-900">Upgrade to Starter</p>
+              <p className="text-xs text-slate-500 mt-0.5">Unlock the full benefits of VANTAGE</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" aria-hidden="true" />
+          </Link>
+        )}
+
+        {/* Nav sections */}
+        {visibleSections.map((section) => {
+          const items = section.items.filter((item) => !(item.retailOnly && isService));
+          if (!items.length) return null;
+          const isOpen = openSections.has(section.id);
+
+          return (
+            <div key={section.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+              {/* Section header */}
+              <button
+                onClick={() => toggleSection(section.id)}
+                aria-expanded={isOpen}
+                className="w-full flex items-center justify-between px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500"
+              >
+                <span className="text-[11px] font-bold uppercase tracking-widest text-slate-600">
+                  {section.label}
+                </span>
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn(
+                    "w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0",
+                    !isOpen && "-rotate-90"
+                  )}
+                />
+              </button>
+
+              {/* Items */}
+              {isOpen && items.map((item, i) => {
+                const label = isService && item.serviceLabel ? item.serviceLabel : item.label;
+                const href = `/${slug}/${item.href}`;
+                const isActive = pathname === href || pathname.startsWith(`${href}/`);
+                const Icon = item.icon;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={href}
+                    onClick={onClose}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
+                      i >= 0 && "border-t border-slate-100",
+                      isActive ? "bg-green-50" : "active:bg-slate-50"
+                    )}
+                  >
+                    {/* Icon badge */}
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
+                        isActive ? "bg-green-100" : "bg-green-50"
+                      )}
+                    >
+                      <Icon
+                        aria-hidden="true"
+                        className={cn(
+                          "w-5 h-5",
+                          isActive ? "text-green-700" : "text-green-600"
+                        )}
+                      />
+                    </div>
+
+                    {/* Label */}
+                    <span
+                      className={cn(
+                        "flex-1 text-[14px] font-medium",
+                        isActive ? "text-green-700" : "text-slate-700"
+                      )}
+                    >
+                      {label}
+                    </span>
+
+                    {/* Chevron */}
+                    <ChevronRight
+                      aria-hidden="true"
+                      className="w-4 h-4 text-slate-300 flex-shrink-0"
+                    />
+                  </Link>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -269,14 +279,14 @@ export function BottomNav({ slug }: { slug: string }) {
   const posLabel = isService ? "Services" : "POS";
   const customersLabel = isService ? "Clients" : "Customers";
 
-  // Close the sheet whenever the user navigates
+  // Close when the user navigates to any route
   useEffect(() => {
     setShowMore(false);
   }, [pathname]);
 
   return (
     <>
-      {showMore && <MoreSheet slug={slug} onClose={() => setShowMore(false)} />}
+      {showMore && <MorePage slug={slug} onClose={() => setShowMore(false)} />}
 
       <nav
         aria-label="Main navigation"
@@ -284,7 +294,7 @@ export function BottomNav({ slug }: { slug: string }) {
       >
         {BOTTOM_TABS.map((tab) => {
           const href = `/${slug}/${tab.href}`;
-          const isActive = pathname === href || pathname.startsWith(`${href}/`);
+          const isActive = !showMore && (pathname === href || pathname.startsWith(`${href}/`));
           const Icon = tab.icon;
           const label =
             tab.href === "pos" ? posLabel
@@ -306,21 +316,16 @@ export function BottomNav({ slug }: { slug: string }) {
                 aria-hidden="true"
                 className={cn("w-5 h-5 transition-transform", isActive && "scale-110")}
               />
-              <span
-                className={cn(
-                  "text-[10px] font-semibold leading-none",
-                  isActive ? "text-green-600" : "text-slate-400"
-                )}
-              >
+              <span className={cn("text-[10px] font-semibold leading-none", isActive ? "text-green-600" : "text-slate-400")}>
                 {label}
               </span>
             </Link>
           );
         })}
 
-        {/* More — opens the nav sheet */}
+        {/* More */}
         <button
-          onClick={() => setShowMore(true)}
+          onClick={() => setShowMore((v) => !v)}
           aria-label="Open full navigation menu"
           aria-expanded={showMore}
           className={cn(
@@ -332,12 +337,7 @@ export function BottomNav({ slug }: { slug: string }) {
             aria-hidden="true"
             className={cn("w-5 h-5 transition-transform", showMore && "scale-110")}
           />
-          <span
-            className={cn(
-              "text-[10px] font-semibold leading-none",
-              showMore ? "text-green-600" : "text-slate-400"
-            )}
-          >
+          <span className={cn("text-[10px] font-semibold leading-none", showMore ? "text-green-600" : "text-slate-400")}>
             More
           </span>
         </button>
