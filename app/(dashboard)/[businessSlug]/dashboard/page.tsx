@@ -187,8 +187,10 @@ export default async function DashboardPage({ params }: Props) {
     : null;
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-[#F5F6F8] lg:bg-[#F7F9FC]">
-      <TopBar title="Dashboard" />
+    <div className="flex flex-col flex-1 min-h-0 bg-white lg:bg-[#F7F9FC]">
+      <div className="hidden lg:block">
+        <TopBar title="Dashboard" />
+      </div>
 
       {/* ── Mobile dashboard (Bumpa-style) ── */}
       <div className="flex flex-col flex-1 min-h-0 lg:hidden">
