@@ -204,6 +204,9 @@ export default async function DashboardPage({ params }: Props) {
           netProfit={netProfit}
           revenueGrowthPct={revenueGrowthPct}
           sales={todaySales as any}
+          totalProducts={products.length}
+          totalCustomers={totalCustomers}
+          newCustomers={newCustomers}
         />
       </div>
 

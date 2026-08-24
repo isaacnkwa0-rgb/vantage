@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Plus, Search, Package, TrendingUp, BarChart3, Download, Briefcase } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
+import { cn } from "@/lib/utils";
 import { ProductForm } from "./ProductForm";
 import { ProductCard } from "./ProductCard";
 import { BulkImportModal } from "./BulkImportModal";
@@ -88,12 +89,28 @@ export function ProductsClient({ products, categories, locations, businessId, cu
     return stockOverrides[p.id] !== undefined ? stockOverrides[p.id] : p.stock_quantity;
   }
 
+  const MOBILE_TABS = isService
+    ? [
+        { value: "all",      label: "All" },
+        { value: "active",   label: "Active" },
+        { value: "inactive", label: "Inactive" },
+      ]
+    : [
+        { value: "all",           label: "All" },
+        { value: "active",        label: "Active" },
+        { value: "inactive",      label: "Inactive" },
+        { value: "out-of-stock",  label: "Out of Stock" },
+      ];
+
   const filtered = products.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       (p.sku ?? "").toLowerCase().includes(search.toLowerCase());
     if (!matchSearch) return false;
     if (selectedFilter === "all") return true;
+    if (selectedFilter === "active") return p.is_active;
+    if (selectedFilter === "inactive") return !p.is_active;
+    if (selectedFilter === "out-of-stock") return getQty(p) === 0;
     if (selectedFilter === "low-stock") return getQty(p) <= p.low_stock_threshold;
     if (selectedFilter.startsWith("loc-")) return p.location_id === selectedFilter.slice(4);
     return p.category_id === selectedFilter;
@@ -128,10 +145,11 @@ export function ProductsClient({ products, categories, locations, businessId, cu
     URL.revokeObjectURL(url);
   }
 
-  const filterLabel = selectedFilter === "all"
-    ? null
-    : selectedFilter === "low-stock"
-    ? "Low stock items"
+  const filterLabel = selectedFilter === "all" ? null
+    : selectedFilter === "active" ? null
+    : selectedFilter === "inactive" ? null
+    : selectedFilter === "out-of-stock" ? null
+    : selectedFilter === "low-stock" ? "Low stock items"
     : selectedFilter.startsWith("loc-")
     ? locations.find((l) => l.id === selectedFilter.slice(4))?.name ?? "Location"
     : categories.find((c) => c.id === selectedFilter)?.name ?? "Category";
@@ -223,27 +241,49 @@ export function ProductsClient({ products, categories, locations, businessId, cu
         </div>
       )}
 
-      {/* Search + filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={isService ? "Search services..." : "Search products or SKU..."}
-              className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-            />
-          </div>
+      {/* Search */}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={isService ? "Search services..." : "Search products or SKU..."}
+            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+          />
         </div>
+      </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+      {/* Mobile status filter tabs */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 sm:hidden">
+        {MOBILE_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setSelectedFilter(tab.value)}
+            className={cn(
+              "flex-shrink-0 px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors",
+              selectedFilter === tab.value
+                ? "bg-[#1a9c38] text-white"
+                : "bg-white border border-slate-200 text-slate-600 active:bg-slate-50"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop filters */}
+      <div className="hidden sm:flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
           <select
             value={selectedFilter}
             onChange={(e) => setSelectedFilter(e.target.value)}
             className="px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="all">{isService ? "All services" : "All products"}</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            {!isService && <option value="out-of-stock">Out of Stock</option>}
             {!isService && <option value="low-stock">⚠️ Low stock</option>}
             {categories.length > 0 && (
               <optgroup label="Categories">
@@ -403,6 +443,15 @@ export function ProductsClient({ products, categories, locations, businessId, cu
           startConnected={igStartConnected}
         />
       )}
+
+      {/* Mobile FAB */}
+      <button
+        onClick={() => { setEditingProduct(null); setShowForm(true); }}
+        className="sm:hidden fixed bottom-[calc(4rem+env(safe-area-inset-bottom)+1rem)] right-4 w-14 h-14 rounded-full bg-[#1a9c38] text-white flex items-center justify-center shadow-lg shadow-green-900/30 z-30 active:scale-95 transition-transform"
+        aria-label={isService ? "Add service" : "Add product"}
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </div>
   );
 }

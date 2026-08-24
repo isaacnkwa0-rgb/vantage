@@ -30,6 +30,9 @@ interface Props {
   netProfit: number;
   revenueGrowthPct: number | null;
   sales: Sale[];
+  totalProducts: number;
+  totalCustomers: number;
+  newCustomers: number;
 }
 
 function getGreeting() {
@@ -56,6 +59,7 @@ export function MobileDashboard({
   businessName, businessType, slug, currency,
   todayRevenue, todaySalesCount, monthRevenue,
   monthExpenses, netProfit, revenueGrowthPct, sales,
+  totalProducts, totalCustomers, newCustomers,
 }: Props) {
   const [hidden, setHidden] = useState(false);
 
@@ -168,6 +172,30 @@ export function MobileDashboard({
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* ── Quick stats row ───────────────────────────────── */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-2xl px-3 py-3.5 border border-slate-100 shadow-sm text-center">
+            <p className="font-numeric text-[22px] font-bold text-slate-900 leading-none">
+              {todaySalesCount}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1.5 font-medium">{txLabel} today</p>
+          </div>
+          <div className="bg-white rounded-2xl px-3 py-3.5 border border-slate-100 shadow-sm text-center">
+            <p className="font-numeric text-[22px] font-bold text-slate-900 leading-none">
+              {totalCustomers}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1.5 font-medium">
+              {isService ? "clients" : "customers"}
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl px-3 py-3.5 border border-slate-100 shadow-sm text-center">
+            <p className="font-numeric text-[22px] font-bold text-[#1a9c38] leading-none">
+              +{newCustomers}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1.5 font-medium">new this month</p>
           </div>
         </div>
 
