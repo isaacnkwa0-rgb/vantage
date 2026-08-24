@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, ShoppingCart, ClipboardList, Users, MoreHorizontal, Zap,
+  Home, ShoppingCart, Package, Users, MoreHorizontal, Zap,
+  LayoutDashboard, ClipboardList,
   Package, Package2, Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
   ShoppingBag, Tag, CalendarDays, BookOpen, FileX, Globe, Gift, Share2,
@@ -122,10 +123,10 @@ const NAV_SECTIONS: NavSection[] = [
 ];
 
 const BOTTOM_TABS = [
-  { label: "Home", icon: LayoutDashboard, href: "dashboard" },
-  { label: "POS", icon: ShoppingCart, href: "pos" },
-  { label: "Sales", icon: ClipboardList, href: "sales" },
-  { label: "Customers", icon: Users, href: "customers" },
+  { label: "Home",      icon: Home,         href: "dashboard" },
+  { label: "POS",       icon: ShoppingCart, href: "pos"       },
+  { label: "Products",  icon: Package,      href: "products"  },
+  { label: "Customers", icon: Users,        href: "customers" },
 ] as const;
 
 function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
@@ -300,8 +301,9 @@ export function BottomNav({ slug }: { slug: string }) {
           const isActive = !showMore && (pathname === href || pathname.startsWith(`${href}/`));
           const Icon = tab.icon;
           const label =
-            tab.href === "pos" ? posLabel
+            tab.href === "pos"       ? posLabel
             : tab.href === "customers" ? customersLabel
+            : tab.href === "products"  && isService ? "Services"
             : tab.label;
 
           return (

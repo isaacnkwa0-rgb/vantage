@@ -8,6 +8,7 @@ import { BusinessHealth } from "@/components/dashboard/BusinessHealth";
 import { InventoryPanel } from "@/components/dashboard/InventoryPanel";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { TopProductsPanel } from "@/components/dashboard/TopProductsPanel";
+import { MobileDashboard } from "@/components/dashboard/MobileDashboard";
 
 interface Props {
   params: Promise<{ businessSlug: string }>;
@@ -180,9 +181,34 @@ export default async function DashboardPage({ params }: Props) {
   const totalCustomers = customersRes.count ?? 0;
   const newCustomers = newCustomersRes.count ?? 0;
 
+  const netProfit = monthRevenue - monthCOGS - monthExpenses;
+  const revenueGrowthPct = lastMonthRevenue > 0
+    ? ((monthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
+    : null;
+
   return (
-    <div className="flex flex-col flex-1 overflow-auto bg-[#F7F9FC]">
+    <div className="flex flex-col flex-1 min-h-0 bg-[#F5F6F8] lg:bg-[#F7F9FC]">
       <TopBar title="Dashboard" />
+
+      {/* ── Mobile dashboard (Bumpa-style) ── */}
+      <div className="flex flex-col flex-1 min-h-0 lg:hidden">
+        <MobileDashboard
+          businessName={business.name}
+          businessType={businessType}
+          slug={businessSlug}
+          currency={business.currency}
+          todayRevenue={todayRevenue}
+          todaySalesCount={todaySalesCount}
+          monthRevenue={monthRevenue}
+          monthExpenses={monthExpenses}
+          netProfit={netProfit}
+          revenueGrowthPct={revenueGrowthPct}
+          sales={todaySales as any}
+        />
+      </div>
+
+      {/* ── Desktop dashboard ── */}
+      <div className="hidden lg:flex flex-col flex-1 overflow-auto">
       <div className="flex-1 p-4 sm:p-6 space-y-5 max-w-screen-2xl mx-auto w-full">
 
         {/* Header + Quick Actions */}
@@ -254,6 +280,7 @@ export default async function DashboardPage({ params }: Props) {
           </div>
         </div>
 
+      </div>
       </div>
     </div>
   );
