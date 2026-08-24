@@ -150,7 +150,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
 
   return (
     /* Covers full viewport except the bottom nav (h-16 = 64px) */
-    <div className="fixed inset-x-0 top-0 bottom-16 z-50 bg-[#F5F6F8] flex flex-col overflow-hidden">
+    <div className="fixed inset-x-0 top-0 z-50 bg-[#F5F6F8] flex flex-col overflow-hidden" style={{ bottom: "calc(4rem + env(safe-area-inset-bottom))" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-12 pb-4 bg-[#F5F6F8] flex-shrink-0">
         <div className="w-9" /> {/* balance the avatar */}
@@ -290,8 +290,11 @@ export function BottomNav({ slug }: { slug: string }) {
 
       <nav
         aria-label="Main navigation"
-        className="bottom-nav lg:hidden flex-shrink-0 bg-white border-t border-slate-200 flex items-stretch h-16"
+        className="bottom-nav fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white border-t border-slate-200 flex flex-col"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
+        {/* Fixed-height row so safe-area padding never squashes the icons */}
+        <div className="h-16 flex items-stretch w-full">
         {BOTTOM_TABS.map((tab) => {
           const href = `/${slug}/${tab.href}`;
           const isActive = !showMore && (pathname === href || pathname.startsWith(`${href}/`));
@@ -341,6 +344,7 @@ export function BottomNav({ slug }: { slug: string }) {
             More
           </span>
         </button>
+        </div>
       </nav>
     </>
   );

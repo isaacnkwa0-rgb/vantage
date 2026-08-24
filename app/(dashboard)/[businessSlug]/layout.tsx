@@ -52,18 +52,21 @@ export default async function BusinessLayout({ children, params }: Props) {
           Skip to main content
         </a>
 
-        <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
+        <div className="flex h-[100dvh] overflow-hidden bg-[#F8FAFC]">
           {/* Desktop only — icon-strip sidebar, hidden on mobile */}
           <div className="hidden lg:block">
             <Sidebar slug={businessSlug} />
           </div>
           <main id="main-content" className="flex-1 flex flex-col overflow-hidden min-w-0">
-            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+            {/* pb-16 on mobile reserves space for the fixed bottom nav */}
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col pb-16 lg:pb-0">
               {children}
             </div>
-            <BottomNav slug={businessSlug} />
           </main>
         </div>
+
+        {/* Fixed bottom nav — outside the flex flow so it never shifts */}
+        <BottomNav slug={businessSlug} />
       </CommandSearchProvider>
     </BusinessProvider>
   );
