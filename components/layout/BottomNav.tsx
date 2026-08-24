@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ShoppingCart, Package, Users, MoreHorizontal, Zap,
+  Home, ShoppingCart, Package, Package2, Users, MoreHorizontal, Zap,
   LayoutDashboard, ClipboardList,
-  Package, Package2, Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
+  Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
   ShoppingBag, Tag, CalendarDays, BookOpen, FileX, Globe, Gift, Share2,
   RefreshCw, Barcode, Thermometer, BellRing, Landmark, Wallet,
