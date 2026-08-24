@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ShoppingCart, Package, Package2, Users, MoreHorizontal, Zap,
+  Home, ShoppingCart, Box, Package, Package2, Users, MoreHorizontal, Zap,
   LayoutDashboard, ClipboardList,
   Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
@@ -125,7 +125,7 @@ const NAV_SECTIONS: NavSection[] = [
 const BOTTOM_TABS = [
   { label: "Home",      icon: Home,         href: "dashboard" },
   { label: "POS",       icon: ShoppingCart, href: "pos"       },
-  { label: "Products",  icon: Package,      href: "products"  },
+  { label: "Products",  icon: Box,          href: "products"  },
   { label: "Customers", icon: Users,        href: "customers" },
 ] as const;
 
