@@ -8,33 +8,156 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
-import {
-  Loader2, CheckCircle2,
-  ShoppingCart, Package, DollarSign, BarChart3, Users, Receipt,
-} from "lucide-react";
+import { Loader2, CheckCircle2, ShoppingCart, Package, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const schema = z
-  .object({
-    fullName: z.string().min(2, "Enter your full name"),
-    email: z.string().email("Enter a valid email"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((d) => d.password === d.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+const schema = z.object({
+  fullName: z.string().min(2, "Enter your full name"),
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(8, "At least 8 characters"),
+});
 type FormData = z.infer<typeof schema>;
+
+const SLIDES = [
+  {
+    headline: "Start managing your business like you",
+    highlight: "mean business.",
+    sub: "Manage your inventory, sales, customers & payments with structure.",
+    Illustration: () => (
+      <div className="bg-white rounded-2xl shadow-lg p-4 mx-2 border border-slate-100">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-[11px] text-slate-400">Hello, Zikky</p>
+            <p className="text-[10px] text-green-600 font-medium">Record your first sale →</p>
+          </div>
+          <div className="flex gap-2">
+            <div className="w-7 h-7 bg-slate-100 rounded-full" />
+            <div className="w-7 h-7 bg-slate-100 rounded-full" />
+          </div>
+        </div>
+        <div className="bg-slate-50 rounded-xl px-3 py-2 flex items-center gap-2 mb-3 border border-slate-100">
+          <div className="w-5 h-5 rounded bg-[#1a9c38] flex items-center justify-center">
+            <Package className="w-3 h-3 text-white" />
+          </div>
+          <span className="text-[11px] font-semibold text-slate-700">Zikky Gadgets</span>
+        </div>
+        <p className="text-[10px] text-slate-400 mb-0.5">Total Revenue · This Month</p>
+        <p className="text-[22px] font-bold text-slate-900 font-numeric leading-none mb-3">₦840,000</p>
+        <div className="grid grid-cols-4 gap-1.5 mb-3">
+          {[
+            { label: "Orders", val: "1,240", bg: "bg-slate-50" },
+            { label: "Products", val: "289", bg: "bg-[#E8F5EC]" },
+            { label: "Customers", val: "136", bg: "bg-[#FEF9EC]" },
+            { label: "New", val: "+12", bg: "bg-[#FEF0F0]" },
+          ].map((s) => (
+            <div key={s.label} className={cn("rounded-lg p-1.5 text-center", s.bg)}>
+              <p className="text-[11px] font-bold text-slate-800">{s.val}</p>
+              <p className="text-[8px] text-slate-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-4 gap-1.5">
+          {[
+            { label: "New Sale", icon: ShoppingCart, green: true },
+            { label: "Products", icon: Package, green: false },
+            { label: "Analytics", icon: TrendingUp, green: false },
+            { label: "Expenses", icon: TrendingUp, green: false },
+          ].map((a) => (
+            <div key={a.label} className="flex flex-col items-center gap-1">
+              <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", a.green ? "bg-[#1a9c38]" : "bg-slate-100")}>
+                <a.icon className={cn("w-4 h-4", a.green ? "text-white" : "text-slate-500")} />
+              </div>
+              <span className="text-[8px] text-slate-500">{a.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    headline: "Record sales & track inventory",
+    highlight: "in real time.",
+    sub: "Fast POS checkout with multiple payment methods and live stock updates.",
+    Illustration: () => (
+      <div className="bg-white rounded-2xl shadow-lg p-4 mx-2 border border-slate-100">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[12px] font-bold text-slate-800">Today's Sales</p>
+          <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">POS Active</span>
+        </div>
+        <div className="space-y-2 mb-3">
+          {[
+            { name: "Wireless Earbuds", qty: "×1", amount: "₦12,000", method: "Cash" },
+            { name: "iPhone Case", qty: "×2", amount: "₦8,500", method: "Transfer" },
+            { name: "USB-C Cable", qty: "×3", amount: "₦4,500", method: "Card" },
+          ].map((s) => (
+            <div key={s.name} className="flex items-center gap-2 py-1.5 border-b border-slate-50">
+              <div className="w-7 h-7 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                <ShoppingCart className="w-3.5 h-3.5 text-[#1a9c38]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-semibold text-slate-800 truncate">{s.name} {s.qty}</p>
+                <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 rounded-full">{s.method}</span>
+              </div>
+              <p className="text-[11px] font-bold text-slate-900 font-numeric">{s.amount}</p>
+            </div>
+          ))}
+        </div>
+        <div className="bg-[#E8F5EC] rounded-xl p-2.5 flex items-center justify-between">
+          <p className="text-[11px] font-semibold text-green-800">Total today</p>
+          <p className="text-[14px] font-bold text-[#1a9c38] font-numeric">₦25,000</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    headline: "Grow your business beyond",
+    highlight: "your goals.",
+    sub: "Expense tracking, invoicing, customer insights, and detailed reports to keep you ahead.",
+    Illustration: () => (
+      <div className="bg-white rounded-2xl shadow-lg p-4 mx-2 border border-slate-100">
+        <p className="text-[12px] font-bold text-slate-800 mb-3">Business Overview</p>
+        <div className="space-y-2.5 mb-3">
+          {[
+            { label: "Revenue", val: "₦840,000", pct: 85, color: "bg-[#1a9c38]" },
+            { label: "Expenses", val: "₦120,000", pct: 30, color: "bg-amber-400" },
+            { label: "Net Profit", val: "₦720,000", pct: 72, color: "bg-blue-400" },
+          ].map((r) => (
+            <div key={r.label}>
+              <div className="flex justify-between mb-1">
+                <p className="text-[10px] text-slate-500">{r.label}</p>
+                <p className="text-[10px] font-bold text-slate-800 font-numeric">{r.val}</p>
+              </div>
+              <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className={cn("h-full rounded-full", r.color)} style={{ width: `${r.pct}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-slate-50 rounded-xl p-2.5 text-center">
+            <p className="text-[18px] font-bold text-slate-900 font-numeric">136</p>
+            <p className="text-[9px] text-slate-500">Customers</p>
+          </div>
+          <div className="bg-[#E8F5EC] rounded-xl p-2.5 text-center">
+            <p className="text-[18px] font-bold text-[#1a9c38] font-numeric">+18%</p>
+            <p className="text-[9px] text-slate-500">vs last month</p>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+];
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [slide, setSlide] = useState(0);
+  const [showForm, setShowForm] = useState(false);
   const [success, setSuccess] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const [error, setError] = useState<string | null>(null);
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
   async function onSubmit(data: FormData) {
     setError(null);
@@ -51,281 +174,170 @@ export default function RegisterPage() {
     setSuccess(true);
   }
 
-  return (
-    <div className="min-h-screen lg:grid lg:grid-cols-2">
-      {/* ── Left panel ── */}
-      <div className="hidden lg:flex flex-col bg-gradient-to-br from-green-900 via-green-800 to-green-700 p-10 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/[0.02] rounded-full" />
+  const { headline, highlight, sub, Illustration } = SLIDES[slide];
+
+  // ── Success state ──────────────────────────────────────────
+  if (success) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8 text-green-600" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
+        <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
+          We sent a confirmation link to your email. Click it to activate your account.
+        </p>
+        <Link href="/login" className="mt-6 inline-block text-green-600 font-semibold text-sm">
+          Back to sign in →
+        </Link>
+      </div>
+    );
+  }
+
+  // ── Form state ─────────────────────────────────────────────
+  if (showForm) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 pt-12 pb-6">
+          <button onClick={() => setShowForm(false)} className="text-slate-400 text-sm font-medium">
+            ← Back
+          </button>
         </div>
 
-        {/* Logo */}
-        <div className="relative flex items-center gap-3 mb-12">
-          <Image src="/vantage-icon.svg" alt="VANTAGE" width={40} height={40} className="rounded-xl" />
-          <span className="text-2xl font-extrabold tracking-tight text-white">Vantage</span>
-        </div>
+        <div className="flex-1 px-5">
+          <div className="flex items-center gap-2.5 mb-6">
+            <Image src="/vantage-icon.svg" alt="Vantage" width={32} height={32} className="rounded-xl" />
+            <span className="text-lg font-extrabold text-slate-900">Vantage</span>
+          </div>
 
-        {/* Headline */}
-        <div className="relative mb-10">
-          <h2 className="text-4xl font-extrabold text-white leading-tight">
-            One platform.<br />
-            Every business.
-          </h2>
-          <p className="text-green-200 mt-3 text-base leading-relaxed">
-            Whether you sell products or offer services,<br />
-            Vantage gives you the tools to grow.
+          <h2 className="text-2xl font-bold text-slate-900 mb-1">Create your account</h2>
+          <p className="text-slate-400 text-sm mb-6">Start managing your business in minutes</p>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+              <input
+                {...register("fullName")}
+                type="text"
+                autoComplete="name"
+                placeholder="Isaac Nkwa"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+              <input
+                {...register("email")}
+                type="email"
+                autoComplete="email"
+                placeholder="you@business.com"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+              <input
+                {...register("password")}
+                type="password"
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+            </div>
+
+            {error && <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">{error}</div>}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold py-3.5 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 mt-2"
+            >
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isSubmitting ? "Creating account..." : "Create account"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-slate-400 mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
           </p>
         </div>
+      </div>
+    );
+  }
 
-        {/* Feature cards */}
-        <div className="relative space-y-4 flex-1">
-          {/* Record Sales card */}
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 bg-emerald-400/30 rounded-xl flex items-center justify-center border border-emerald-300/30">
-                <ShoppingCart className="w-4.5 h-4.5 text-emerald-200" />
-              </div>
-              <div>
-                <p className="text-white font-semibold text-sm">Record Sales & POS</p>
-                <p className="text-green-300 text-xs">Fast checkout, multiple payment methods</p>
-              </div>
-            </div>
-            <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-green-200 text-[10px] font-semibold uppercase tracking-wider">Live Sale</span>
-                <span className="text-[10px] bg-emerald-400/30 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-300/30">POS Active</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-white/80 text-xs">
-                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Wireless Earbuds ×1</span>
-                  <span className="font-numeric font-semibold">₦89,000</span>
-                </div>
-                <div className="flex justify-between text-white/80 text-xs">
-                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Phone Case ×2</span>
-                  <span className="font-numeric font-semibold">₦14,000</span>
-                </div>
-              </div>
-              <div className="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
-                <span className="text-green-200 text-xs">Total</span>
-                <span className="font-numeric text-white font-bold text-sm">₦103,000</span>
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {[
-                { icon: Package,   label: "Inventory" },
-                { icon: Users,     label: "Customers" },
-                { icon: BarChart3, label: "Reports" },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex flex-col items-center gap-1 bg-white/10 rounded-lg py-2">
-                  <Icon className="w-3.5 h-3.5 text-emerald-300" />
-                  <span className="text-[10px] text-green-200">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+  // ── Onboarding carousel ────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-2 pt-14 pb-4">
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setSlide(i)}
+            className={cn(
+              "rounded-full transition-all",
+              i === slide ? "w-6 h-2 bg-[#1a9c38]" : "w-2 h-2 bg-slate-200"
+            )}
+          />
+        ))}
+      </div>
 
-          {/* Inventory card */}
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 bg-green-400/30 rounded-xl flex items-center justify-center border border-green-300/30">
-                <Package className="w-4.5 h-4.5 text-green-200" />
-              </div>
-              <div>
-                <p className="text-white font-semibold text-sm">Inventory Management</p>
-                <p className="text-green-300 text-xs">Track stock, get low-stock alerts</p>
-              </div>
-            </div>
-            <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-green-200 text-[10px] font-semibold uppercase tracking-wider">Stock Overview</span>
-                <span className="text-[10px] bg-amber-400/30 text-amber-200 px-2 py-0.5 rounded-full border border-amber-300/30">2 Low Stock</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-white/80 text-xs">
-                  <span>iPhone 15 Case</span>
-                  <span className="text-green-300 font-semibold">48 units</span>
-                </div>
-                <div className="flex justify-between text-white/80 text-xs">
-                  <span>USB-C Cable</span>
-                  <span className="text-amber-300 font-semibold">3 units</span>
-                </div>
-              </div>
-              <div className="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
-                <span className="text-green-200 text-xs">Total Products</span>
-                <span className="font-numeric text-white font-bold text-sm">82</span>
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {[
-                { icon: DollarSign, label: "Expenses" },
-                { icon: Receipt,    label: "Invoices" },
-                { icon: BarChart3,  label: "Analytics" },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex flex-col items-center gap-1 bg-white/10 rounded-lg py-2">
-                  <Icon className="w-3.5 h-3.5 text-green-300" />
-                  <span className="text-[10px] text-green-200">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Slide content */}
+      <div
+        className="flex-1 flex flex-col px-6 pt-4"
+        onTouchStart={(e) => {
+          const startX = e.touches[0].clientX;
+          const el = e.currentTarget;
+          el.dataset.startX = String(startX);
+        }}
+        onTouchEnd={(e) => {
+          const startX = Number(e.currentTarget.dataset.startX ?? 0);
+          const endX = e.changedTouches[0].clientX;
+          const diff = startX - endX;
+          if (diff > 50) setSlide((s) => Math.min(s + 1, SLIDES.length - 1));
+          if (diff < -50) setSlide((s) => Math.max(s - 1, 0));
+        }}
+      >
+        {/* Headline */}
+        <div className="mb-6">
+          <h1 className="text-[28px] font-extrabold text-slate-900 leading-tight">
+            {headline}{" "}
+            <span className="text-[#1a9c38] underline decoration-[#1a9c38] underline-offset-4">
+              {highlight}
+            </span>
+          </h1>
+          <p className="text-slate-400 text-[14px] mt-3 leading-relaxed">{sub}</p>
         </div>
 
-        {/* Trust signal */}
-        <div className="relative mt-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex -space-x-2">
-              {[47, 12, 32, 68, 3].map((n) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={n}
-                  src={`https://i.pravatar.cc/56?img=${n}`}
-                  alt=""
-                  className="w-8 h-8 rounded-full border-2 border-green-800 object-cover"
-                />
-              ))}
-            </div>
-            <div>
-              <p className="text-white text-xs font-semibold">
-                Join <span className="text-emerald-300">1,200+</span> businesses
-              </p>
-              <p className="text-green-300 text-[10px]">already growing with Vantage</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="flex gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-3 h-3 fill-amber-400" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <span className="text-green-300 text-[10px]">4.9 / 5 from 200+ reviews</span>
+        {/* Illustration */}
+        <div className="flex-1 flex items-center">
+          <div className="w-full">
+            <Illustration />
           </div>
         </div>
       </div>
 
-      {/* ── Right panel (form) ── */}
-      <div className="flex flex-col min-h-screen bg-white">
-        {/* Mobile header */}
-        <div className="lg:hidden bg-gradient-to-br from-green-900 to-green-700 px-6 pt-10 pb-8 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Image src="/vantage-icon.svg" alt="VANTAGE" width={32} height={32} className="rounded-lg" />
-            <span className="text-xl font-extrabold text-white tracking-tight">Vantage</span>
-          </div>
-          <p className="text-green-200 text-sm">Business management for shops & services</p>
-        </div>
-
-        <div className="flex-1 flex items-center justify-center px-6 py-10">
-          <div className="w-full max-w-sm">
-            {success ? (
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-xl font-bold text-[#0F172A] mb-2">Check your email</h2>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                  We sent a confirmation link to your email. Click it to activate your account and get started.
-                </p>
-                <Link href="/login" className="mt-6 inline-block text-green-600 font-medium text-sm hover:underline">
-                  Back to sign in →
-                </Link>
-              </div>
-            ) : (
-              <>
-                {/* Header */}
-                <div className="mb-7">
-                  <h2 className="text-2xl font-bold text-[#0F172A]">Create your free account</h2>
-                  <p className="text-slate-500 text-sm mt-1">Start managing your business in minutes</p>
-                </div>
-
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#0F172A] mb-1">Full Name</label>
-                    <input
-                      {...register("fullName")}
-                      type="text"
-                      autoComplete="name"
-                      placeholder="Isaac Nkwa"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                    />
-                    {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#0F172A] mb-1">Email</label>
-                    <input
-                      {...register("email")}
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@business.com"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                    />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#0F172A] mb-1">Password</label>
-                    <input
-                      {...register("password")}
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="At least 8 characters"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                    />
-                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#0F172A] mb-1">Confirm Password</label>
-                    <input
-                      {...register("confirmPassword")}
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="••••••••"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                    />
-                    {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
-                  </div>
-
-                  {error && (
-                    <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg">{error}</div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 mt-2"
-                  >
-                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {isSubmitting ? "Creating account..." : "Get started"}
-                  </button>
-                </form>
-
-                {/* Divider features */}
-                <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-                  {[
-                    { icon: ShoppingCart, label: "Record Sales" },
-                    { icon: Package,      label: "Inventory Mgmt" },
-                    { icon: DollarSign,   label: "Track Expenses" },
-                  ].map(({ icon: Icon, label }) => (
-                    <div key={label} className="flex flex-col items-center gap-1.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                      <Icon className="w-4 h-4 text-green-600" />
-                      <span className="text-[10px] text-slate-500 font-medium leading-tight">{label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <p className="text-center text-sm text-slate-500 mt-6">
-                  Already have an account?{" "}
-                  <Link href="/login" className="text-green-600 font-semibold hover:underline">Sign in</Link>
-                </p>
-              </>
-            )}
-          </div>
-        </div>
+      {/* Bottom buttons */}
+      <div className="px-5 pb-10 pt-6 space-y-3">
+        <Link
+          href="/login"
+          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold py-3.5 rounded-xl flex items-center justify-center text-[15px] transition"
+        >
+          Sign In
+        </Link>
+        <button
+          onClick={() => setShowForm(true)}
+          className="w-full border-2 border-slate-200 text-slate-800 font-semibold py-3.5 rounded-xl flex items-center justify-center text-[15px] hover:border-slate-300 transition"
+        >
+          Create an account
+        </button>
       </div>
     </div>
   );
