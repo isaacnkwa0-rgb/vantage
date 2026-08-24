@@ -122,7 +122,7 @@ const NAV_SECTIONS: NavSection[] = [
 ];
 
 const BOTTOM_TABS = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "dashboard" },
+  { label: "Home", icon: LayoutDashboard, href: "dashboard" },
   { label: "POS", icon: ShoppingCart, href: "pos" },
   { label: "Sales", icon: ClipboardList, href: "sales" },
   { label: "Customers", icon: Users, href: "customers" },
