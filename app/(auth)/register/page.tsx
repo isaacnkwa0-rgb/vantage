@@ -9,8 +9,8 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import {
-  Loader2, ShoppingBag, Scissors, CheckCircle2,
-  TrendingUp, Users, BarChart3, Receipt, Package,
+  Loader2, CheckCircle2,
+  ShoppingCart, Package, DollarSign, BarChart3, Users, Receipt,
 } from "lucide-react";
 
 const schema = z
@@ -82,18 +82,17 @@ export default function RegisterPage() {
 
         {/* Feature cards */}
         <div className="relative space-y-4 flex-1">
-          {/* Selling card */}
+          {/* Record Sales card */}
           <div className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 bg-emerald-400/30 rounded-xl flex items-center justify-center border border-emerald-300/30">
-                <ShoppingBag className="w-4.5 h-4.5 text-emerald-200" />
+                <ShoppingCart className="w-4.5 h-4.5 text-emerald-200" />
               </div>
               <div>
-                <p className="text-white font-semibold text-sm">For shops & retailers</p>
-                <p className="text-green-300 text-xs">Sell products, track inventory</p>
+                <p className="text-white font-semibold text-sm">Record Sales & POS</p>
+                <p className="text-green-300 text-xs">Fast checkout, multiple payment methods</p>
               </div>
             </div>
-            {/* Mini POS mockup */}
             <div className="bg-white/10 rounded-xl p-3 border border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-green-200 text-[10px] font-semibold uppercase tracking-wider">Live Sale</span>
@@ -102,22 +101,22 @@ export default function RegisterPage() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-white/80 text-xs">
                   <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Wireless Earbuds ×1</span>
-                  <span className="font-numeric font-semibold">$89.00</span>
+                  <span className="font-numeric font-semibold">₦89,000</span>
                 </div>
                 <div className="flex justify-between text-white/80 text-xs">
-                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Premium Tee ×2</span>
-                  <span className="font-numeric font-semibold">€54.00</span>
+                  <span className="flex items-center gap-1.5"><Package className="w-3 h-3 text-green-300" /> Phone Case ×2</span>
+                  <span className="font-numeric font-semibold">₦14,000</span>
                 </div>
               </div>
               <div className="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
                 <span className="text-green-200 text-xs">Total</span>
-                <span className="font-numeric text-white font-bold text-sm">$143.00</span>
+                <span className="font-numeric text-white font-bold text-sm">₦103,000</span>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {[
-                { icon: Package, label: "Inventory" },
-                { icon: TrendingUp, label: "Analytics" },
+                { icon: Package,   label: "Inventory" },
+                { icon: Users,     label: "Customers" },
                 { icon: BarChart3, label: "Reports" },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1 bg-white/10 rounded-lg py-2">
@@ -128,48 +127,42 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Services card */}
+          {/* Inventory card */}
           <div className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 bg-green-400/30 rounded-xl flex items-center justify-center border border-green-300/30">
-                <Scissors className="w-4.5 h-4.5 text-green-200" />
+                <Package className="w-4.5 h-4.5 text-green-200" />
               </div>
               <div>
-                <p className="text-white font-semibold text-sm">For salons & service businesses</p>
-                <p className="text-green-300 text-xs">Record services, manage clients</p>
+                <p className="text-white font-semibold text-sm">Inventory Management</p>
+                <p className="text-green-300 text-xs">Track stock, get low-stock alerts</p>
               </div>
             </div>
-            {/* Mini session mockup */}
             <div className="bg-white/10 rounded-xl p-3 border border-white/10">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-green-200 text-[10px] font-semibold uppercase tracking-wider">Today's Session</span>
-                <span className="text-[10px] bg-green-400/30 text-green-200 px-2 py-0.5 rounded-full border border-green-300/30">In Progress</span>
+                <span className="text-green-200 text-[10px] font-semibold uppercase tracking-wider">Stock Overview</span>
+                <span className="text-[10px] bg-amber-400/30 text-amber-200 px-2 py-0.5 rounded-full border border-amber-300/30">2 Low Stock</span>
               </div>
-              <div className="flex items-center gap-2.5 mb-2">
-                <div className="w-7 h-7 bg-green-400/30 rounded-full flex items-center justify-center text-xs font-bold text-white border border-green-300/30">A</div>
-                <div>
-                  <p className="text-white text-xs font-medium">Amara Johnson</p>
-                  <p className="text-green-300 text-[10px]">Walk-in client</p>
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-white/80 text-xs">
+                  <span>iPhone 15 Case</span>
+                  <span className="text-green-300 font-semibold">48 units</span>
+                </div>
+                <div className="flex justify-between text-white/80 text-xs">
+                  <span>USB-C Cable</span>
+                  <span className="text-amber-300 font-semibold">3 units</span>
                 </div>
               </div>
-              <div className="space-y-1">
-                {["Haircut", "Beard Trim"].map((s) => (
-                  <div key={s} className="flex items-center gap-1.5 text-white/80 text-xs">
-                    <CheckCircle2 className="w-3 h-3 text-green-400" />
-                    {s}
-                  </div>
-                ))}
-              </div>
               <div className="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
-                <span className="text-green-200 text-xs">Charge</span>
-                <span className="font-numeric text-white font-bold text-sm">£65.00</span>
+                <span className="text-green-200 text-xs">Total Products</span>
+                <span className="font-numeric text-white font-bold text-sm">82</span>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {[
-                { icon: Users, label: "Clients" },
-                { icon: Receipt, label: "Invoices" },
-                { icon: TrendingUp, label: "Revenue" },
+                { icon: DollarSign, label: "Expenses" },
+                { icon: Receipt,    label: "Invoices" },
+                { icon: BarChart3,  label: "Analytics" },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1 bg-white/10 rounded-lg py-2">
                   <Icon className="w-3.5 h-3.5 text-green-300" />
@@ -304,19 +297,19 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-green-300/30 mt-2"
+                    className="w-full bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 mt-2"
                   >
                     {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {isSubmitting ? "Creating account..." : "Get started — it's free"}
+                    {isSubmitting ? "Creating account..." : "Get started"}
                   </button>
                 </form>
 
                 {/* Divider features */}
                 <div className="mt-6 grid grid-cols-3 gap-3 text-center">
                   {[
-                    { icon: ShoppingBag, label: "Sell products" },
-                    { icon: Scissors, label: "Book services" },
-                    { icon: BarChart3, label: "See reports" },
+                    { icon: ShoppingCart, label: "Record Sales" },
+                    { icon: Package,      label: "Inventory Mgmt" },
+                    { icon: DollarSign,   label: "Track Expenses" },
                   ].map(({ icon: Icon, label }) => (
                     <div key={label} className="flex flex-col items-center gap-1.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                       <Icon className="w-4 h-4 text-green-600" />
