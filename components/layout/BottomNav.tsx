@@ -290,7 +290,7 @@ export function BottomNav({ slug }: { slug: string }) {
 
       <nav
         aria-label="Main navigation"
-        className="bottom-nav flex-shrink-0 bg-white border-t border-slate-200 flex items-stretch h-16"
+        className="bottom-nav lg:hidden flex-shrink-0 bg-white border-t border-slate-200 flex items-stretch h-16"
       >
         {BOTTOM_TABS.map((tab) => {
           const href = `/${slug}/${tab.href}`;
