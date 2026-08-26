@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { generateBusinessSlug } from "@/lib/utils/slugify";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_CATEGORIES: Record<string, { name: string; color: string }[]> = {
@@ -36,31 +36,55 @@ const DEFAULT_CATEGORIES: Record<string, { name: string; color: string }[]> = {
 
 const COUNTRY_OPTIONS = [
   { label: "Nigeria", flag: "🇳🇬", currency: "NGN" },
-  { label: "Kenya",  flag: "🇰🇪", currency: "KES" },
+  { label: "Kenya", flag: "🇰🇪", currency: "KES" },
 ];
 
 const BUSINESS_TYPES = [
-  { value: "retail",     label: "I sell products"  },
-  { value: "service",    label: "I offer services" },
+  { value: "retail", label: "I sell products" },
+  { value: "service", label: "I offer services" },
   { value: "restaurant", label: "Restaurant / Food" },
 ];
 
 const WEEKLY_ORDERS = ["0-50", "51-100", "101-1000", "1001+"];
-
+const CURRENCIES = ["Naira", "KES", "USD", "GBP", "CAD", "Others"];
 const STAFF_OPTIONS = ["None", "1-3", "4-5", "6-10", "11+"];
+const STORE_COUNTS = ["None", "1", "2", "3", "4+"];
 
-function Chip({
-  label, selected, onClick,
-}: { label: string; selected: boolean; onClick: () => void }) {
+function Chip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "px-5 py-2.5 rounded-lg text-[14px] font-medium transition",
-        selected ? "bg-[#1a9c38] text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+        "px-4 py-2.5 rounded-lg text-[14px] font-medium transition",
+        selected ? "bg-[#1a9c38] text-white" : "bg-[#F3F4F6] text-slate-700 hover:bg-slate-200"
       )}
     >
+      {label}
+    </button>
+  );
+}
+
+function CheckChip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2 px-4 py-2.5 rounded-lg text-[14px] font-medium transition",
+        selected ? "bg-[#1a9c38] text-white" : "bg-[#F3F4F6] text-slate-700 hover:bg-slate-200"
+      )}
+    >
+      <span className={cn(
+        "w-4 h-4 rounded-sm border-2 flex items-center justify-center flex-shrink-0",
+        selected ? "border-white bg-white" : "border-slate-400 bg-transparent"
+      )}>
+        {selected && (
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path d="M1 4L3.5 6.5L9 1" stroke="#1a9c38" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </span>
       {label}
     </button>
   );
@@ -73,9 +97,15 @@ export default function OnboardingPage() {
   const [country, setCountry] = useState(COUNTRY_OPTIONS[0]);
   const [businessType, setBusinessType] = useState("retail");
   const [weeklyOrders, setWeeklyOrders] = useState("");
+  const [currencies, setCurrencies] = useState<string[]>([]);
   const [staffCount, setStaffCount] = useState("");
+  const [storeCount, setStoreCount] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function toggleCurrency(c: string) {
+    setCurrencies((prev) => prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]);
+  }
 
   async function onSubmit() {
     if (!businessName.trim() || businessName.trim().length < 2) {
@@ -132,127 +162,185 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col px-5 pt-14 pb-10 overflow-auto">
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-auto px-5 pt-14 pb-32">
 
-      {/* Heading */}
-      <div className="text-center mb-8">
-        <h1 className="text-[28px] font-bold text-slate-900 leading-tight">
-          You&apos;re almost done
-        </h1>
-        <p className="text-slate-400 text-[15px] mt-2">
-          Tell us a little bit about your business.
-        </p>
+        {/* Heading */}
+        <div className="text-center mb-10">
+          <h1 className="text-[28px] font-bold text-slate-900 leading-tight">
+            You&apos;re almost done
+          </h1>
+          <p className="text-slate-400 text-[15px] mt-2">
+            Tell us a little bit about your business.
+          </p>
+        </div>
+
+        <div className="space-y-8">
+
+          {/* Business Name */}
+          <div>
+            <input
+              type="text"
+              value={businessName}
+              onChange={(e) => { setBusinessName(e.target.value); setNameError(null); }}
+              placeholder="Business Name"
+              autoComplete="organization"
+              className="w-full h-11 px-4 border border-slate-300 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+            />
+            {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
+          </div>
+
+          {/* Store URL */}
+          <div>
+            <input
+              type="text"
+              placeholder="Store URL"
+              className="w-full h-11 px-4 border border-slate-300 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+            />
+            <div className="flex items-start gap-1.5 mt-2">
+              <Info className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
+              <p className="text-[12px] text-slate-400 leading-relaxed">
+                You can purchase or connect a custom domain later.
+              </p>
+            </div>
+          </div>
+
+          {/* Country */}
+          <div>
+            <p className="text-[16px] font-bold text-slate-900 mb-3">
+              Where is your business situated?
+            </p>
+            <div className="flex gap-3 flex-wrap">
+              {COUNTRY_OPTIONS.map((c) => (
+                <button
+                  key={c.label}
+                  type="button"
+                  onClick={() => setCountry(c)}
+                  className={cn(
+                    "flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-medium transition",
+                    country.label === c.label
+                      ? "bg-[#1a9c38] text-white"
+                      : "bg-[#F3F4F6] text-slate-700 hover:bg-slate-200"
+                  )}
+                >
+                  <span>{c.flag}</span> {c.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-start gap-1.5 mt-2">
+              <Info className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
+              <p className="text-[12px] text-slate-400 leading-relaxed">
+                This determines the currency on your app will display. You can change the currency on your website later.
+              </p>
+            </div>
+          </div>
+
+          {/* Business type */}
+          <div>
+            <p className="text-[16px] font-bold text-slate-900 mb-3">
+              What does your business do?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {BUSINESS_TYPES.map((t) => (
+                <Chip
+                  key={t.value}
+                  label={t.label}
+                  selected={businessType === t.value}
+                  onClick={() => setBusinessType(t.value)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Weekly orders */}
+          <div>
+            <p className="text-[16px] font-bold text-slate-900 mb-3">
+              How many orders do you get weekly?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {WEEKLY_ORDERS.map((o) => (
+                <Chip
+                  key={o}
+                  label={o}
+                  selected={weeklyOrders === o}
+                  onClick={() => setWeeklyOrders(weeklyOrders === o ? "" : o)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Currencies */}
+          <div>
+            <p className="text-[16px] font-bold text-slate-900 mb-0.5">
+              What currencies do you receive payment in?
+            </p>
+            <p className="text-[13px] text-[#1a9c38] font-medium mb-3">(Select all that apply)</p>
+            <div className="flex flex-wrap gap-3">
+              {CURRENCIES.map((c) => (
+                <CheckChip
+                  key={c}
+                  label={c}
+                  selected={currencies.includes(c)}
+                  onClick={() => toggleCurrency(c)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Staff count */}
+          <div>
+            <p className="text-[16px] font-bold text-slate-900 mb-3">
+              How many staff do you have?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {STAFF_OPTIONS.map((s) => (
+                <Chip
+                  key={s}
+                  label={s}
+                  selected={staffCount === s}
+                  onClick={() => setStaffCount(staffCount === s ? "" : s)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Physical stores */}
+          <div>
+            <p className="text-[16px] font-bold text-slate-900 mb-3">
+              How many physical stores do you have?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {STORE_COUNTS.map((s) => (
+                <Chip
+                  key={s}
+                  label={s}
+                  selected={storeCount === s}
+                  onClick={() => setStoreCount(storeCount === s ? "" : s)}
+                />
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl mt-6">{error}</div>
+        )}
       </div>
 
-      <div className="space-y-8">
-
-        {/* Business Name */}
-        <div>
-          <input
-            type="text"
-            value={businessName}
-            onChange={(e) => { setBusinessName(e.target.value); setNameError(null); }}
-            placeholder="Business Name"
-            autoComplete="organization"
-            className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
-          />
-          {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
-        </div>
-
-        {/* Country */}
-        <div>
-          <p className="text-[15px] font-semibold text-slate-900 mb-3">
-            Where is your business situated?
-          </p>
-          <div className="flex gap-3">
-            {COUNTRY_OPTIONS.map((c) => (
-              <button
-                key={c.label}
-                type="button"
-                onClick={() => setCountry(c)}
-                className={cn(
-                  "flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-medium transition",
-                  country.label === c.label
-                    ? "bg-[#1a9c38] text-white"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                )}
-              >
-                <span>{c.flag}</span> {c.label}
-              </button>
-            ))}
-          </div>
-          <p className="text-[12px] text-slate-400 mt-2 leading-relaxed">
-            This determines the currency your app will display. You can change it later.
-          </p>
-        </div>
-
-        {/* Business type */}
-        <div>
-          <p className="text-[15px] font-semibold text-slate-900 mb-3">
-            What does your business do?
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {BUSINESS_TYPES.map((t) => (
-              <Chip
-                key={t.value}
-                label={t.label}
-                selected={businessType === t.value}
-                onClick={() => setBusinessType(t.value)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Weekly orders */}
-        <div>
-          <p className="text-[15px] font-semibold text-slate-900 mb-3">
-            How many orders do you get weekly?
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {WEEKLY_ORDERS.map((o) => (
-              <Chip
-                key={o}
-                label={o}
-                selected={weeklyOrders === o}
-                onClick={() => setWeeklyOrders(weeklyOrders === o ? "" : o)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Staff count */}
-        <div>
-          <p className="text-[15px] font-semibold text-slate-900 mb-3">
-            How many staff do you have?
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {STAFF_OPTIONS.map((s) => (
-              <Chip
-                key={s}
-                label={s}
-                selected={staffCount === s}
-                onClick={() => setStaffCount(staffCount === s ? "" : s)}
-              />
-            ))}
-          </div>
-        </div>
-
+      {/* Sticky Continue button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-5 py-4 border-t border-slate-100">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={isSubmitting}
+          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
+        >
+          {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isSubmitting ? "Setting up..." : "Continue"}
+        </button>
       </div>
-
-      {error && (
-        <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl mt-6">{error}</div>
-      )}
-
-      <button
-        type="button"
-        onClick={onSubmit}
-        disabled={isSubmitting}
-        className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60 mt-10"
-      >
-        {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-        {isSubmitting ? "Setting up..." : "Continue"}
-      </button>
-
     </div>
   );
 }

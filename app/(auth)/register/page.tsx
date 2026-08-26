@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -167,6 +167,14 @@ const SLIDES = [
   },
 ];
 
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 814 1000">
+      <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 376.8 45 355.2 45 345.4c0-177.3 115.4-271.6 228.7-271.6 60.7 0 111.3 39.8 149.7 39.8 36.5 0 93.5-42.4 162.9-42.4 13.1 0 108.2 1.3 170.5 82.6zm-160.2-181.4c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z" />
+    </svg>
+  );
+}
+
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 48 48">
@@ -179,8 +187,14 @@ function GoogleIcon() {
 }
 
 export default function RegisterPage() {
+  return <Suspense><RegisterPageInner /></Suspense>;
+}
+
+function RegisterPageInner() {
+  const searchParams = useSearchParams();
+  const initialStep = searchParams.get("step") as "carousel" | "methods" | "email-form" | null;
   const [slide, setSlide] = useState(0);
-  const [step, setStep] = useState<"carousel" | "methods" | "email-form">("carousel");
+  const [step, setStep] = useState<"carousel" | "methods" | "email-form">(initialStep ?? "carousel");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -201,7 +215,7 @@ export default function RegisterPage() {
       password: data.password,
       options: {
         data: { full_name: `${data.firstName} ${data.lastName}` },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
     if (authError) { setError(authError.message); return; }
@@ -443,7 +457,15 @@ export default function RegisterPage() {
             className="w-full h-11 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[15px] font-semibold text-white transition"
           >
             <Mail className="w-5 h-5" />
-            Continue with Email
+            Join with Email
+          </button>
+
+          <button
+            type="button"
+            className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition"
+          >
+            <AppleIcon />
+            Join with Apple
           </button>
 
           <button
@@ -452,7 +474,7 @@ export default function RegisterPage() {
             className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
           >
             {googleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
-            Continue with Google
+            Join with Google
           </button>
         </div>
 
