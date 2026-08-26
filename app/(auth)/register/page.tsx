@@ -215,7 +215,7 @@ function RegisterPageInner() {
       password: data.password,
       options: {
         data: { full_name: `${data.firstName} ${data.lastName}` },
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     if (authError) { setError(authError.message); return; }
