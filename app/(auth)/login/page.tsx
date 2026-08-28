@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft } from "lucide-react";
 
 function GoogleIcon() {
   return (
@@ -80,8 +80,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white flex flex-col px-5">
       {/* Back */}
       <div className="pt-12 pb-2">
-        <Link href="/register" className="flex items-center gap-1 text-[#1a9c38] text-sm font-medium">
-          ‹ Back
+        <Link href="/register" className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit">
+          <ChevronLeft className="w-[13px] h-[13px]" /> Back
         </Link>
       </div>
 

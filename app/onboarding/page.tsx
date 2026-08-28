@@ -176,7 +176,7 @@ export default function OnboardingPage() {
       defaultCats.map((c) => ({ business_id: business.id, name: c.name, color: c.color }))
     );
 
-    router.push(`/onboarding/plan?slug=${slug}`);
+    router.push(`/onboarding/verify?slug=${slug}`);
   }
 
   return (
@@ -208,6 +208,7 @@ export default function OnboardingPage() {
                   setStoreUrl(e.target.value.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, ""));
                 }}
                 placeholder="Business Name"
+                autoCapitalize="words"
                 autoComplete="organization"
                 className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
               />

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, CheckCircle2, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, Mail, ChevronLeft } from "lucide-react";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
       <div className="px-5 pt-12 pb-4">
         <Link
           href="/login"
-          className="flex items-center gap-1 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full w-fit"
+          className="flex items-center gap-1 text-[13px] font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full w-fit"
         >
           ‹ Back
         </Link>
