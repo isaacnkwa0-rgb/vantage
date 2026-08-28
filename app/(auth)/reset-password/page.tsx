@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
           <Lock className="w-6 h-6 text-[#1a9c38]" />
         </div>
 
-        <h2 className="text-[26px] font-bold text-slate-900 leading-snug mb-1">
+        <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">
           Set a new password
         </h2>
         <p className="text-slate-400 text-[14px] mb-8">
@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
               type="password"
               autoComplete="new-password"
               placeholder="New password*"
-              className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+              className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
             />
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>
@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
               type="password"
               autoComplete="new-password"
               placeholder="Confirm password*"
-              className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+              className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
             />
             {errors.confirm && <p className="text-red-500 text-xs mt-1">{errors.confirm.message}</p>}
           </div>
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
+            className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[14px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
           >
             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
             {isSubmitting ? "Updating..." : "Update password"}

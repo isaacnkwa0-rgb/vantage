@@ -37,6 +37,8 @@ const DEFAULT_CATEGORIES: Record<string, { name: string; color: string }[]> = {
 const COUNTRY_OPTIONS = [
   { label: "Nigeria", flag: "🇳🇬", currency: "NGN" },
   { label: "Kenya", flag: "🇰🇪", currency: "KES" },
+  { label: "Ghana", flag: "🇬🇭", currency: "GHS" },
+  { label: "South Africa", flag: "🇿🇦", currency: "ZAR" },
 ];
 
 const BUSINESS_TYPES = [
@@ -45,7 +47,18 @@ const BUSINESS_TYPES = [
   { value: "restaurant", label: "Restaurant / Food" },
 ];
 
-const WEEKLY_ORDERS = ["0-50", "51-100", "101-1000", "1001+"];
+const WEEKLY_ORDERS_CONFIG: Record<string, { label: string; options: string[] }> = {
+  retail:     { label: "How many orders do you get weekly?",   options: ["0-50", "51-100", "101-1000", "1001+"] },
+  service:    { label: "How many clients do you see weekly?",  options: ["0-50", "51-100", "101-1000", "1001+"] },
+  restaurant: { label: "How many covers do you serve weekly?", options: ["0-100", "101-500", "501-2000", "2001+"] },
+};
+
+const STORE_LABEL: Record<string, string> = {
+  retail:     "How many physical stores do you have?",
+  service:    "How many locations do you operate from?",
+  restaurant: "How many branches do you have?",
+};
+
 const CURRENCIES = ["Naira", "KES", "USD", "GBP", "CAD", "Others"];
 const STAFF_OPTIONS = ["None", "1-3", "4-5", "6-10", "11+"];
 const STORE_COUNTS = ["None", "1", "2", "3", "4+"];
@@ -55,9 +68,10 @@ function Chip({ label, selected, onClick }: { label: string; selected: boolean; 
     <button
       type="button"
       onClick={onClick}
+      style={selected ? { backgroundColor: "#ecf7f1" } : undefined}
       className={cn(
-        "px-4 py-2.5 rounded-lg text-[14px] font-medium transition",
-        selected ? "bg-[#1a9c38] text-white" : "bg-[#F3F4F6] text-slate-700 hover:bg-slate-200"
+        "px-4 h-10 rounded-[4px] text-[14px] font-medium border transition",
+        selected ? "border-[#1a9c38] text-slate-900" : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
       )}
     >
       {label}
@@ -70,18 +84,19 @@ function CheckChip({ label, selected, onClick }: { label: string; selected: bool
     <button
       type="button"
       onClick={onClick}
+      style={selected ? { backgroundColor: "#ecf7f1" } : undefined}
       className={cn(
-        "flex items-center gap-2 px-4 py-2.5 rounded-lg text-[14px] font-medium transition",
-        selected ? "bg-[#1a9c38] text-white" : "bg-[#F3F4F6] text-slate-700 hover:bg-slate-200"
+        "flex items-center gap-2 px-4 h-10 rounded-[4px] text-[14px] font-medium border transition",
+        selected ? "border-[#1a9c38] text-slate-900" : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
       )}
     >
       <span className={cn(
         "w-4 h-4 rounded-sm border-2 flex items-center justify-center flex-shrink-0",
-        selected ? "border-white bg-white" : "border-slate-400 bg-transparent"
+        selected ? "border-[#1a9c38] bg-[#1a9c38]" : "border-slate-400 bg-transparent"
       )}>
         {selected && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4L3.5 6.5L9 1" stroke="#1a9c38" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </span>
@@ -93,6 +108,7 @@ function CheckChip({ label, selected, onClick }: { label: string; selected: bool
 export default function OnboardingPage() {
   const router = useRouter();
   const [businessName, setBusinessName] = useState("");
+  const [storeUrl, setStoreUrl] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
   const [country, setCountry] = useState(COUNTRY_OPTIONS[0]);
   const [businessType, setBusinessType] = useState("retail");
@@ -126,7 +142,9 @@ export default function OnboardingPage() {
       email: user.email!,
     });
 
-    const slug = generateBusinessSlug(businessName.trim());
+    const baseSlug = storeUrl || businessName.trim().toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
+    const suffix = Math.random().toString(36).slice(2, 5);
+    const slug = `${baseSlug}-${suffix}`;
     const { data: business, error: bizError } = await supabase
       .from("businesses")
       .insert({
@@ -158,7 +176,7 @@ export default function OnboardingPage() {
       defaultCats.map((c) => ({ business_id: business.id, name: c.name, color: c.color }))
     );
 
-    router.push(`/${slug}/dashboard`);
+    router.push(`/onboarding/plan?slug=${slug}`);
   }
 
   return (
@@ -168,7 +186,7 @@ export default function OnboardingPage() {
 
         {/* Heading */}
         <div className="text-center mb-10">
-          <h1 className="text-[28px] font-bold text-slate-900 leading-tight">
+          <h1 className="text-[22px] font-bold text-slate-900 leading-tight">
             You&apos;re almost done
           </h1>
           <p className="text-slate-400 text-[15px] mt-2">
@@ -178,37 +196,38 @@ export default function OnboardingPage() {
 
         <div className="space-y-8">
 
-          {/* Business Name */}
-          <div>
-            <input
-              type="text"
-              value={businessName}
-              onChange={(e) => { setBusinessName(e.target.value); setNameError(null); }}
-              placeholder="Business Name"
-              autoComplete="organization"
-              className="w-full h-11 px-4 border border-slate-300 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
-            />
-            {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
-          </div>
-
-          {/* Store URL */}
-          <div>
-            <input
-              type="text"
-              placeholder="Store URL"
-              className="w-full h-11 px-4 border border-slate-300 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
-            />
-            <div className="flex items-start gap-1.5 mt-2">
-              <Info className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
-              <p className="text-[12px] text-slate-400 leading-relaxed">
-                You can purchase or connect a custom domain later.
-              </p>
+          {/* Business Name + Store URL */}
+          <div className="space-y-3">
+            <div>
+              <input
+                type="text"
+                value={businessName}
+                onChange={(e) => {
+                  setBusinessName(e.target.value);
+                  setNameError(null);
+                  setStoreUrl(e.target.value.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, ""));
+                }}
+                placeholder="Business Name"
+                autoComplete="organization"
+                className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+              />
+              {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
+            </div>
+            <div className="flex items-center h-10 border border-slate-300 rounded-[4px] focus-within:ring-2 focus-within:ring-[#1a9c38] focus-within:border-transparent">
+              <input
+                type="text"
+                value={storeUrl}
+                onChange={(e) => setStoreUrl(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                placeholder="Store URL"
+                className="flex-1 min-w-0 px-4 h-full text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
+              />
+              {storeUrl && <span className="pr-3 text-[14px] text-slate-400 select-none whitespace-nowrap shrink-0">.getvantage.app</span>}
             </div>
           </div>
 
           {/* Country */}
           <div>
-            <p className="text-[16px] font-bold text-slate-900 mb-3">
+            <p className="text-[15px] font-bold text-slate-900 mb-3">
               Where is your business situated?
             </p>
             <div className="flex gap-3 flex-wrap">
@@ -217,11 +236,12 @@ export default function OnboardingPage() {
                   key={c.label}
                   type="button"
                   onClick={() => setCountry(c)}
+                  style={country.label === c.label ? { backgroundColor: "#ecf7f1" } : undefined}
                   className={cn(
-                    "flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-medium transition",
+                    "flex items-center gap-2 px-5 h-10 rounded-[4px] text-[14px] font-medium border transition",
                     country.label === c.label
-                      ? "bg-[#1a9c38] text-white"
-                      : "bg-[#F3F4F6] text-slate-700 hover:bg-slate-200"
+                      ? "border-[#1a9c38] text-slate-900"
+                      : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
                   )}
                 >
                   <span>{c.flag}</span> {c.label}
@@ -238,7 +258,7 @@ export default function OnboardingPage() {
 
           {/* Business type */}
           <div>
-            <p className="text-[16px] font-bold text-slate-900 mb-3">
+            <p className="text-[15px] font-bold text-slate-900 mb-3">
               What does your business do?
             </p>
             <div className="flex flex-wrap gap-3">
@@ -247,7 +267,7 @@ export default function OnboardingPage() {
                   key={t.value}
                   label={t.label}
                   selected={businessType === t.value}
-                  onClick={() => setBusinessType(t.value)}
+                  onClick={() => { setBusinessType(t.value); setWeeklyOrders(""); setStoreCount(""); }}
                 />
               ))}
             </div>
@@ -255,11 +275,11 @@ export default function OnboardingPage() {
 
           {/* Weekly orders */}
           <div>
-            <p className="text-[16px] font-bold text-slate-900 mb-3">
-              How many orders do you get weekly?
+            <p className="text-[15px] font-bold text-slate-900 mb-3">
+              {WEEKLY_ORDERS_CONFIG[businessType].label}
             </p>
             <div className="flex flex-wrap gap-3">
-              {WEEKLY_ORDERS.map((o) => (
+              {WEEKLY_ORDERS_CONFIG[businessType].options.map((o) => (
                 <Chip
                   key={o}
                   label={o}
@@ -272,7 +292,7 @@ export default function OnboardingPage() {
 
           {/* Currencies */}
           <div>
-            <p className="text-[16px] font-bold text-slate-900 mb-0.5">
+            <p className="text-[15px] font-bold text-slate-900 mb-0.5">
               What currencies do you receive payment in?
             </p>
             <p className="text-[13px] text-[#1a9c38] font-medium mb-3">(Select all that apply)</p>
@@ -290,7 +310,7 @@ export default function OnboardingPage() {
 
           {/* Staff count */}
           <div>
-            <p className="text-[16px] font-bold text-slate-900 mb-3">
+            <p className="text-[15px] font-bold text-slate-900 mb-3">
               How many staff do you have?
             </p>
             <div className="flex flex-wrap gap-3">
@@ -307,8 +327,8 @@ export default function OnboardingPage() {
 
           {/* Physical stores */}
           <div>
-            <p className="text-[16px] font-bold text-slate-900 mb-3">
-              How many physical stores do you have?
+            <p className="text-[15px] font-bold text-slate-900 mb-3">
+              {STORE_LABEL[businessType]}
             </p>
             <div className="flex flex-wrap gap-3">
               {STORE_COUNTS.map((s) => (
@@ -335,7 +355,7 @@ export default function OnboardingPage() {
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white text-[14px] font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           {isSubmitting ? "Setting up..." : "Continue"}

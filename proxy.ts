@@ -66,7 +66,19 @@ export async function proxy(request: NextRequest) {
   }
 
   // Session cookie exists — validate with Supabase and handle routing.
-  const { supabaseResponse, user, supabase } = await updateSession(request);
+  // Timeout after 4s to avoid hanging the entire response on slow Supabase calls.
+  const sessionResult = await Promise.race([
+    updateSession(request),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000)),
+  ]);
+
+  if (!sessionResult) {
+    // Supabase timed out — trust the cookie and let the request through.
+    // The page's own server-side auth will handle invalid sessions.
+    return NextResponse.next();
+  }
+
+  const { supabaseResponse, user, supabase } = sessionResult;
 
   if (!user) {
     if (!isPublic) {

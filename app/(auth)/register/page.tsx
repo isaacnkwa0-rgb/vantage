@@ -270,7 +270,7 @@ function RegisterPageInner() {
                   placeholder="Enter country name"
                   value={countrySearch}
                   onChange={(e) => setCountrySearch(e.target.value)}
-                  className="flex-1 text-[15px] text-slate-700 focus:outline-none placeholder:text-slate-400"
+                  className="flex-1 text-[14px] text-slate-700 focus:outline-none placeholder:text-slate-400"
                   autoFocus
                 />
               </div>
@@ -300,7 +300,7 @@ function RegisterPageInner() {
         </div>
 
         <div className="flex-1 px-5 pb-10 overflow-auto">
-          <h2 className="text-[26px] font-bold text-slate-900 leading-snug mb-1">
+          <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">
             Start doing business like a Pro today.
           </h2>
           <p className="text-slate-400 text-[14px] mb-6">Manage your business smarter with Vantage</p>
@@ -314,7 +314,7 @@ function RegisterPageInner() {
                   type="text"
                   autoComplete="given-name"
                   placeholder="First Name*"
-                  className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                  className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
                 />
                 {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
               </div>
@@ -324,7 +324,7 @@ function RegisterPageInner() {
                   type="text"
                   autoComplete="family-name"
                   placeholder="Surname*"
-                  className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                  className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
                 />
                 {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
               </div>
@@ -337,13 +337,13 @@ function RegisterPageInner() {
                 type="email"
                 autoComplete="email"
                 placeholder="Email Address*"
-                className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Phone with country picker */}
-            <div className="h-11 flex border border-slate-200 rounded-[4px] overflow-hidden focus-within:ring-2 focus-within:ring-[#1a9c38]">
+            <div className="h-10 flex border border-slate-200 rounded-[4px] overflow-hidden focus-within:ring-2 focus-within:ring-[#1a9c38]">
               <button
                 type="button"
                 onClick={() => setShowCountryPicker(true)}
@@ -357,7 +357,7 @@ function RegisterPageInner() {
                 type="tel"
                 autoComplete="tel"
                 placeholder={`${country.code} 8012345678`}
-                className="flex-1 px-3 text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-white"
+                className="flex-1 px-3 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-white"
               />
             </div>
 
@@ -368,7 +368,7 @@ function RegisterPageInner() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="Password*"
-                className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
               />
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
@@ -377,7 +377,7 @@ function RegisterPageInner() {
             <div className="relative">
               <select
                 {...register("referral")}
-                className="w-full h-11 px-4 border border-slate-200 rounded-[4px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent appearance-none bg-white text-slate-400"
+                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent appearance-none bg-white text-slate-400"
                 defaultValue=""
               >
                 <option value="" disabled>How did you hear about Vantage?</option>
@@ -407,7 +407,7 @@ function RegisterPageInner() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
+              className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[14px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {isSubmitting ? "Creating account..." : "Continue"}
@@ -444,7 +444,7 @@ function RegisterPageInner() {
 
         {/* Headline */}
         <div className="text-center mt-10 mb-10 px-2">
-          <h2 className="text-[26px] font-bold text-slate-900 leading-snug">
+          <h2 className="text-[22px] font-bold text-slate-900 leading-snug">
             Start doing business like a Pro today.
           </h2>
           <p className="text-slate-400 text-[14px] mt-2">Manage your business smarter with Vantage</p>
@@ -454,7 +454,7 @@ function RegisterPageInner() {
         <div className="space-y-3">
           <button
             onClick={() => setStep("email-form")}
-            className="w-full h-11 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[15px] font-semibold text-white transition"
+            className="w-full h-10 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[14px] font-semibold text-white transition"
           >
             <Mail className="w-5 h-5" />
             Join with Email
@@ -462,7 +462,7 @@ function RegisterPageInner() {
 
           <button
             type="button"
-            className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition"
+            className="w-full h-10 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[14px] font-semibold text-slate-900 hover:bg-slate-50 transition"
           >
             <AppleIcon />
             Join with Apple
@@ -471,7 +471,7 @@ function RegisterPageInner() {
           <button
             onClick={signInWithGoogle}
             disabled={googleLoading}
-            className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
+            className="w-full h-10 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[14px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
           >
             {googleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
             Join with Google
@@ -517,7 +517,7 @@ function RegisterPageInner() {
         }}
       >
         <div className="mb-6">
-          <h1 className="text-[28px] font-extrabold text-slate-900 leading-tight">
+          <h1 className="text-[22px] font-extrabold text-slate-900 leading-tight">
             {headline}{" "}
             <span className="text-[#1a9c38] underline decoration-[#1a9c38] underline-offset-4">
               {highlight}
@@ -534,13 +534,13 @@ function RegisterPageInner() {
       <div className="px-5 pb-10 pt-6 space-y-3">
         <Link
           href="/login"
-          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] transition"
+          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold h-10 rounded-[4px] flex items-center justify-center text-[14px] transition"
         >
           Sign In
         </Link>
         <button
           onClick={() => setStep("methods")}
-          className="w-full border border-black text-slate-900 font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] hover:bg-slate-50 transition"
+          className="w-full border border-black text-slate-900 font-semibold h-10 rounded-[4px] flex items-center justify-center text-[14px] hover:bg-slate-50 transition"
         >
           Create an account
         </button>
