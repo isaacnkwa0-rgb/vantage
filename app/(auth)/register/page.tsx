@@ -23,6 +23,8 @@ type FormData = z.infer<typeof schema>;
 const COUNTRIES = [
   { flag: "🇳🇬", code: "+234", name: "Nigeria" },
   { flag: "🇰🇪", code: "+254", name: "Kenya" },
+  { flag: "🇿🇦", code: "+27", name: "South Africa" },
+  { flag: "🇬🇭", code: "+233", name: "Ghana" },
 ];
 
 const REFERRAL_OPTIONS = [
