@@ -198,6 +198,7 @@ function RegisterPageInner() {
   const [slide, setSlide] = useState(0);
   const [step, setStep] = useState<"carousel" | "methods" | "email-form">(initialStep ?? "carousel");
   const [success, setSuccess] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [country, setCountry] = useState(COUNTRIES[0]);
@@ -221,6 +222,7 @@ function RegisterPageInner() {
       },
     });
     if (authError) { setError(authError.message); return; }
+    setSubmittedEmail(data.email);
     setSuccess(true);
   }
 
@@ -242,8 +244,10 @@ function RegisterPageInner() {
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
         <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
-          We sent a confirmation link to your email. Click it to activate your account.
+          We sent a confirmation link to
         </p>
+        <p className="text-slate-900 font-semibold text-sm mt-1 mb-1">{submittedEmail}</p>
+        <p className="text-slate-500 text-sm">Click it to activate your account.</p>
         <Link href="/login" className="mt-6 inline-block text-[#1a9c38] font-semibold text-sm">
           Back to sign in →
         </Link>
