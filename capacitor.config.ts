@@ -5,9 +5,9 @@ const config: CapacitorConfig = {
   appName: "VANTAGE",
   webDir: "out",
   server: {
-    // Point to your production Vercel URL.
-    // Change this to your real domain before building for the stores.
-    url: process.env.CAPACITOR_SERVER_URL ?? "https://vantage-mu-ten.vercel.app",
+    // Set CAPACITOR_SERVER_URL in your environment before running cap sync.
+    // Find your URL at vercel.com/dashboard → your project → Domains.
+    url: process.env.CAPACITOR_SERVER_URL ?? "https://vantage.vercel.app",
     cleartext: false,
     androidScheme: "https",
   },
