@@ -407,7 +407,7 @@ function RegisterPageInner() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[14px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
+              className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {isSubmitting ? "Creating account..." : "Continue"}
@@ -454,7 +454,7 @@ function RegisterPageInner() {
         <div className="space-y-3">
           <button
             onClick={() => setStep("email-form")}
-            className="w-full h-10 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[14px] font-semibold text-white transition"
+            className="w-full h-11 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[15px] font-semibold text-white transition"
           >
             <Mail className="w-5 h-5" />
             Join with Email
@@ -462,7 +462,7 @@ function RegisterPageInner() {
 
           <button
             type="button"
-            className="w-full h-10 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[14px] font-semibold text-slate-900 hover:bg-slate-50 transition"
+            className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition"
           >
             <AppleIcon />
             Join with Apple
@@ -471,7 +471,7 @@ function RegisterPageInner() {
           <button
             onClick={signInWithGoogle}
             disabled={googleLoading}
-            className="w-full h-10 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[14px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
+            className="w-full h-11 flex items-center justify-center gap-3 border border-black rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
           >
             {googleLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleIcon />}
             Join with Google
@@ -534,13 +534,13 @@ function RegisterPageInner() {
       <div className="px-5 pb-10 pt-6 space-y-3">
         <Link
           href="/login"
-          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold h-10 rounded-[4px] flex items-center justify-center text-[14px] transition"
+          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] transition"
         >
           Sign In
         </Link>
         <button
           onClick={() => setStep("methods")}
-          className="w-full border border-black text-slate-900 font-semibold h-10 rounded-[4px] flex items-center justify-center text-[14px] hover:bg-slate-50 transition"
+          className="w-full border border-black text-slate-900 font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] hover:bg-slate-50 transition"
         >
           Create an account
         </button>

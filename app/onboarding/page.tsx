@@ -355,7 +355,7 @@ export default function OnboardingPage() {
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white text-[14px] font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white text-[15px] font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           {isSubmitting ? "Setting up..." : "Continue"}

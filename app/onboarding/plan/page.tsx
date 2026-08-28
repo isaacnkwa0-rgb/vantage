@@ -237,7 +237,7 @@ function PlanPage() {
         {/* Free trial secondary */}
         <button
           onClick={handleFreeTrial}
-          className="w-full h-10 border border-slate-200 rounded-[4px] text-[14px] text-slate-700 font-medium flex items-center justify-center gap-1"
+          className="w-full h-11 border border-slate-200 rounded-[4px] text-[15px] text-slate-700 font-medium flex items-center justify-center gap-1"
         >
           Not sure what plan to choose?{" "}
           <span className="text-[#1a9c38] font-semibold">Start free trial</span>
@@ -247,7 +247,7 @@ function PlanPage() {
         <button
           onClick={handleSelect}
           disabled={isLoading}
-          className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[14px] transition disabled:opacity-60"
+          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition disabled:opacity-60"
         >
           {selectedPlan === "trial" ? "Start Free Trial" : "Select Plan"}
         </button>

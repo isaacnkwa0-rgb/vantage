@@ -122,7 +122,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-10 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[14px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
+          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           {isSubmitting ? "Signing in..." : "Sign in"}
@@ -138,7 +138,7 @@ export default function LoginPage() {
         {/* Apple */}
         <button
           type="button"
-          className="w-full h-10 flex items-center justify-center gap-3 border border-slate-900 rounded-[4px] text-[14px] font-semibold text-slate-900 hover:bg-slate-50 transition"
+          className="w-full h-11 flex items-center justify-center gap-3 border border-slate-900 rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition"
         >
           <AppleIcon />
           Sign in with Apple
@@ -149,7 +149,7 @@ export default function LoginPage() {
           type="button"
           onClick={signInWithGoogle}
           disabled={googleLoading}
-          className="w-full h-10 flex items-center justify-center gap-3 border border-slate-300 rounded-[4px] text-[14px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
+          className="w-full h-11 flex items-center justify-center gap-3 border border-slate-300 rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition disabled:opacity-60"
         >
           {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
           Sign in with Google
