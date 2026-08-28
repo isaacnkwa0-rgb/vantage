@@ -193,6 +193,7 @@ export default function RegisterPage() {
 }
 
 function RegisterPageInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialStep = searchParams.get("step") as "carousel" | "methods" | "email-form" | null;
   const [slide, setSlide] = useState(0);
@@ -213,7 +214,7 @@ function RegisterPageInner() {
   async function onSubmit(data: FormData) {
     setError(null);
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
+    const { data: signUpData, error: authError } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -222,6 +223,12 @@ function RegisterPageInner() {
       },
     });
     if (authError) { setError(authError.message); return; }
+    // If Supabase returns a session immediately (email confirmation disabled),
+    // go straight to onboarding. Otherwise show the "check your email" screen.
+    if (signUpData.session) {
+      router.push("/onboarding");
+      return;
+    }
     setSubmittedEmail(data.email);
     setSuccess(true);
   }
