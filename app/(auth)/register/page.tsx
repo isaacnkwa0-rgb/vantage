@@ -293,9 +293,9 @@ function RegisterPageInner() {
         <div className="px-5 pt-12 pb-4">
           <button
             onClick={() => setStep("methods")}
-            className="flex items-center gap-1 text-[13px] font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full"
+            className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit"
           >
-            ‹ Back
+            <ChevronLeft className="w-[13px] h-[13px]" /> Back
           </button>
         </div>
 
@@ -437,8 +437,8 @@ function RegisterPageInner() {
       <div className="min-h-screen bg-white flex flex-col px-5">
         {/* Back */}
         <div className="pt-12 pb-2">
-          <button onClick={() => setStep("carousel")} className="flex items-center gap-1 text-[13px] font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full">
-            ‹ Back
+          <button onClick={() => setStep("carousel")} className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit">
+            <ChevronLeft className="w-[13px] h-[13px]" /> Back
           </button>
         </div>
 
