@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins, JetBrains_Mono } from "next/font/google";
+import { Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const jakarta = Poppins({
+const jakarta = Outfit({
   subsets: ["latin"],
   variable: "--font-jakarta",
   display: "swap",

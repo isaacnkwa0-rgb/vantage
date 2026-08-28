@@ -517,7 +517,7 @@ function RegisterPageInner() {
         }}
       >
         <div className="mb-6">
-          <h1 className="text-[22px] font-extrabold text-slate-900 leading-tight">
+          <h1 className="text-[28px] font-semibold text-slate-900 leading-tight">
             {headline}{" "}
             <span className="text-[#1a9c38] underline decoration-[#1a9c38] underline-offset-4">
               {highlight}
