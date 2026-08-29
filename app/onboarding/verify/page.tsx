@@ -18,8 +18,11 @@ function VerifyPage() {
   const [cooldown, setCooldown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const verifyingRef = useRef(false);
+  const otpSentRef = useRef(false);
 
   useEffect(() => {
+    if (otpSentRef.current) return;
+    otpSentRef.current = true;
     sendOtp();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
