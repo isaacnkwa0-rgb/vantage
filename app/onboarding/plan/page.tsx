@@ -157,7 +157,7 @@ function PlanPage() {
 
         {/* Plan radio pills */}
         <div className="flex gap-2 mb-5 overflow-x-auto pb-4">
-          {PLANS.map((p) => (
+          {PLANS.filter((p) => p.key !== "trial").map((p) => (
             <button
               key={p.key}
               onClick={() => setSelectedPlan(p.key)}
@@ -237,10 +237,9 @@ function PlanPage() {
         {/* Free trial secondary */}
         <button
           onClick={handleFreeTrial}
-          className="w-full h-11 border border-slate-200 rounded-[4px] text-[15px] text-slate-700 font-medium flex items-center justify-center gap-1"
+          className="w-full h-11 border border-[#1a9c38] rounded-[4px] text-[15px] text-[#1a9c38] font-semibold flex items-center justify-center"
         >
-          Not sure what plan to choose?{" "}
-          <span className="text-[#1a9c38] font-semibold">Start free trial</span>
+          Start free trial for 14 days
         </button>
 
         {/* Select Plan primary */}
