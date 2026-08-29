@@ -103,7 +103,7 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
             )}
           </div>
           {/* Price shown below name on mobile */}
-          <p className="font-numeric font-semibold text-emerald-600 text-sm mt-1 md:hidden">
+          <p className="font-semibold text-emerald-600 text-sm mt-1 md:hidden">
             {formatCurrency(product.selling_price, currency)}
             {!isService && (
               <span className="text-slate-400 font-normal text-xs ml-1">· {margin.toFixed(0)}% margin</span>
@@ -171,7 +171,7 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
 
         {/* Price column — desktop only (mobile shows below name) */}
         <div className="text-right flex-shrink-0 w-28 hidden md:block">
-          <p className="font-numeric font-semibold text-[#0F172A] text-sm">
+          <p className="font-semibold text-[#0F172A] text-sm">
             {formatCurrency(product.selling_price, currency)}
           </p>
           {!isService && <p className="text-xs text-slate-400">{margin.toFixed(0)}% margin</p>}

@@ -139,15 +139,15 @@ export function ReferralsClient({ program: initialProgram, referrals, currency, 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{referrals.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{referrals.length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Referrals</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-blue-600">{converted}</p>
+          <p className="text-xl font-bold text-blue-600">{converted}</p>
           <p className="text-xs text-slate-500 mt-0.5">Converted</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-green-600">{rewarded}</p>
+          <p className="text-xl font-bold text-green-600">{rewarded}</p>
           <p className="text-xs text-slate-500 mt-0.5">Rewarded</p>
         </div>
       </div>

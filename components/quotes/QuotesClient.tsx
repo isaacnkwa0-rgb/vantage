@@ -250,7 +250,7 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
             </div>
             <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Quotes</p>
           </div>
-          <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{quotes.length}</p>
+          <p className="text-sm sm:text-xl font-bold text-[#0F172A]">{quotes.length}</p>
           <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">all time</p>
         </div>
 
@@ -262,7 +262,7 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
             </div>
             <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Pending Value</p>
           </div>
-          <p className="font-numeric text-sm sm:text-xl font-bold text-blue-600">{fmt(totalPending)}</p>
+          <p className="text-sm sm:text-xl font-bold text-blue-600">{fmt(totalPending)}</p>
           <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">draft + sent</p>
         </div>
 
@@ -274,7 +274,7 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
             </div>
             <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Accepted Value</p>
           </div>
-          <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">{fmt(totalAccepted)}</p>
+          <p className="text-sm sm:text-xl font-bold text-emerald-600">{fmt(totalAccepted)}</p>
           <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">accepted + converted</p>
         </div>
       </div>
@@ -348,7 +348,7 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
               return (
                 <div key={q.id} className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition group">
                   <div className="w-28 flex-shrink-0">
-                    <span className="text-sm font-bold text-[#0F172A] font-numeric">{q.quote_number}</span>
+                    <span className="text-sm font-bold text-[#0F172A]">{q.quote_number}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#0F172A] truncate">{clientName}</p>
@@ -370,7 +370,7 @@ export function QuotesClient({ quotes, business, customers, userId }: Props) {
                       : "—"}
                   </div>
                   <div className="w-24 text-right flex-shrink-0">
-                    <p className="font-numeric font-bold text-sm text-[#0F172A]">{fmt(q.total_amount)}</p>
+                    <p className="font-bold text-sm text-[#0F172A]">{fmt(q.total_amount)}</p>
                   </div>
                   <div className="w-40 flex-shrink-0 flex items-center gap-1 justify-end">
                     {/* Print */}

@@ -217,7 +217,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
                   value={form.discount_value}
                   onChange={(e) => setForm((f) => ({ ...f, discount_value: e.target.value }))}
                   placeholder={form.discount_type === "percent" ? "e.g. 10" : "e.g. 500"}
-                  className="flex-1 px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-numeric focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
                 value={form.min_order_amount}
                 onChange={(e) => setForm((f) => ({ ...f, min_order_amount: e.target.value }))}
                 placeholder="0 = no minimum"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-numeric focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
 
@@ -244,7 +244,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
                 value={form.max_uses}
                 onChange={(e) => setForm((f) => ({ ...f, max_uses: e.target.value }))}
                 placeholder="Leave blank for unlimited"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-numeric focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
 
@@ -340,7 +340,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
 
                   {/* Usage */}
                   <div className="w-24 flex-shrink-0 hidden md:flex items-center gap-1">
-                    <span className="text-sm text-slate-600 font-numeric">{c.uses_count}</span>
+                    <span className="text-sm text-slate-600">{c.uses_count}</span>
                     <span className="text-slate-400 text-xs">
                       / {c.max_uses === null ? <Infinity className="w-3 h-3 inline" /> : c.max_uses}
                     </span>

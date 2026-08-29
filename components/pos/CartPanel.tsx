@@ -199,7 +199,7 @@ export function CartPanel({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[#0F172A] truncate">{item.name}</p>
                 {item.variantName && <p className="text-xs text-slate-400">{item.variantName}</p>}
-                <p className="font-numeric text-sm text-green-600 font-semibold mt-0.5">{fmt(item.unitPrice)}</p>
+                <p className="text-sm text-green-600 font-semibold mt-0.5">{fmt(item.unitPrice)}</p>
               </div>
               <button
                 onClick={() => removeItem(item.productId, item.variantId)}
@@ -218,7 +218,7 @@ export function CartPanel({
                   <Minus className="w-3 h-3" />
                 </button>
                 <div className="text-center">
-                  <span className="font-numeric text-sm font-semibold w-6 block text-center">{item.quantity}</span>
+                  <span className="text-sm font-semibold w-6 block text-center">{item.quantity}</span>
                   {item.minOrderQty > 1 && item.quantity === item.minOrderQty && (
                     <span className="text-[9px] text-amber-500 font-semibold leading-none">min</span>
                   )}
@@ -234,7 +234,7 @@ export function CartPanel({
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
-              <span className="font-numeric text-sm font-bold text-[#0F172A]">
+              <span className="text-sm font-bold text-[#0F172A]">
                 {fmt(item.unitPrice * item.quantity)}
               </span>
             </div>
@@ -440,7 +440,7 @@ export function CartPanel({
                     value={discountInput}
                     onChange={(e) => setDiscountInput(e.target.value)}
                     placeholder="0"
-                    className="flex-1 px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                    className="flex-1 px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -457,29 +457,29 @@ export function CartPanel({
       <div className="px-4 pb-4 pt-2 border-t border-slate-200 space-y-1.5">
         <div className="flex justify-between text-sm text-slate-500">
           <span>Subtotal</span>
-          <span className="font-numeric">{fmt(sub)}</span>
+          <span className="">{fmt(sub)}</span>
         </div>
         {disc > 0 && (
           <div className="flex justify-between text-sm text-emerald-600">
             <span>Discount</span>
-            <span className="font-numeric">-{fmt(disc)}</span>
+            <span className="">-{fmt(disc)}</span>
           </div>
         )}
         {tax > 0 && (
           <div className="flex justify-between text-sm text-amber-600">
             <span>{taxName} ({taxRate}%)</span>
-            <span className="font-numeric">+{fmt(tax)}</span>
+            <span className="">+{fmt(tax)}</span>
           </div>
         )}
         {loyaltyDisc > 0 && (
           <div className="flex justify-between text-sm text-amber-500">
             <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Loyalty</span>
-            <span className="font-numeric">-{fmt(loyaltyDisc)}</span>
+            <span className="">-{fmt(loyaltyDisc)}</span>
           </div>
         )}
         <div className="flex justify-between text-base font-bold text-[#0F172A] pt-1 border-t border-slate-100">
           <span>Total</span>
-          <span className="font-numeric text-green-600">{fmt(tot)}</span>
+          <span className="text-green-600">{fmt(tot)}</span>
         </div>
 
         <button

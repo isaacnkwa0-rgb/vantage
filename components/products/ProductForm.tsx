@@ -343,7 +343,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 {errors.selling_price && <p className="text-red-500 text-xs mt-1">{errors.selling_price.message}</p>}
               </div>
@@ -358,7 +358,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -372,7 +372,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 {errors.selling_price && <p className="text-red-500 text-xs mt-1">{errors.selling_price.message}</p>}
               </div>
@@ -384,7 +384,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -413,7 +413,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                       {...register("stock_quantity")}
                       type="number"
                       min="0"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                   <div>
@@ -422,7 +422,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                       {...register("low_stock_threshold")}
                       type="number"
                       min="0"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                 </div>
@@ -439,7 +439,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                     {...register("min_order_qty")}
                     type="number"
                     min="1"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">Minimum units per sale</p>
                 </div>
@@ -453,7 +453,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                     type="number"
                     min="1"
                     placeholder="No limit"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">Leave blank for no limit</p>
                 </div>

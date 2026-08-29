@@ -152,7 +152,7 @@ export function ReportsClient({ businessId, currency }: Props) {
                 <div className={`w-8 h-8 ${stat.bg} rounded-lg flex items-center justify-center mb-2`}>
                   <stat.icon className={`w-4 h-4 ${stat.color}`} />
                 </div>
-                <p className={`font-numeric text-lg font-bold ${stat.color}`}>{stat.value}</p>
+                <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
                 <p className="text-xs text-slate-500 mt-0.5">{stat.label}</p>
               </div>
             ))}
@@ -188,7 +188,7 @@ export function ReportsClient({ businessId, currency }: Props) {
                         <td className="px-4 py-3 hidden md:table-cell text-slate-400 text-xs">
                           {new Date(sale.created_at).toLocaleDateString()}
                         </td>
-                        <td className="px-4 py-3 text-right font-numeric font-semibold text-emerald-600">
+                        <td className="px-4 py-3 text-right font-semibold text-emerald-600">
                           {fmt(sale.total_amount)}
                         </td>
                       </tr>

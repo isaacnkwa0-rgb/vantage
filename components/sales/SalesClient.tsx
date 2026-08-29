@@ -189,7 +189,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             </div>
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Transactions</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{filtered.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{filtered.length}</p>
           <p className="text-xs text-slate-400 mt-0.5">in view</p>
         </div>
 
@@ -201,7 +201,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             </div>
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Revenue</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-emerald-600 truncate">{fmt(totalRevenue)}</p>
+          <p className="text-xl font-bold text-emerald-600 truncate">{fmt(totalRevenue)}</p>
           <p className="text-xs text-slate-400 mt-0.5">from filtered sales</p>
         </div>
 
@@ -213,7 +213,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             </div>
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Avg. Sale</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-violet-600 truncate">{fmt(avgSale)}</p>
+          <p className="text-xl font-bold text-violet-600 truncate">{fmt(avgSale)}</p>
           <p className="text-xs text-slate-400 mt-0.5">per transaction</p>
         </div>
       </div>
@@ -316,7 +316,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                     {/* Amount + time */}
                     <div className="text-right flex-shrink-0">
                       <p className={cn(
-                        "font-numeric text-[14px] font-bold",
+                        "text-[14px] font-bold",
                         isReturned ? "text-slate-400 line-through" : "text-slate-900"
                       )}>
                         {fmt(sale.total_amount)}
@@ -378,7 +378,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                       )}
                     >
                       <div className="w-28 flex-shrink-0 space-y-0.5">
-                        <span className="text-sm font-bold text-[#0F172A] font-numeric">{sale.sale_number}</span>
+                        <span className="text-sm font-bold text-[#0F172A]">{sale.sale_number}</span>
                         {isReturned && (
                           <span className="block text-[10px] font-semibold text-orange-500 uppercase tracking-wide">Returned</span>
                         )}
@@ -404,7 +404,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                       </div>
 
                       <div className="w-28 text-right flex-shrink-0">
-                        <p className={cn("font-numeric font-bold text-sm", isReturned ? "text-slate-400 line-through" : "text-[#0F172A]")}>
+                        <p className={cn("font-bold text-sm", isReturned ? "text-slate-400 line-through" : "text-[#0F172A]")}>
                           {fmt(sale.total_amount)}
                         </p>
                         {sale.discount_amount > 0 && !isReturned && (

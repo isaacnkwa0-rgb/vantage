@@ -90,7 +90,7 @@ export function RecentTransactions({ sales, currency, businessType, slug }: Prop
 
                 {/* Amount — always visible */}
                 <div className="text-right sm:order-3">
-                  <p className="font-numeric text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-slate-900">
                     {fmt(sale.total_amount)}
                   </p>
                 </div>

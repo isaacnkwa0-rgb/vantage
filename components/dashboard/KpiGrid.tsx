@@ -45,7 +45,7 @@ function KpiCard({ label, value, sub, trend, trendLabel, accentClass }: KpiCardP
         <p className="text-xs font-semibold text-slate-500 tracking-wide">{label}</p>
         <TrendBadge value={trend} />
       </div>
-      <p className={cn("font-numeric text-2xl font-bold tracking-tight", accentClass)}>{value}</p>
+      <p className={cn("text-2xl font-bold tracking-tight", accentClass)}>{value}</p>
       <p className="text-xs text-slate-400 mt-1.5">{sub}</p>
       {trend !== null && (
         <p className="text-[11px] text-slate-400 mt-0.5">{trendLabel}</p>

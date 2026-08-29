@@ -40,17 +40,17 @@ export function ShiftsClient({ shifts, currency }: Props) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{shifts.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{shifts.length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Shifts</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-emerald-600">{fmt(totalCashSales)}</p>
+          <p className="text-xl font-bold text-emerald-600">{fmt(totalCashSales)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Cash Sales</p>
         </div>
         <div className={`bg-white rounded-xl border p-4 shadow-sm text-center ${
           totalDiscrepancy < 0 ? "border-red-100" : totalDiscrepancy > 0 ? "border-blue-100" : "border-slate-200"
         }`}>
-          <p className={`font-numeric text-xl font-bold ${
+          <p className={`text-xl font-bold ${
             totalDiscrepancy < 0 ? "text-red-500" : totalDiscrepancy > 0 ? "text-blue-600" : "text-slate-400"
           }`}>
             {totalDiscrepancy >= 0 ? "+" : ""}{fmt(totalDiscrepancy)}
@@ -95,13 +95,13 @@ export function ShiftsClient({ shifts, currency }: Props) {
                       <span className="inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full">OPEN</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right font-numeric text-sm">{fmt(shift.opening_float)}</td>
-                  <td className="px-4 py-3 text-right font-numeric text-sm text-emerald-600">{shift.cash_sales != null ? fmt(shift.cash_sales) : "—"}</td>
-                  <td className="px-4 py-3 text-right font-numeric text-sm">{shift.expected_cash != null ? fmt(shift.expected_cash) : "—"}</td>
-                  <td className="px-4 py-3 text-right font-numeric text-sm">{shift.closing_float != null ? fmt(shift.closing_float) : "—"}</td>
+                  <td className="px-4 py-3 text-right text-sm">{fmt(shift.opening_float)}</td>
+                  <td className="px-4 py-3 text-right text-sm text-emerald-600">{shift.cash_sales != null ? fmt(shift.cash_sales) : "—"}</td>
+                  <td className="px-4 py-3 text-right text-sm">{shift.expected_cash != null ? fmt(shift.expected_cash) : "—"}</td>
+                  <td className="px-4 py-3 text-right text-sm">{shift.closing_float != null ? fmt(shift.closing_float) : "—"}</td>
                   <td className="px-4 py-3 text-right">
                     {shift.discrepancy != null ? (
-                      <div className={`flex items-center justify-end gap-1 text-sm font-numeric font-semibold ${
+                      <div className={`flex items-center justify-end gap-1 text-sm font-semibold ${
                         shift.discrepancy < 0 ? "text-red-500" : shift.discrepancy > 0 ? "text-blue-600" : "text-slate-400"
                       }`}>
                         {shift.discrepancy < 0 ? <TrendingDown className="w-3.5 h-3.5" /> :

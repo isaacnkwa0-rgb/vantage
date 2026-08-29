@@ -59,7 +59,7 @@ export async function TopProducts({ businessId, currency, businessType = "retail
               </span>
               <p className="text-sm text-[#0F172A] flex-1 truncate">{name}</p>
               <div className="text-right flex-shrink-0">
-                <p className="font-numeric text-xs font-semibold text-[#0F172A]">
+                <p className="text-xs font-semibold text-[#0F172A]">
                   {fmt(revenue)}
                 </p>
                 <p className="text-xs text-slate-400">{qty} {soldLabel}</p>

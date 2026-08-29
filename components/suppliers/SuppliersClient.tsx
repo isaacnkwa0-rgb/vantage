@@ -143,7 +143,7 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
           <Truck className="w-5 h-5 text-blue-600" />
         </div>
         <div>
-          <p className="text-2xl font-bold font-numeric text-[#0F172A]">{suppliers.length}</p>
+          <p className="text-2xl font-bold text-[#0F172A]">{suppliers.length}</p>
           <p className="text-xs text-slate-400">Total Suppliers</p>
         </div>
       </div>

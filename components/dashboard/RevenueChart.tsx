@@ -41,7 +41,7 @@ function CustomTooltip({ active, payload, label, currency }: any) {
   return (
     <div className="bg-white border border-slate-200 rounded-lg shadow-lg px-3 py-2.5 text-xs">
       <p className="text-slate-500 mb-1">{label}</p>
-      <p className="font-numeric font-bold text-slate-900">
+      <p className="font-bold text-slate-900">
         {formatCurrency(payload[0]?.value ?? 0, currency)}
       </p>
     </div>
@@ -63,7 +63,7 @@ export function RevenueChart({ sales, currency }: Props) {
       <div className="flex items-start justify-between mb-4 gap-4 flex-wrap">
         <div>
           <p className="text-xs font-semibold text-slate-500 tracking-wide">Revenue Overview</p>
-          <p className="font-numeric text-2xl font-bold text-slate-900 mt-0.5">
+          <p className="text-2xl font-bold text-slate-900 mt-0.5">
             {hasData ? formatCurrency(total, currency) : "—"}
           </p>
           <p className="text-xs text-slate-400 mt-0.5">

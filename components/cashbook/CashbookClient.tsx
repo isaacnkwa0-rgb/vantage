@@ -135,15 +135,15 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p className="text-xs text-slate-500 flex items-center gap-1"><ArrowUpCircle className="w-3.5 h-3.5 text-green-500" /> Total Income</p>
-          <p className="font-numeric text-xl font-bold text-green-600 mt-1">{fmt(totalIncome)}</p>
+          <p className="text-xl font-bold text-green-600 mt-1">{fmt(totalIncome)}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p className="text-xs text-slate-500 flex items-center gap-1"><ArrowDownCircle className="w-3.5 h-3.5 text-red-500" /> Total Expenses</p>
-          <p className="font-numeric text-xl font-bold text-red-500 mt-1">{fmt(totalExpense)}</p>
+          <p className="text-xl font-bold text-red-500 mt-1">{fmt(totalExpense)}</p>
         </div>
         <div className={cn("rounded-xl border p-4 shadow-sm", balance >= 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200")}>
           <p className="text-xs text-slate-500">Net Balance</p>
-          <p className={cn("font-numeric text-xl font-bold mt-1", balance >= 0 ? "text-green-700" : "text-red-600")}>{fmt(balance)}</p>
+          <p className={cn("text-xl font-bold mt-1", balance >= 0 ? "text-green-700" : "text-red-600")}>{fmt(balance)}</p>
         </div>
       </div>
 
@@ -183,7 +183,7 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
                   </td>
                   <td className="px-5 py-3 text-xs text-slate-400">{e.category ?? <span className="text-slate-200">—</span>}</td>
                   <td className="px-5 py-3 text-xs text-slate-400 font-mono">{e.reference ?? <span className="text-slate-200">—</span>}</td>
-                  <td className={cn("px-5 py-3 text-right font-numeric text-sm font-bold", e.type === "income" ? "text-green-600" : "text-red-500")}>
+                  <td className={cn("px-5 py-3 text-right text-sm font-bold", e.type === "income" ? "text-green-600" : "text-red-500")}>
                     {e.type === "income" ? "+" : "-"}{fmt(e.amount)}
                   </td>
                   <td className="px-5 py-3">

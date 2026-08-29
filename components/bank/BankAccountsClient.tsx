@@ -183,7 +183,7 @@ export function BankAccountsClient({ accounts: initial, transactions: initialTx,
                     </button>
                   </div>
                 </div>
-                <p className="text-lg font-bold text-[#0F172A] font-numeric mt-2">{fmt(a.balance, a.currency)}</p>
+                <p className="text-lg font-bold text-[#0F172A] mt-2">{fmt(a.balance, a.currency)}</p>
               </div>
             ))}
           </div>
@@ -213,7 +213,7 @@ export function BankAccountsClient({ accounts: initial, transactions: initialTx,
                         </div>
                       </div>
                     </div>
-                    <p className={cn("font-numeric text-sm font-bold", t.type === "deposit" ? "text-green-600" : "text-red-500")}>
+                    <p className={cn("text-sm font-bold", t.type === "deposit" ? "text-green-600" : "text-red-500")}>
                       {t.type === "deposit" ? "+" : "−"}{fmt(t.amount)}
                     </p>
                   </div>

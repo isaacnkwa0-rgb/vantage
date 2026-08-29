@@ -188,9 +188,9 @@ export function BulkImportModal({ businessId, categories, onClose }: Props) {
                         )}
                       </td>
                       <td className="px-3 py-2 font-medium text-[#0F172A]">{row.name || <span className="text-red-400 italic">missing</span>}</td>
-                      <td className="px-3 py-2 font-numeric">{row.selling_price}</td>
-                      <td className="px-3 py-2 font-numeric">{row.cost_price}</td>
-                      <td className="px-3 py-2 font-numeric">{row.stock_quantity}</td>
+                      <td className="px-3 py-2">{row.selling_price}</td>
+                      <td className="px-3 py-2">{row.cost_price}</td>
+                      <td className="px-3 py-2">{row.stock_quantity}</td>
                       <td className="px-3 py-2 text-slate-500">{row.sku}</td>
                       <td className="px-3 py-2 text-slate-500">{row.category}</td>
                     </tr>

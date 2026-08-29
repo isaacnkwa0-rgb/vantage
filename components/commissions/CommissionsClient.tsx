@@ -95,15 +95,15 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-emerald-600">{fmt(totalCommissions)}</p>
+          <p className="text-xl font-bold text-emerald-600">{fmt(totalCommissions)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Commissions Due</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{fmt(totalSales)}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{fmt(totalSales)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Sales (period)</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{rows.filter((r) => r.hasRule).length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{rows.filter((r) => r.hasRule).length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Staff with Commission Rates</p>
         </div>
       </div>
@@ -141,7 +141,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
                   </div>
                 </td>
                 <td className="px-5 py-3 text-right text-sm text-slate-600">{row.saleCount}</td>
-                <td className="px-5 py-3 text-right font-numeric text-sm font-semibold text-[#0F172A]">{fmt(row.salesTotal)}</td>
+                <td className="px-5 py-3 text-right text-sm font-semibold text-[#0F172A]">{fmt(row.salesTotal)}</td>
                 <td className="px-5 py-3 text-right text-xs text-slate-400">
                   {row.hasRule
                     ? row.rule.type === "percentage"
@@ -151,7 +151,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
                 </td>
                 <td className="px-5 py-3 text-right">
                   {row.commission > 0
-                    ? <span className="font-numeric font-bold text-emerald-600">{fmt(row.commission)}</span>
+                    ? <span className="font-bold text-emerald-600">{fmt(row.commission)}</span>
                     : <span className="text-slate-300 text-sm">—</span>}
                 </td>
               </tr>
@@ -161,7 +161,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
             <tfoot>
               <tr className="border-t-2 border-slate-200 bg-slate-50">
                 <td className="px-5 py-3 text-sm font-bold text-[#0F172A]" colSpan={4}>Total</td>
-                <td className="px-5 py-3 text-right font-numeric font-bold text-emerald-600">{fmt(totalCommissions)}</td>
+                <td className="px-5 py-3 text-right font-bold text-emerald-600">{fmt(totalCommissions)}</td>
               </tr>
             </tfoot>
           )}

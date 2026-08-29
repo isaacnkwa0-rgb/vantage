@@ -122,15 +122,15 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{cards.filter((c) => c.status === "active").length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{cards.filter((c) => c.status === "active").length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Active Cards</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-green-600">{fmt(activeTotal)}</p>
+          <p className="text-xl font-bold text-green-600">{fmt(activeTotal)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Outstanding Balance</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{cards.filter((c) => c.status === "redeemed").length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{cards.filter((c) => c.status === "redeemed").length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Redeemed</p>
         </div>
       </div>
@@ -175,8 +175,8 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
                       {card.status}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-right font-numeric font-bold text-green-600">{fmt(card.balance)}</td>
-                  <td className="px-5 py-3 text-right font-numeric text-sm text-slate-400">{fmt(card.initial_value)}</td>
+                  <td className="px-5 py-3 text-right font-bold text-green-600">{fmt(card.balance)}</td>
+                  <td className="px-5 py-3 text-right text-sm text-slate-400">{fmt(card.initial_value)}</td>
                   <td className="px-5 py-3 text-xs text-slate-400">{card.expires_at ?? <span className="text-slate-200">—</span>}</td>
                   <td className="px-5 py-3">
                     {card.status === "active" && (

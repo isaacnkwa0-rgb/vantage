@@ -185,7 +185,7 @@ export function ReturnModal({ sale, items, business, userId, onClose, onSuccess 
             <div className="bg-slate-50 rounded-xl p-4 w-full text-sm space-y-2">
               <div className="flex justify-between">
                 <span className="text-slate-500">Refund amount</span>
-                <span className="font-bold text-orange-600 font-numeric">{fmt(refundAmount)}</span>
+                <span className="font-bold text-orange-600">{fmt(refundAmount)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Method</span>
@@ -278,7 +278,7 @@ export function ReturnModal({ sale, items, business, userId, onClose, onSuccess 
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="w-5 text-center text-sm font-bold font-numeric">{qty}</span>
+                        <span className="w-5 text-center text-sm font-bold">{qty}</span>
                         <button
                           onClick={() => adjustQty(item.id, 1, item.quantity)}
                           disabled={qty >= item.quantity}
@@ -286,12 +286,12 @@ export function ReturnModal({ sale, items, business, userId, onClose, onSuccess 
                         >
                           <Plus className="w-3 h-3" />
                         </button>
-                        <span className="text-sm font-semibold text-orange-600 font-numeric w-20 text-right">
+                        <span className="text-sm font-semibold text-orange-600 w-20 text-right">
                           {fmt(qty * item.unit_price)}
                         </span>
                       </div>
                     ) : (
-                      <span className="text-sm text-slate-400 font-numeric flex-shrink-0">
+                      <span className="text-sm text-slate-400 flex-shrink-0">
                         {fmt(item.line_total)}
                       </span>
                     )}
@@ -305,7 +305,7 @@ export function ReturnModal({ sale, items, business, userId, onClose, onSuccess 
           {hasSelection && (
             <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex items-center justify-between">
               <span className="text-sm font-semibold text-orange-700">Refund Amount</span>
-              <span className="text-xl font-bold text-orange-600 font-numeric">{fmt(refundAmount)}</span>
+              <span className="text-xl font-bold text-orange-600">{fmt(refundAmount)}</span>
             </div>
           )}
 

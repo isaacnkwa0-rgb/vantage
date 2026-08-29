@@ -129,15 +129,15 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{orders.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{orders.length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Orders</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-blue-600">{orders.filter((o) => o.status === "paid" || o.status === "processing").length}</p>
+          <p className="text-xl font-bold text-blue-600">{orders.filter((o) => o.status === "paid" || o.status === "processing").length}</p>
           <p className="text-xs text-slate-500 mt-0.5">To Fulfil</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-green-600">{fmt(totalRevenue)}</p>
+          <p className="text-xl font-bold text-green-600">{fmt(totalRevenue)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Revenue</p>
         </div>
       </div>
@@ -173,7 +173,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-numeric font-bold text-[#0F172A]">{fmt(order.total_amount)}</p>
+                    <p className="font-bold text-[#0F172A]">{fmt(order.total_amount)}</p>
                     <p className="text-xs text-slate-400">{new Date(order.created_at).toLocaleDateString()}</p>
                   </div>
                   {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
@@ -186,7 +186,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
                       {order.store_order_items.map((item, i) => (
                         <div key={i} className="flex justify-between text-sm">
                           <span className="text-slate-600">{item.name} × {item.quantity}</span>
-                          <span className="font-numeric font-semibold text-[#0F172A]">{fmt(item.total)}</span>
+                          <span className="font-semibold text-[#0F172A]">{fmt(item.total)}</span>
                         </div>
                       ))}
                     </div>

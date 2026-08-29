@@ -280,9 +280,9 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
 
           <div className="bg-[#0F172A] rounded-xl p-4 text-center">
             <p className="text-slate-400 text-sm">Amount Due</p>
-            <p className="font-numeric text-3xl font-bold text-white mt-1">{fmt(tot)}</p>
+            <p className="text-3xl font-bold text-white mt-1">{fmt(tot)}</p>
             {txCurrency !== business.currency && !fetchingRate && (
-              <p className="text-blue-300 text-sm font-numeric mt-1">≈ {fmtForeign(foreignTotal)} @ {exchangeRate.toFixed(4)}</p>
+              <p className="text-blue-300 text-sm mt-1">≈ {fmtForeign(foreignTotal)} @ {exchangeRate.toFixed(4)}</p>
             )}
             {fetchingRate && <p className="text-slate-400 text-xs mt-1">Fetching rate...</p>}
             {discountAmount() > 0 && (
@@ -350,11 +350,11 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
                 min={tot}
                 value={amountPaid}
                 onChange={(e) => setAmountPaid(e.target.value)}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-numeric font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
               />
               {change > 0 && (
                 <div className="mt-2 bg-emerald-50 text-emerald-700 text-sm font-semibold px-3 py-2 rounded-lg text-center">
-                  Change: <span className="font-numeric">{fmt(change)}</span>
+                  Change: <span className="">{fmt(change)}</span>
                 </div>
               )}
             </div>

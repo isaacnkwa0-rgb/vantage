@@ -121,7 +121,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
                   <FileText className="w-3.5 h-3.5" />
                   {invoice.invoice_number}
                 </div>
-                <p className="text-white font-numeric text-2xl font-bold">{fmt(invoice.total_amount)}</p>
+                <p className="text-white text-2xl font-bold">{fmt(invoice.total_amount)}</p>
                 {invoice.due_date && (
                   <p className="text-slate-400 text-xs mt-1">Due {new Date(invoice.due_date).toLocaleDateString()}</p>
                 )}
@@ -146,7 +146,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
                   <p className="text-[#0F172A]">{item.description}</p>
                   {item.quantity > 1 && <p className="text-xs text-slate-400">{item.quantity} × {fmt(item.unit_price)}</p>}
                 </div>
-                <span className="font-numeric font-medium text-[#0F172A] ml-4">{fmt(item.line_total)}</span>
+                <span className="font-medium text-[#0F172A] ml-4">{fmt(item.line_total)}</span>
               </div>
             ))}
           </div>
@@ -154,26 +154,26 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
           {/* Totals */}
           <div className="px-6 py-4 border-t border-slate-100 space-y-1.5">
             <div className="flex justify-between text-sm text-slate-500">
-              <span>Subtotal</span><span className="font-numeric">{fmt(invoice.subtotal)}</span>
+              <span>Subtotal</span><span className="">{fmt(invoice.subtotal)}</span>
             </div>
             {invoice.discount_amount > 0 && (
               <div className="flex justify-between text-sm text-emerald-600">
-                <span>Discount</span><span className="font-numeric">-{fmt(invoice.discount_amount)}</span>
+                <span>Discount</span><span className="">-{fmt(invoice.discount_amount)}</span>
               </div>
             )}
             {invoice.tax_amount > 0 && (
               <div className="flex justify-between text-sm text-slate-500">
-                <span>Tax</span><span className="font-numeric">{fmt(invoice.tax_amount)}</span>
+                <span>Tax</span><span className="">{fmt(invoice.tax_amount)}</span>
               </div>
             )}
             {invoice.amount_paid > 0 && (
               <div className="flex justify-between text-sm text-emerald-600">
-                <span>Already paid</span><span className="font-numeric">-{fmt(invoice.amount_paid)}</span>
+                <span>Already paid</span><span className="">-{fmt(invoice.amount_paid)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-[#0F172A] text-base pt-2 border-t border-slate-100">
               <span>Amount Due</span>
-              <span className="font-numeric text-green-700">{fmt(amountDue)}</span>
+              <span className="text-green-700">{fmt(amountDue)}</span>
             </div>
           </div>
 

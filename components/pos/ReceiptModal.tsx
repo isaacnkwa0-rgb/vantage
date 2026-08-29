@@ -141,29 +141,29 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
               {sale.items.map((item, i) => (
                 <div key={i} className="flex justify-between text-slate-600">
                   <span>{item.product_name} × {item.quantity}</span>
-                  <span className="font-numeric">{fmt(item.line_total)}</span>
+                  <span className="">{fmt(item.line_total)}</span>
                 </div>
               ))}
               {sale.discount_amount > 0 && (
                 <div className="flex justify-between text-emerald-600 border-t border-slate-200 pt-1.5 mt-1.5">
                   <span>Discount</span>
-                  <span className="font-numeric">-{fmt(sale.discount_amount)}</span>
+                  <span className="">-{fmt(sale.discount_amount)}</span>
                 </div>
               )}
               {sale.tax_amount > 0 && (
                 <div className="flex justify-between text-amber-600 border-t border-slate-200 pt-1.5 mt-1.5">
                   <span>Tax</span>
-                  <span className="font-numeric">+{fmt(sale.tax_amount)}</span>
+                  <span className="">+{fmt(sale.tax_amount)}</span>
                 </div>
               )}
               <div className="flex justify-between font-bold text-[#0F172A] border-t border-slate-200 pt-1.5 mt-1.5">
                 <span>Total</span>
-                <span className="font-numeric">{fmt(sale.total_amount)}</span>
+                <span className="">{fmt(sale.total_amount)}</span>
               </div>
               {sale.change_amount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Change</span>
-                  <span className="font-numeric">{fmt(sale.change_amount)}</span>
+                  <span className="">{fmt(sale.change_amount)}</span>
                 </div>
               )}
             </div>

@@ -197,7 +197,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                       {o.status}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-right font-numeric text-sm font-semibold text-[#0F172A]">{fmt(o.total_amount)}</td>
+                  <td className="px-5 py-3 text-right text-sm font-semibold text-[#0F172A]">{fmt(o.total_amount)}</td>
                   <td className="px-5 py-3 text-sm text-slate-500">{o.expected_date ?? <span className="text-slate-300">—</span>}</td>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition justify-end">
@@ -293,7 +293,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
 
             <div className="flex items-center justify-between border-t border-slate-100 pt-3">
               <p className="text-sm font-semibold text-[#0F172A]">Total</p>
-              <p className="font-numeric text-lg font-bold text-[#0F172A]">{fmt(itemsTotal)}</p>
+              <p className="text-lg font-bold text-[#0F172A]">{fmt(itemsTotal)}</p>
             </div>
 
             <div>

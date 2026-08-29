@@ -138,11 +138,11 @@ export function TargetsClient({
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p className="text-xs text-slate-500">Revenue This Month</p>
-          <p className="font-numeric text-2xl font-bold text-[#0F172A] mt-1">{fmt(revenueThisMonth)}</p>
+          <p className="text-2xl font-bold text-[#0F172A] mt-1">{fmt(revenueThisMonth)}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p className="text-xs text-slate-500">Transactions This Month</p>
-          <p className="font-numeric text-2xl font-bold text-[#0F172A] mt-1">{transactionsThisMonth}</p>
+          <p className="text-2xl font-bold text-[#0F172A] mt-1">{transactionsThisMonth}</p>
         </div>
       </div>
 

@@ -195,7 +195,7 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
             </div>
             <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Invoices</p>
           </div>
-          <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{invoices.length}</p>
+          <p className="text-sm sm:text-xl font-bold text-[#0F172A]">{invoices.length}</p>
           <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">all time</p>
         </div>
 
@@ -207,7 +207,7 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
             </div>
             <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Collected</p>
           </div>
-          <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">{fmt(totalPaid)}</p>
+          <p className="text-sm sm:text-xl font-bold text-emerald-600">{fmt(totalPaid)}</p>
           <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">from paid invoices</p>
         </div>
 
@@ -219,7 +219,7 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
             </div>
             <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Outstanding</p>
           </div>
-          <p className="font-numeric text-sm sm:text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
+          <p className="text-sm sm:text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
           <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">pending collection</p>
         </div>
       </div>
@@ -295,7 +295,7 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
               return (
                 <div key={inv.id} className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition group">
                   <div className="w-32 flex-shrink-0">
-                    <span className="text-sm font-bold text-[#0F172A] font-numeric">{inv.invoice_number}</span>
+                    <span className="text-sm font-bold text-[#0F172A]">{inv.invoice_number}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#0F172A] truncate">{clientName}</p>
@@ -317,7 +317,7 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
                       : "—"}
                   </div>
                   <div className="w-28 text-right flex-shrink-0">
-                    <p className="font-numeric font-bold text-sm text-[#0F172A]">{fmt(inv.total_amount)}</p>
+                    <p className="font-bold text-sm text-[#0F172A]">{fmt(inv.total_amount)}</p>
                     {balanceDue > 0 && inv.status !== "cancelled" && (
                       <p className="text-xs text-red-500">Due: {fmt(balanceDue)}</p>
                     )}

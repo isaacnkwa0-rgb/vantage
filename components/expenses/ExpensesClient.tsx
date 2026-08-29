@@ -146,13 +146,13 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="col-span-2 sm:col-span-1 bg-white rounded-xl border border-red-100 p-4 shadow-sm">
           <p className="text-xs text-slate-500">Total Expenses</p>
-          <p className="font-numeric text-xl font-bold text-red-500 mt-1">{fmt(totalExpenses)}</p>
+          <p className="text-xl font-bold text-red-500 mt-1">{fmt(totalExpenses)}</p>
           <p className="text-xs text-slate-400">{filtered.length} records</p>
         </div>
         {categoryTotals.slice(0, 3).map((cat) => (
           <div key={cat.value} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
             <p className="text-xs text-slate-500">{cat.icon} {cat.label}</p>
-            <p className="font-numeric text-base font-bold text-[#0F172A] mt-1">{fmt(cat.total)}</p>
+            <p className="text-base font-bold text-[#0F172A] mt-1">{fmt(cat.total)}</p>
           </div>
         ))}
       </div>
@@ -196,7 +196,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
                       {new Date(expense.expense_date).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <span className="font-numeric text-sm font-semibold text-red-500">{fmt(expense.amount)}</span>
+                      <span className="text-sm font-semibold text-red-500">{fmt(expense.amount)}</span>
                     </td>
                     <td className="px-4 py-3">
                       <button
@@ -247,7 +247,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#0F172A] mb-1">Amount *</label>
-                <input {...register("amount")} type="number" step="0.01" min="0" placeholder="0.00" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric" />
+                <input {...register("amount")} type="number" step="0.01" min="0" placeholder="0.00" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
                 {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount.message}</p>}
               </div>
               <div>

@@ -69,7 +69,7 @@ export function RecentSales({ sales, currency, businessType = "retail" }: Props)
               <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full flex-shrink-0">
                 {METHOD_LABELS[sale.payment_method] ?? sale.payment_method}
               </span>
-              <span className="font-numeric text-sm font-semibold text-emerald-600 flex-shrink-0">
+              <span className="text-sm font-semibold text-emerald-600 flex-shrink-0">
                 {fmt(sale.total_amount)}
               </span>
             </div>

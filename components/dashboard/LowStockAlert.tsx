@@ -27,7 +27,7 @@ export function LowStockAlert({ products, slug }: Props) {
         {products.slice(0, 5).map((product) => (
           <div key={product.id} className="flex items-center justify-between px-4 py-2.5">
             <p className="text-sm text-[#0F172A] truncate flex-1">{product.name}</p>
-            <span className="font-numeric text-xs font-semibold text-amber-600 ml-2">
+            <span className="text-xs font-semibold text-amber-600 ml-2">
               {product.stock_quantity} left
             </span>
           </div>

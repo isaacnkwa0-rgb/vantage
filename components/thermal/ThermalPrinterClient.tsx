@@ -261,7 +261,7 @@ export function ThermalPrinterClient({ business, recentSales }: Props) {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-numeric text-sm font-bold text-[#0F172A]">{fmt(sale.total_amount)}</span>
+                  <span className="text-sm font-bold text-[#0F172A]">{fmt(sale.total_amount)}</span>
                   <button
                     onClick={() => printReceipt(sale)}
                     disabled={printing === sale.id}

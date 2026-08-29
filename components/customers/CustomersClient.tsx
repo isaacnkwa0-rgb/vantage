@@ -212,21 +212,21 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{customers.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{customers.length}</p>
           <p className="text-xs text-slate-500">{isService ? "Total Clients" : "Total Customers"}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
-          <p className="font-numeric text-xl font-bold text-emerald-600">
+          <p className="text-xl font-bold text-emerald-600">
             {fmt(customers.reduce((s, c) => s + c.total_spent, 0))}
           </p>
           <p className="text-xs text-slate-500">Total Revenue</p>
         </div>
         <div className="bg-white rounded-xl border border-red-100 p-3 text-center shadow-sm">
-          <p className="font-numeric text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
+          <p className="text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
           <p className="text-xs text-slate-500">Outstanding</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">
+          <p className="text-xl font-bold text-[#0F172A]">
             {customers.filter((c) => c.last_purchase_at).length}
           </p>
           <p className="text-xs text-slate-500">Returning</p>
@@ -336,7 +336,7 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
                       <p className="text-sm text-slate-600">{customer.phone ?? customer.email ?? "—"}</p>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <span className="font-numeric text-sm font-semibold text-emerald-600">
+                      <span className="text-sm font-semibold text-emerald-600">
                         {fmt(customer.total_spent)}
                       </span>
                     </td>
@@ -409,7 +409,7 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
                   placeholder={recordingPaymentFor.credit_balance.toFixed(2)}
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric text-lg"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-lg"
                   autoFocus
                 />
               </div>

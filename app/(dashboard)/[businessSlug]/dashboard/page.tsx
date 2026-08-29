@@ -44,6 +44,12 @@ export default async function DashboardPage({ params }: Props) {
 
   const ninetyDaysAgo = new Date(now); ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89); ninetyDaysAgo.setHours(0, 0, 0, 0);
 
+  // Week start (Monday)
+  const weekStart = new Date(now);
+  const dayOfWeek = weekStart.getDay();
+  weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  weekStart.setHours(0, 0, 0, 0);
+
   const [
     todaySalesRes,
     yesterdaySalesRes,
@@ -56,6 +62,7 @@ export default async function DashboardPage({ params }: Props) {
     productsRes,
     customersRes,
     newCustomersRes,
+    locationsRes,
   ] = await Promise.all([
     // Today's full sales (for recent transactions + KPIs)
     supabase
@@ -140,7 +147,17 @@ export default async function DashboardPage({ params }: Props) {
       .select("id", { count: "exact", head: true })
       .eq("business_id", business.id)
       .gte("created_at", monthStart.toISOString()),
+
+    // Active locations for this business
+    supabase
+      .from("locations")
+      .select("id, name")
+      .eq("business_id", business.id)
+      .eq("is_active", true)
+      .order("name"),
   ]);
+
+  const locations = (locationsRes.data ?? []).map((l) => ({ id: l.id, name: l.name }));
 
   // Derived values
   const todaySales = todaySalesRes.data ?? [];
@@ -151,16 +168,23 @@ export default async function DashboardPage({ params }: Props) {
   const yesterdayRevenue = yesterdaySales.reduce((s, r) => s + r.total_amount, 0);
   const yesterdayCount = yesterdaySales.length;
 
-  // Chart data (date → daily total)
-  const chartSales = (chartSalesRes.data ?? []).map((s) => ({
+  // Chart raw data (individual sales, 90 days)
+  const chartSalesRaw = chartSalesRes.data ?? [];
+  const chartSales = chartSalesRaw.map((s) => ({
     date: s.created_at.split("T")[0],
     amount: s.total_amount,
   }));
 
-  // Month revenue (derive from chart data filtered to this month)
-  const monthRevenue = chartSales
-    .filter((s) => s.date >= monthStart.toISOString().split("T")[0])
-    .reduce((sum, s) => sum + s.amount, 0);
+  // Week data (Monday–now, derived from chart raw)
+  const weekRaw = chartSalesRaw.filter((s) => s.created_at >= weekStart.toISOString());
+  const weekRevenue = weekRaw.reduce((sum, s) => sum + s.total_amount, 0);
+  const weekSalesCount = weekRaw.length;
+
+  // Month revenue + count (derive from chart raw)
+  const monthRaw = chartSalesRaw.filter((s) => s.created_at >= monthStart.toISOString());
+  const monthRevenue = monthRaw.reduce((sum, s) => sum + s.total_amount, 0);
+  const monthSalesCount = monthRaw.length;
+
 
   const monthExpenses = (monthExpensesRes.data ?? []).reduce((s, e) => s + e.amount, 0);
   const lastMonthExpenses = (lastMonthExpensesRes.data ?? []).reduce((s, e) => s + e.amount, 0);
@@ -201,7 +225,10 @@ export default async function DashboardPage({ params }: Props) {
           currency={business.currency}
           todayRevenue={todayRevenue}
           todaySalesCount={todaySalesCount}
+          weekRevenue={weekRevenue}
+          weekSalesCount={weekSalesCount}
           monthRevenue={monthRevenue}
+          monthSalesCount={monthSalesCount}
           monthExpenses={monthExpenses}
           netProfit={netProfit}
           revenueGrowthPct={revenueGrowthPct}
@@ -209,6 +236,7 @@ export default async function DashboardPage({ params }: Props) {
           totalProducts={products.length}
           totalCustomers={totalCustomers}
           newCustomers={newCustomers}
+          locations={locations}
         />
       </div>
 
@@ -259,7 +287,7 @@ export default async function DashboardPage({ params }: Props) {
           ) : (
             <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-center items-center gap-2 text-center">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Customers</p>
-              <p className="font-numeric text-3xl font-bold text-slate-900">{totalCustomers.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-slate-900">{totalCustomers.toLocaleString()}</p>
               <p className="text-xs text-slate-400">{newCustomers} new this month</p>
             </div>
           )}

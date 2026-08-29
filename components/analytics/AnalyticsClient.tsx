@@ -69,15 +69,15 @@ export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props)
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-emerald-600">{fmt(totalRevenue)}</p>
+          <p className="text-xl font-bold text-emerald-600">{fmt(totalRevenue)}</p>
           <p className="text-xs text-slate-500">30-day Revenue</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-red-500">{fmt(totalExpenses)}</p>
+          <p className="text-xl font-bold text-red-500">{fmt(totalExpenses)}</p>
           <p className="text-xs text-slate-500">30-day Expenses</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className={`font-numeric text-xl font-bold ${totalRevenue - totalExpenses >= 0 ? "text-green-600" : "text-red-600"}`}>
+          <p className={`text-xl font-bold ${totalRevenue - totalExpenses >= 0 ? "text-green-600" : "text-red-600"}`}>
             {fmt(totalRevenue - totalExpenses)}
           </p>
           <p className="text-xs text-slate-500">Net Profit</p>

@@ -295,14 +295,14 @@ export function QuoteForm({ business, customers, editingQuote, userId, onClose }
                       onChange={(e) => updateItem(idx, "description", e.target.value)}
                     />
                     <input
-                      className="col-span-2 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-center font-numeric"
+                      className="col-span-2 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-center"
                       type="number"
                       min="1"
                       value={item.quantity}
                       onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 1)}
                     />
                     <input
-                      className="col-span-3 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-right font-numeric"
+                      className="col-span-3 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-right"
                       type="number"
                       min="0"
                       step="0.01"
@@ -321,7 +321,7 @@ export function QuoteForm({ business, customers, editingQuote, userId, onClose }
                 ))}
                 <div className="flex justify-between items-center px-3 py-2 text-sm font-bold text-[#0F172A] bg-slate-100">
                   <span>Quote Total</span>
-                  <span className="font-numeric">{subtotal.toLocaleString("en", { minimumFractionDigits: 2 })}</span>
+                  <span className="">{subtotal.toLocaleString("en", { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
             )}

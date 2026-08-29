@@ -134,7 +134,7 @@ export function ServiceSearchPanel({ services, currency }: Props) {
                     {service.name}
                   </p>
 
-                  <p className={cn("font-numeric text-base font-bold mt-1.5", inCart ? "text-green-600" : "text-green-600")}>
+                  <p className={cn("text-base font-bold mt-1.5", inCart ? "text-green-600" : "text-green-600")}>
                     {formatCurrency(service.selling_price, currency)}
                   </p>
 

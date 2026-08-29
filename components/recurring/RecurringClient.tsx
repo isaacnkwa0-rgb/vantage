@@ -152,7 +152,7 @@ export function RecurringClient({ schedules: initial, customers, currency, busin
                   </td>
                   <td className="px-5 py-3 text-sm text-slate-600">{s.customers?.name ?? <span className="text-slate-300">—</span>}</td>
                   <td className="px-5 py-3 text-xs text-slate-500">{FREQ_LABELS[s.frequency]}</td>
-                  <td className="px-5 py-3 text-right font-numeric font-bold text-[#0F172A]">{fmt(s.amount)}</td>
+                  <td className="px-5 py-3 text-right font-bold text-[#0F172A]">{fmt(s.amount)}</td>
                   <td className="px-5 py-3 text-xs text-slate-500">{s.next_issue_date}</td>
                   <td className="px-5 py-3">
                     <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[s.status])}>

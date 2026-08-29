@@ -63,7 +63,7 @@ const SLIDES = [
           <span className="text-[11px] font-semibold text-slate-700">Zikky Gadgets</span>
         </div>
         <p className="text-[10px] text-slate-400 mb-0.5">Total Revenue · This Month</p>
-        <p className="text-[22px] font-bold text-slate-900 font-numeric leading-none mb-3">₦840,000</p>
+        <p className="text-[22px] font-bold text-slate-900 leading-none mb-3">₦840,000</p>
         <div className="grid grid-cols-4 gap-1.5 mb-3">
           {[
             { label: "Orders", val: "1,240", bg: "bg-slate-50" },
@@ -119,13 +119,13 @@ const SLIDES = [
                 <p className="text-[11px] font-semibold text-slate-800 truncate">{s.name} {s.qty}</p>
                 <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 rounded-full">{s.method}</span>
               </div>
-              <p className="text-[11px] font-bold text-slate-900 font-numeric">{s.amount}</p>
+              <p className="text-[11px] font-bold text-slate-900">{s.amount}</p>
             </div>
           ))}
         </div>
         <div className="bg-[#E8F5EC] rounded-xl p-2.5 flex items-center justify-between">
           <p className="text-[11px] font-semibold text-green-800">Total today</p>
-          <p className="text-[14px] font-bold text-[#1a9c38] font-numeric">₦25,000</p>
+          <p className="text-[14px] font-bold text-[#1a9c38]">₦25,000</p>
         </div>
       </div>
     ),
@@ -146,7 +146,7 @@ const SLIDES = [
             <div key={r.label}>
               <div className="flex justify-between mb-1">
                 <p className="text-[10px] text-slate-500">{r.label}</p>
-                <p className="text-[10px] font-bold text-slate-800 font-numeric">{r.val}</p>
+                <p className="text-[10px] font-bold text-slate-800">{r.val}</p>
               </div>
               <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                 <div className={cn("h-full rounded-full", r.color)} style={{ width: `${r.pct}%` }} />
@@ -156,11 +156,11 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-slate-50 rounded-xl p-2.5 text-center">
-            <p className="text-[18px] font-bold text-slate-900 font-numeric">136</p>
+            <p className="text-[18px] font-bold text-slate-900">136</p>
             <p className="text-[9px] text-slate-500">Customers</p>
           </div>
           <div className="bg-[#E8F5EC] rounded-xl p-2.5 text-center">
-            <p className="text-[18px] font-bold text-[#1a9c38] font-numeric">+18%</p>
+            <p className="text-[18px] font-bold text-[#1a9c38]">+18%</p>
             <p className="text-[9px] text-slate-500">vs last month</p>
           </div>
         </div>

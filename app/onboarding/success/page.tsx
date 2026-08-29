@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const COLORS = ["#1a9c38", "#0f6624", "#34d058", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#dcfce7", "#052e16", "#14532d", "#166534"];
 
@@ -94,7 +95,42 @@ function Confetti() {
 function SuccessPage() {
   const router = useRouter();
   const params = useSearchParams();
-  const slug = params.get("slug") ?? "";
+  const [slug, setSlug] = useState(params.get("slug") ?? "");
+
+  useEffect(() => {
+    if (slug) return;
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("businesses")
+        .select("slug")
+        .eq("owner_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single()
+        .then(({ data }) => { if (data?.slug) setSlug(data.slug); });
+    });
+  }, [slug]);
+
+  async function handleExplore() {
+    let destination = slug;
+    if (!destination) {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from("businesses")
+          .select("slug")
+          .eq("owner_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+        destination = data?.slug ?? "";
+      }
+    }
+    router.push(destination ? `/${destination}/dashboard` : "/dashboard");
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
@@ -135,7 +171,7 @@ function SuccessPage() {
         </p>
 
         <button
-          onClick={() => router.push(`/${slug}/dashboard`)}
+          onClick={handleExplore}
           className="fade-up-3 w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition"
         >
           Start Exploring

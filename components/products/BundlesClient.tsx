@@ -164,11 +164,11 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
           <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Total Bundles</p>
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{bundles.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{bundles.length}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
           <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Active</p>
-          <p className="font-numeric text-xl font-bold text-emerald-600">{activeBundles}</p>
+          <p className="text-xl font-bold text-emerald-600">{activeBundles}</p>
         </div>
       </div>
 
@@ -229,7 +229,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                   </div>
 
                   <div className="flex-shrink-0 text-right">
-                    <p className="font-numeric font-bold text-violet-700">{fmt(b.price)}</p>
+                    <p className="font-bold text-violet-700">{fmt(b.price)}</p>
                     {savings > 0 && (
                       <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">Save {fmt(savings)}</p>
                     )}
@@ -314,7 +314,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                   value={form.price}
                   onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 {form.items.some((i) => i.product_id) && (() => {
                   const sum = componentTotal(form.items);
@@ -354,7 +354,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                         min="1"
                         value={item.quantity}
                         onChange={(e) => updateFormItem(idx, "quantity", parseInt(e.target.value) || 1)}
-                        className="w-16 px-2 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                        className="w-16 px-2 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                       <button
                         onClick={() => removeFormItem(idx)}

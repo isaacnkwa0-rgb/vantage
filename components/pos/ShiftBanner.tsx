@@ -131,7 +131,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                     min="0"
                     value={openingFloat}
                     onChange={(e) => setOpeningFloat(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-numeric font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
                     autoFocus
                   />
                 </div>
@@ -187,15 +187,15 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
               <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Opening float</span>
-                  <span className="font-numeric font-semibold">{fmt(shift.opening_float)}</span>
+                  <span className="font-semibold">{fmt(shift.opening_float)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Cash sales</span>
-                  <span className="font-numeric font-semibold text-emerald-600">+{fmt(cashSales)}</span>
+                  <span className="font-semibold text-emerald-600">+{fmt(cashSales)}</span>
                 </div>
                 <div className="border-t border-slate-200 pt-2 flex justify-between font-semibold">
                   <span>Expected in drawer</span>
-                  <span className="font-numeric">{fmt(expectedCash)}</span>
+                  <span className="">{fmt(expectedCash)}</span>
                 </div>
               </div>
 
@@ -208,7 +208,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                   value={closingFloat}
                   onChange={(e) => setClosingFloat(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-numeric font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
                   autoFocus
                 />
               </div>
@@ -222,7 +222,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                     <TrendingUp className="w-4 h-4" />
                     <span>{discrepancy === 0 ? "Balanced" : discrepancy > 0 ? "Over" : "Short"}</span>
                   </div>
-                  <span className="font-numeric">{discrepancy >= 0 ? "+" : ""}{fmt(discrepancy)}</span>
+                  <span className="">{discrepancy >= 0 ? "+" : ""}{fmt(discrepancy)}</span>
                 </div>
               )}
 

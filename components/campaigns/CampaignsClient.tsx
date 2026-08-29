@@ -127,17 +127,17 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{campaigns.length}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{campaigns.length}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Campaigns</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-emerald-600">
+          <p className="text-xl font-bold text-emerald-600">
             {campaigns.reduce((s, c) => s + c.sent_count, 0).toLocaleString()}
           </p>
           <p className="text-xs text-slate-500 mt-0.5">Messages Sent</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="font-numeric text-xl font-bold text-blue-600">{emailReachCount + phoneReachCount}</p>
+          <p className="text-xl font-bold text-blue-600">{emailReachCount + phoneReachCount}</p>
           <p className="text-xs text-slate-500 mt-0.5">Reachable Contacts</p>
         </div>
       </div>

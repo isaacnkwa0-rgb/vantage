@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Eye, EyeOff, ShoppingCart, Box, Users, FileText,
   DollarSign, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, BarChart3, Bell, Zap,
+  ChevronDown, Bell, User, Store, Share2, BarChart2, X, Check, MapPin, Trophy,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,10 @@ interface Props {
   currency: string;
   todayRevenue: number;
   todaySalesCount: number;
+  weekRevenue: number;
+  weekSalesCount: number;
   monthRevenue: number;
+  monthSalesCount: number;
   monthExpenses: number;
   netProfit: number;
   revenueGrowthPct: number | null;
@@ -35,6 +38,7 @@ interface Props {
   totalProducts: number;
   totalCustomers: number;
   newCustomers: number;
+  locations: { id: string; name: string }[];
 }
 
 const METHOD_STYLES: Record<string, string> = {
@@ -47,27 +51,34 @@ const METHOD_STYLES: Record<string, string> = {
 
 export function MobileDashboard({
   businessName, businessType, slug, currency,
-  todayRevenue, todaySalesCount, monthRevenue,
+  todayRevenue, todaySalesCount,
+  weekRevenue, weekSalesCount,
+  monthRevenue, monthSalesCount,
   monthExpenses, netProfit, revenueGrowthPct, sales,
-  totalProducts, totalCustomers, newCustomers,
+  totalProducts, totalCustomers, newCustomers, locations,
 }: Props) {
   const [hidden, setHidden] = useState(false);
-  const [period, setPeriod] = useState<"today" | "month">("today");
+  const [period, setPeriod] = useState<"today" | "week" | "month">("today");
   const [showPeriod, setShowPeriod] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+  const selectedLocationName = selectedLocationId
+    ? (locations.find((l) => l.id === selectedLocationId)?.name ?? "Headquarters")
+    : "Headquarters";
   const { activeBusiness } = useBusinessStore();
 
-  const isService   = businessType === "service";
-  const txLabel     = isService ? "services" : "sales";
-  const walkIn      = isService ? "Walk-in client" : "Walk-in";
+  const isService    = businessType === "service";
+  const txLabel      = isService ? "services" : "sales";
+  const walkIn       = isService ? "Walk-in client" : "Walk-in";
   const primaryLabel = isService ? "Record Service" : "New Sale";
 
-  const revenue     = period === "today" ? todayRevenue : monthRevenue;
-  const periodLabel = period === "today" ? "Today" : "This month";
-  const txCount     = period === "today" ? todaySalesCount : sales.length;
+  const revenue     = period === "today" ? todayRevenue : period === "week" ? weekRevenue : monthRevenue;
+  const periodLabel = period === "today" ? "Today" : period === "week" ? "This week" : "This month";
+  const txCount     = period === "today" ? todaySalesCount : period === "week" ? weekSalesCount : monthSalesCount;
 
   const fmt = (n: number) => hidden ? "••••••" : formatCurrency(n, currency);
 
-  const initials = businessName.slice(0, 2).toUpperCase();
   const isFree = activeBusiness?.subscription_tier === "free";
 
   const QUICK_ACTIONS = [
@@ -77,149 +88,176 @@ export function MobileDashboard({
     { label: "Expense",  icon: DollarSign,    href: "expenses",  primary: false },
   ] as const;
 
+  const MILESTONES = [
+    { label: "Record your first sale",    done: monthSalesCount > 0 },
+    { label: "Add your first product",    done: totalProducts > 0   },
+    { label: "Add your first customer",   done: totalCustomers > 0  },
+  ];
+  const milestoneDone  = MILESTONES.filter((m) => m.done).length;
+  const milestoneTotal = MILESTONES.length;
+  const nextMilestone  = MILESTONES.find((m) => !m.done);
+
   const STATS: { value: number; label: string; bg: string; green?: boolean }[] = [
-    { value: todaySalesCount, label: isService ? "Services" : "Orders",   bg: "bg-slate-50"  },
-    { value: totalProducts,   label: isService ? "Services" : "Products", bg: "bg-[#E8F5EC]" },
-    { value: totalCustomers,  label: isService ? "Clients" : "Customers", bg: "bg-[#FEF9EC]" },
-    { value: newCustomers,    label: "New this mo.",                       bg: "bg-[#FEF0F0]", green: true },
+    { value: txCount,        label: isService ? "Services" : "Orders",   bg: "bg-slate-50"  },
+    { value: totalProducts,  label: "Sold",         bg: "bg-[#E8F5EC]" },
+    { value: totalCustomers, label: isService ? "Clients" : "Customers", bg: "bg-[#FEF9EC]" },
+    { value: newCustomers,   label: "Store visits", bg: "bg-[#FEF0F0]" },
   ];
 
   return (
     <div className="flex-1 overflow-auto bg-white">
       <div className="pb-10">
 
-        {/* ── Header (Bumpa-style inside scroll) ───────────── */}
-        <div className="flex items-start justify-between px-4 pt-12 pb-3">
-          <div className="flex items-center gap-3">
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-[#1a9c38] font-bold text-[15px] leading-none">{initials}</span>
+        {/* ── Hero section (grey background, Bumpa-style) ──── */}
+        <div className="bg-[#f6f6f6] px-4 pt-9 pb-7 rounded-b-[32px]">
+          {/* Header row */}
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-0.5">
+              {/* Avatar – bare person silhouette like Bumpa */}
+              <User className="w-10 h-10 text-slate-300 flex-shrink-0 -ml-2" aria-hidden="true" />
+              <div>
+                <p className="text-[15px] font-bold text-slate-900 leading-tight">
+                  Hi, {businessName.split(" ")[0]}
+                </p>
+                <p className="text-[12px] text-[#1a9c38] mt-0.5 flex items-center gap-0.5">
+                  Share your website link
+                  <ChevronRight className="w-3 h-3" aria-hidden="true" />
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-[15px] font-bold text-slate-900 leading-tight">
-                Hi, {businessName.split(" ")[0]}
-              </p>
-              <p className="text-[12px] text-slate-400 mt-0.5 flex items-center gap-1">
-                Record a sale today
-                <ShoppingCart className="w-3 h-3" aria-hidden="true" />
-              </p>
-            </div>
+
+            {/* Subscription badge */}
+            {isFree ? (
+              <span className="text-[11px] text-green-600 mt-1">Free plan</span>
+            ) : (
+              <span className="text-[11px] text-violet-600 mt-1 capitalize">
+                {activeBusiness?.subscription_tier ?? "Starter"}
+              </span>
+            )}
           </div>
 
-          {/* Subscription badge */}
-          {isFree ? (
-            <span className="text-[11px] font-semibold text-green-600 mt-1">Free plan</span>
-          ) : (
-            <span className="text-[11px] font-semibold text-violet-600 mt-1 capitalize">
-              {activeBusiness?.subscription_tier ?? "Starter"}
-            </span>
-          )}
-        </div>
-
-        {/* ── Utility buttons row ───────────────────────────── */}
-        <div className="flex items-center gap-2 px-4 pb-4">
-          <Link
-            href={`/${slug}/pos`}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-full text-[12px] font-semibold text-slate-600"
-          >
-            <ShoppingCart className="w-3.5 h-3.5" aria-hidden="true" />
-            {primaryLabel}
-          </Link>
-          <Link
-            href={`/${slug}/sales`}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-full text-[12px] font-semibold text-slate-600"
-          >
-            <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
-            Sales
-          </Link>
-          <div className="flex-1" />
-          <Link
-            href={`/${slug}/notifications`}
-            className="p-2 rounded-full bg-slate-100 text-slate-500"
-            aria-label="Notifications"
-          >
-            <Bell className="w-4.5 h-4.5" aria-hidden="true" />
-          </Link>
-        </div>
-
-        {/* ── Business name bar ─────────────────────────────── */}
-        <div className="mx-4 mb-3">
-          <div className="bg-slate-50 rounded-xl px-4 py-3 flex items-center gap-2.5 border border-slate-100">
-            <div className="w-6 h-6 rounded-md bg-[#1a9c38] flex items-center justify-center flex-shrink-0">
-              <Box className="w-3.5 h-3.5 text-white" aria-hidden="true" />
-            </div>
-            <span className="text-[13px] font-semibold text-slate-800 flex-1 truncate">{businessName}</span>
-            <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
+          {/* Utility buttons row */}
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/${slug}/store`}
+              className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-[4px] text-[12px] text-slate-600 border border-slate-200"
+            >
+              <Store className="w-3.5 h-3.5" aria-hidden="true" />
+              Visit store
+            </Link>
+            <Link
+              href={`/${slug}/share`}
+              className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-[4px] text-[12px] text-slate-600 border border-slate-200"
+            >
+              <Share2 className="w-3.5 h-3.5" aria-hidden="true" />
+              Share link
+            </Link>
+            <div className="flex-1" />
+            <Link
+              href={`/${slug}/reports`}
+              className="p-1 text-[#1a9c38]"
+              aria-label="Analytics"
+            >
+              <BarChart2 className="w-5 h-5" aria-hidden="true" />
+            </Link>
+            <Link
+              href={`/${slug}/notifications`}
+              className="p-1 text-[#1a9c38]"
+              aria-label="Notifications"
+            >
+              <Bell className="w-5 h-5" aria-hidden="true" />
+            </Link>
           </div>
         </div>
 
-        {/* ── Upgrade CTA (free tier) ───────────────────────── */}
-        {isFree && (
-          <Link
-            href={`/${slug}/settings?tab=billing`}
-            className="mx-4 mb-3 flex items-center gap-3 bg-[#1a9c38] rounded-xl px-4 py-3"
+        {/* ── Location picker ───────────────────────────────── */}
+        <div className="mx-4 mt-4 mb-3">
+          <button
+            onClick={() => setShowLocationPicker(true)}
+            className="w-full flex items-center gap-2.5 text-[13px] font-semibold text-slate-700 bg-white border border-slate-200 px-4 py-3 rounded-[8px]"
           >
-            <Zap className="w-4 h-4 text-white flex-shrink-0" aria-hidden="true" />
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-bold text-white">Upgrade to Starter</p>
-              <p className="text-[11px] text-green-100 mt-0.5">Unlock the full benefits of VANTAGE</p>
+            <MapPin className="w-4 h-4 text-[#1a9c38] flex-shrink-0" aria-hidden="true" />
+            <span className="flex-1 text-left">{selectedLocationName}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" aria-hidden="true" />
+          </button>
+        </div>
+
+        {/* Location bottom sheet */}
+        {showLocationPicker && (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-end"
+            onClick={() => setShowLocationPicker(false)}
+          >
+            <div
+              className="w-full bg-white rounded-t-2xl px-5 pt-5 pb-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[16px] font-bold text-slate-900">Select Location</h3>
+                <button onClick={() => setShowLocationPicker(false)} className="p-1">
+                  <X className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                </button>
+              </div>
+              {locations.length === 0 && (
+                <p className="text-[13px] text-slate-400 mb-4 leading-relaxed">
+                  You can set up or add locations in Settings → Locations.
+                </p>
+              )}
+              <div className="space-y-2 mt-4">
+                {/* Headquarters — always first */}
+                {[{ id: null, name: "Headquarters" }, ...locations].map((loc) => {
+                  const active = loc.id === selectedLocationId;
+                  return (
+                    <button
+                      key={loc.id ?? "hq"}
+                      onClick={() => { setSelectedLocationId(loc.id); setShowLocationPicker(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition",
+                        active ? "bg-[#ecf7f1] border border-[#1a9c38]" : "bg-slate-50"
+                      )}
+                    >
+                      <span className={cn("text-[14px] font-semibold flex-1", active ? "text-slate-900" : "text-slate-700")}>
+                        {loc.name}
+                      </span>
+                      {active && <Check className="w-4 h-4 text-[#1a9c38] flex-shrink-0" aria-hidden="true" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-green-200 flex-shrink-0" aria-hidden="true" />
-          </Link>
+          </div>
         )}
 
-        {/* ── Revenue card (white, Bumpa-style) ────────────── */}
-        <div className="mx-4 mb-3 bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        {/* ── Revenue card (Bumpa wallet style) ───────────── */}
+        <div className="mx-4 mb-3 rounded-[14px] px-4 pt-4 pb-[34px] relative overflow-hidden border-l-4 border-[#1a9c38]" style={{ backgroundColor: "#f6f6f6" }}>
 
-          {/* Label row */}
+          {/* Label row — label left, eye right */}
           <div className="flex items-center justify-between mb-3">
             <p className="text-[13px] font-semibold text-slate-500">Total Revenue:</p>
-            <div className="flex items-center gap-2">
-              {/* Period selector */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowPeriod((v) => !v)}
-                  className="flex items-center gap-1 text-[12px] font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full"
-                >
-                  {periodLabel}
-                  <ChevronDown className="w-3 h-3" aria-hidden="true" />
-                </button>
-                {showPeriod && (
-                  <div className="absolute right-0 top-full mt-1 bg-white rounded-xl border border-slate-200 shadow-lg z-10 overflow-hidden min-w-[120px]">
-                    {(["today", "month"] as const).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => { setPeriod(p); setShowPeriod(false); }}
-                        className={cn(
-                          "w-full text-left px-4 py-2.5 text-[13px] font-medium",
-                          period === p ? "text-[#1a9c38] bg-green-50" : "text-slate-700 hover:bg-slate-50"
-                        )}
-                      >
-                        {p === "today" ? "Today" : "This month"}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* Eye toggle */}
-              <button
-                onClick={() => setHidden((v) => !v)}
-                aria-label={hidden ? "Show amounts" : "Hide amounts"}
-                className="text-slate-400 p-0.5"
-              >
-                {hidden
-                  ? <EyeOff className="w-4 h-4" aria-hidden="true" />
-                  : <Eye    className="w-4 h-4" aria-hidden="true" />}
-              </button>
-            </div>
+            <button
+              onClick={() => setHidden((v) => !v)}
+              aria-label={hidden ? "Show amounts" : "Hide amounts"}
+              className="text-[#1a9c38] p-0.5"
+            >
+              {hidden
+                ? <EyeOff className="w-4 h-4" aria-hidden="true" />
+                : <Eye    className="w-4 h-4" aria-hidden="true" />}
+            </button>
           </div>
 
-          {/* Amount */}
-          <p className="font-numeric text-[40px] font-bold text-slate-900 leading-none tracking-tight">
-            {fmt(revenue)}
+          {/* Amount — smaller currency symbol */}
+          <p className="font-bold text-slate-900 leading-none">
+            {hidden ? (
+              <span className="text-[40px]">••••••</span>
+            ) : (
+              <>
+                <span className="text-[30px]">{fmt(revenue).charAt(0)}</span>
+                <span className="text-[40px] ml-1">{fmt(revenue).slice(1)}</span>
+              </>
+            )}
           </p>
           <p className="text-[12px] text-slate-400 mt-2">
-            {txCount} {txLabel} {period === "today" ? "today" : "this month"}
+            {txCount} {txLabel} {period === "today" ? "today" : period === "week" ? "this week" : "this month"}
           </p>
 
           {/* Growth badge — month only */}
@@ -236,20 +274,79 @@ export function MobileDashboard({
           )}
         </div>
 
-        {/* ── 4-column stats (Bumpa-style colored boxes) ────── */}
-        <div className="mx-4 mb-3 grid grid-cols-4 gap-2">
-          {STATS.map((s) => (
-            <div key={s.label} className={cn("rounded-xl p-2.5 text-center", s.bg)}>
-              <p className={cn(
-                "font-numeric text-[20px] font-bold leading-none",
-                s.green ? "text-[#1a9c38]" : "text-slate-900"
-              )}>
-                {s.green && s.value > 0 ? `+${s.value}` : s.value}
+        {/* ── Period picker (Bumpa Total Sales style) ───────── */}
+        <div className="mx-4 mt-5 mb-3 relative">
+          <button
+            onClick={() => setShowPeriod((v) => !v)}
+            className="w-full flex items-center justify-between bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-[14px]"
+          >
+            <div className="text-left">
+              <p className="text-[12px] text-slate-400 font-normal">Total {isService ? "Services" : "Sales"}:</p>
+              <p className="font-bold text-slate-900 leading-tight">
+                {hidden ? (
+                  <span className="text-[20px]">••••••</span>
+                ) : (
+                  <>
+                    <span className="text-[14px]">{fmt(revenue).charAt(0)}</span>
+                    <span className="text-[20px] ml-0.5">{fmt(revenue).slice(1)}</span>
+                  </>
+                )}
               </p>
-              <p className="text-[9px] text-slate-500 mt-1 leading-tight font-medium">{s.label}</p>
+            </div>
+            <div className="flex items-center gap-1 text-[13px] font-normal text-slate-700">
+              {periodLabel}
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" aria-hidden="true" />
+            </div>
+          </button>
+          {showPeriod && (
+            <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-xl border border-slate-200 shadow-lg z-20 overflow-hidden">
+              {(["today", "week", "month"] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => { setPeriod(p); setShowPeriod(false); }}
+                  className={cn(
+                    "w-full text-left px-4 py-3 text-[13px] font-medium",
+                    period === p ? "text-[#1a9c38] bg-green-50" : "text-slate-700 hover:bg-slate-50"
+                  )}
+                >
+                  {p === "today" ? "Today" : p === "week" ? "This week" : "This month"}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── 4-column stats (Bumpa-style colored boxes) ────── */}
+        <div className="mx-4 mb-3 grid grid-cols-4 gap-1">
+          {STATS.map((s) => (
+            <div key={s.label} className={cn("rounded-[8px] h-[70px] flex flex-col items-center justify-center", s.bg)}>
+              <p className="text-[20px] font-bold leading-none text-slate-900">
+                {s.value}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-1 leading-tight font-medium">{s.label}</p>
             </div>
           ))}
         </div>
+
+        {/* ── Milestone card ────────────────────────────────── */}
+        <Link href={`/${slug}/targets`} className="mx-4 mb-3 block bg-white rounded-[14px] border border-slate-200 px-4 py-6">
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-[14px] font-bold text-slate-900">Milestone</p>
+              <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">
+                {nextMilestone ? nextMilestone.label : "You've achieved all milestones!"}
+              </p>
+              <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#1a9c38] rounded-full transition-all"
+                  style={{ width: `${(milestoneDone / milestoneTotal) * 100}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1.5">{milestoneDone}/{milestoneTotal}</p>
+            </div>
+            <span className="text-[52px] leading-none select-none flex-shrink-0" aria-hidden="true">🏆</span>
+          </div>
+        </Link>
 
         {/* ── Quick Actions ─────────────────────────────────── */}
         <div className="mx-4 mb-3 grid grid-cols-4 gap-2">
@@ -327,7 +424,7 @@ export function MobileDashboard({
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-numeric text-[14px] font-bold text-slate-900">
+                    <p className="text-[14px] font-bold text-slate-900">
                       {formatCurrency(sale.total_amount, currency)}
                     </p>
                     <p className="text-[10px] text-slate-400 mt-0.5">

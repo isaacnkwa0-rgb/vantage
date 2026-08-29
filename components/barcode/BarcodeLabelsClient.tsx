@@ -190,7 +190,7 @@ export function BarcodeLabelsClient({ products, currency }: Props) {
                         : <span className="text-xs text-red-400">No barcode</span>}
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-[#0F172A] font-numeric flex-shrink-0">{fmt(p.selling_price)}</span>
+                  <span className="text-sm font-bold text-[#0F172A] flex-shrink-0">{fmt(p.selling_price)}</span>
                   {isSelected && (
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className="text-xs text-slate-500">Qty:</span>

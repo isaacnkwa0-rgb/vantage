@@ -73,7 +73,7 @@ export async function TopProductsPanel({ businessId, currency, businessType, slu
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="font-numeric text-xs font-bold text-slate-900">{fmt(revenue)}</p>
+                  <p className="text-xs font-bold text-slate-900">{fmt(revenue)}</p>
                   <p className="text-[10px] text-slate-400">{qty} {soldLabel}</p>
                 </div>
               </div>

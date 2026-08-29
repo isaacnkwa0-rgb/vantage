@@ -196,7 +196,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                       {s.role && <p className="text-xs text-slate-400">{s.role}</p>}
                     </td>
                     <td className="px-5 py-3">
-                      <p className="text-sm font-bold text-[#0F172A] font-numeric">{fmt(s.salary_amount)}</p>
+                      <p className="text-sm font-bold text-[#0F172A]">{fmt(s.salary_amount)}</p>
                       <p className="text-xs text-slate-400">{SALARY_LABELS[s.salary_type]}</p>
                     </td>
                     <td className="px-5 py-3 text-xs text-slate-500">
@@ -240,7 +240,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                   <div className="flex items-center gap-3">
                     <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[run.status])}>{run.status}</span>
                     <div className="text-right">
-                      <p className="font-numeric text-sm font-bold text-[#0F172A]">{fmt(run.total_net)}</p>
+                      <p className="text-sm font-bold text-[#0F172A]">{fmt(run.total_net)}</p>
                       <p className="text-xs text-slate-400">Net · Gross {fmt(run.total_gross)}</p>
                     </div>
                     {run.status === "draft" && (
@@ -270,9 +270,9 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                         {run.payroll_entries.map((e) => (
                           <tr key={e.id} className="hover:bg-slate-50">
                             <td className="px-5 py-2 text-sm text-[#0F172A]">{e.staff_name}</td>
-                            <td className="px-5 py-2 text-right text-sm font-numeric text-slate-600">{fmt(e.gross_pay)}</td>
-                            <td className="px-5 py-2 text-right text-sm font-numeric text-red-500">{e.deductions > 0 ? `−${fmt(e.deductions)}` : "—"}</td>
-                            <td className="px-5 py-2 text-right text-sm font-bold font-numeric text-[#0F172A]">{fmt(e.net_pay)}</td>
+                            <td className="px-5 py-2 text-right text-sm text-slate-600">{fmt(e.gross_pay)}</td>
+                            <td className="px-5 py-2 text-right text-sm text-red-500">{e.deductions > 0 ? `−${fmt(e.deductions)}` : "—"}</td>
+                            <td className="px-5 py-2 text-right text-sm font-bold text-[#0F172A]">{fmt(e.net_pay)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -396,7 +396,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                           <td className="px-2 py-1">
                             <input type="number" min="0" value={e.deductions} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, deductions: ev.target.value } : r))} className="w-20 px-2 py-1 border border-slate-200 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-green-500" />
                           </td>
-                          <td className="px-4 py-2 text-right text-sm font-bold font-numeric text-[#0F172A]">{fmt(net)}</td>
+                          <td className="px-4 py-2 text-right text-sm font-bold text-[#0F172A]">{fmt(net)}</td>
                         </tr>
                       );
                     })}
@@ -404,9 +404,9 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                   <tfoot>
                     <tr className="bg-slate-50 font-bold text-sm">
                       <td className="px-4 py-2 text-slate-600">Total</td>
-                      <td className="px-4 py-2 text-right font-numeric">{fmt(runEntries.reduce((s, e) => s + (parseFloat(e.gross) || 0), 0))}</td>
-                      <td className="px-4 py-2 text-right font-numeric text-red-500">{fmt(runEntries.reduce((s, e) => s + (parseFloat(e.deductions) || 0), 0))}</td>
-                      <td className="px-4 py-2 text-right font-numeric text-green-600">{fmt(runEntries.reduce((s, e) => s + ((parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0)), 0))}</td>
+                      <td className="px-4 py-2 text-right">{fmt(runEntries.reduce((s, e) => s + (parseFloat(e.gross) || 0), 0))}</td>
+                      <td className="px-4 py-2 text-right text-red-500">{fmt(runEntries.reduce((s, e) => s + (parseFloat(e.deductions) || 0), 0))}</td>
+                      <td className="px-4 py-2 text-right text-green-600">{fmt(runEntries.reduce((s, e) => s + ((parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0)), 0))}</td>
                     </tr>
                   </tfoot>
                 </table>

@@ -173,7 +173,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Services</p>
             </div>
-            <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{products.length}</p>
+            <p className="text-sm sm:text-xl font-bold text-[#0F172A]">{products.length}</p>
             <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">in your catalog</p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
@@ -184,7 +184,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Avg. Charge</p>
             </div>
-            <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">
+            <p className="text-sm sm:text-xl font-bold text-emerald-600">
               {products.length > 0 ? fmt(products.reduce((s, p) => s + p.selling_price, 0) / products.length) : "—"}
             </p>
             <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">per service</p>
@@ -197,7 +197,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Top Charge</p>
             </div>
-            <p className="font-numeric text-sm sm:text-xl font-bold text-violet-600">
+            <p className="text-sm sm:text-xl font-bold text-violet-600">
               {products.length > 0 ? fmt(Math.max(...products.map((p) => p.selling_price))) : "—"}
             </p>
             <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">highest priced service</p>
@@ -213,7 +213,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Stock Value</p>
             </div>
-            <p className="font-numeric text-sm sm:text-xl font-bold text-[#0F172A]">{fmt(stockValue)}</p>
+            <p className="text-sm sm:text-xl font-bold text-[#0F172A]">{fmt(stockValue)}</p>
             <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">at cost price</p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
@@ -224,7 +224,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Retail Value</p>
             </div>
-            <p className="font-numeric text-sm sm:text-xl font-bold text-emerald-600">{fmt(retailValue)}</p>
+            <p className="text-sm sm:text-xl font-bold text-emerald-600">{fmt(retailValue)}</p>
             <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">at selling price</p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative col-span-2 sm:col-span-1">
@@ -235,7 +235,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Profit Potential</p>
             </div>
-            <p className="font-numeric text-sm sm:text-xl font-bold text-violet-600">{fmt(profitPotential)}</p>
+            <p className="text-sm sm:text-xl font-bold text-violet-600">{fmt(profitPotential)}</p>
             <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">if all stock sold</p>
           </div>
         </div>

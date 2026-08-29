@@ -170,7 +170,7 @@ export function CreditNotesClient({ creditNotes: initialNotes, customers, invoic
                   <td className="px-5 py-3">
                     <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[n.status])}>{n.status}</span>
                   </td>
-                  <td className="px-5 py-3 text-right font-numeric text-sm font-bold text-[#0F172A]">{fmt(n.amount)}</td>
+                  <td className="px-5 py-3 text-right text-sm font-bold text-[#0F172A]">{fmt(n.amount)}</td>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition justify-end">
                       {n.status === "open" && (

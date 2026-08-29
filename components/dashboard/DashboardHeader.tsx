@@ -64,8 +64,8 @@ export function DashboardHeader({ businessName, businessType, slug }: Props) {
     <div className="space-y-4">
       {/* Greeting */}
       <div>
-        <p className="text-xs text-slate-400 font-medium">{getFormattedDate()}</p>
-        <h1 className="text-xl font-bold text-slate-900 mt-0.5">
+        <p className="text-xs text-slate-400 font-medium" suppressHydrationWarning>{getFormattedDate()}</p>
+        <h1 className="text-xl font-bold text-slate-900 mt-0.5" suppressHydrationWarning>
           {getGreeting()}, {businessName} <span aria-hidden="true">👋</span>
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">

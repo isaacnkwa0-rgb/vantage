@@ -61,7 +61,7 @@ export function DashboardStats({
           </div>
           <div className="min-w-0">
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Today&apos;s Revenue</p>
-            <p className="font-numeric text-2xl font-bold text-[#0F172A] mt-0.5 truncate">{fmt(todayRevenue)}</p>
+            <p className="text-2xl font-bold text-[#0F172A] mt-0.5 truncate">{fmt(todayRevenue)}</p>
             <p className="text-xs text-slate-400 mt-1">
               {todaySalesCount} {todaySalesCount !== 1 ? txLabel : txSingular} today
             </p>
@@ -76,7 +76,7 @@ export function DashboardStats({
           </div>
           <div className="min-w-0">
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Month Revenue</p>
-            <p className="font-numeric text-2xl font-bold text-[#0F172A] mt-0.5 truncate">{fmt(monthRevenue)}</p>
+            <p className="text-2xl font-bold text-[#0F172A] mt-0.5 truncate">{fmt(monthRevenue)}</p>
             <p className="text-xs text-slate-400 mt-1">{month}</p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function DashboardStats({
           </div>
           <div className="min-w-0">
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">{customerLabel}</p>
-            <p className="font-numeric text-2xl font-bold text-[#0F172A] mt-0.5">{totalCustomers.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[#0F172A] mt-0.5">{totalCustomers.toLocaleString()}</p>
             <p className="text-xs text-slate-400 mt-1">{customerSub}</p>
           </div>
         </div>
@@ -105,7 +105,7 @@ export function DashboardStats({
             </div>
             <p className="text-xs text-slate-500 font-medium">{todayTxLabel}</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{todaySalesCount}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{todaySalesCount}</p>
           <p className="text-xs text-slate-400">{txUnit}</p>
         </div>
 
@@ -117,7 +117,7 @@ export function DashboardStats({
             </div>
             <p className="text-xs text-slate-500 font-medium">Today&apos;s Expenses</p>
           </div>
-          <p className="font-numeric text-xl font-bold text-[#0F172A]">{fmt(todayExpenses)}</p>
+          <p className="text-xl font-bold text-[#0F172A]">{fmt(todayExpenses)}</p>
           <p className="text-xs text-slate-400">recorded today</p>
         </div>
 
@@ -130,7 +130,7 @@ export function DashboardStats({
               </div>
               <p className="text-xs text-slate-500 font-medium">Low Stock</p>
             </div>
-            <p className={`font-numeric text-xl font-bold ${lowStockCount > 0 ? "text-amber-600" : "text-[#0F172A]"}`}>
+            <p className={`text-xl font-bold ${lowStockCount > 0 ? "text-amber-600" : "text-[#0F172A]"}`}>
               {lowStockCount}
             </p>
             <p className="text-xs text-slate-400">items need restock</p>
@@ -145,7 +145,7 @@ export function DashboardStats({
                 {isService ? "Avg. Service Value" : "Avg. Order Value"}
               </p>
             </div>
-            <p className="font-numeric text-xl font-bold text-[#0F172A]">
+            <p className="text-xl font-bold text-[#0F172A]">
               {avgTransactionValue > 0 ? fmt(avgTransactionValue) : "—"}
             </p>
             <p className="text-xs text-slate-400">per {isService ? "service" : "order"}</p>

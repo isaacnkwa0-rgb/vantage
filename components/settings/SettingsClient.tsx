@@ -547,7 +547,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={taxRate}
                     onChange={(e) => setTaxRate(e.target.value)}
                     placeholder="e.g. 7.5"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-numeric"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
               </div>
@@ -584,7 +584,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       value={loyaltyPtsPerDollar}
                       onChange={(e) => setLoyaltyPtsPerDollar(e.target.value)}
                       placeholder="e.g. 1"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 font-numeric"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Points earned per unit spent</p>
                   </div>
@@ -597,7 +597,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       value={loyaltyRedemptionRate}
                       onChange={(e) => setLoyaltyRedemptionRate(e.target.value)}
                       placeholder="e.g. 100"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 font-numeric"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Points needed to redeem 1 currency unit</p>
                   </div>

@@ -250,7 +250,7 @@ export function CustomerPortal({ business }: Props) {
                             <p className="text-xs text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-numeric text-sm font-bold text-[#0F172A]">{fmt(inv.total_amount)}</p>
+                            <p className="text-sm font-bold text-[#0F172A]">{fmt(inv.total_amount)}</p>
                             <p className={cn("text-xs capitalize font-medium", STATUS_COLORS[inv.status] ?? "text-slate-400")}>{inv.status}</p>
                           </div>
                         </div>
@@ -274,7 +274,7 @@ export function CustomerPortal({ business }: Props) {
                             <p className="text-sm font-semibold text-[#0F172A]">{sale.sale_number}</p>
                             <p className="text-xs text-slate-400 capitalize">{sale.payment_method} · {new Date(sale.created_at).toLocaleDateString()}</p>
                           </div>
-                          <p className="font-numeric text-sm font-bold text-[#0F172A]">{fmt(sale.total_amount)}</p>
+                          <p className="text-sm font-bold text-[#0F172A]">{fmt(sale.total_amount)}</p>
                         </div>
                       ))}
                     </div>
