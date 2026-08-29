@@ -235,20 +235,20 @@ function PlanPage() {
       {/* Sticky bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-white px-5 py-4 border-t border-slate-100 space-y-2">
         {/* Free trial secondary */}
-        <button
-          onClick={handleFreeTrial}
-          className="w-full h-11 border border-[#1a9c38] rounded-[4px] text-[15px] text-[#1a9c38] font-semibold flex items-center justify-center"
-        >
-          Start free trial for 14 days
-        </button>
-
         {/* Select Plan primary */}
         <button
           onClick={handleSelect}
           disabled={isLoading}
           className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition disabled:opacity-60"
         >
-          {selectedPlan === "trial" ? "Start Free Trial" : "Select Plan"}
+          Select Plan
+        </button>
+
+        <button
+          onClick={handleFreeTrial}
+          className="w-full h-11 border border-[#1a9c38] rounded-[4px] text-[15px] text-[#1a9c38] font-semibold flex items-center justify-center"
+        >
+          Start free trial for 14 days
         </button>
       </div>
     </div>
