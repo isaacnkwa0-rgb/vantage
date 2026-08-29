@@ -3,7 +3,7 @@
 import { useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const COLORS = ["#1a9c38", "#0f6624", "#34d058", "#fbbf24", "#f97316", "#60a5fa", "#e879f9", "#ffffff"];
+const COLORS = ["#1a9c38", "#0f6624", "#34d058", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#dcfce7", "#052e16", "#14532d", "#166534"];
 
 function Confetti() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
