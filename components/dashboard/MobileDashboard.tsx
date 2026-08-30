@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Eye, EyeOff, ShoppingCart, Box, Users, FileText,
   DollarSign, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, Bell, User, Store, Share2, BarChart2, X, Check, MapPin, Download, Copy,
+  ChevronDown, Bell, User, Store, Share2, BarChart2, X, Check, MapPin, Download, Copy, PackagePlus, Receipt, Wallet,
 } from "lucide-react";
 
 const PROMO_SLIDES = [
@@ -132,9 +132,9 @@ export function MobileDashboard({
 
   const QUICK_ACTIONS = [
     { label: primaryLabel, icon: ShoppingCart, href: "pos",       primary: true  },
-    { label: isService ? "Clients" : "Products", icon: isService ? Users : Box, href: isService ? "customers" : "products", primary: false },
-    { label: "Invoice",  icon: FileText,      href: "invoices",  primary: false },
-    { label: "Expense",  icon: DollarSign,    href: "expenses",  primary: false },
+    { label: isService ? "Clients" : "Add Product", icon: isService ? Users : PackagePlus, href: isService ? "customers" : "products", primary: false },
+    { label: "Invoice",  icon: Receipt,        href: "invoices",  primary: false },
+    { label: "Expense",  icon: Wallet,         href: "expenses",  primary: false },
   ] as const;
 
   const MILESTONES = [
@@ -376,7 +376,7 @@ export function MobileDashboard({
         {/* ── 4-column stats (Bumpa-style colored boxes) ────── */}
         <div className="mx-4 mb-3 grid grid-cols-4 gap-1">
           {STATS.map((s) => (
-            <div key={s.label} className={cn("rounded-[8px] h-[70px] flex flex-col items-center justify-center", s.bg)}>
+            <div key={s.label} className={cn("rounded-[8px] min-h-[70px] flex flex-col items-center justify-center py-3", s.bg)}>
               <p className="text-[18px] font-bold leading-none text-slate-900">
                 {s.display}
               </p>
@@ -417,30 +417,24 @@ export function MobileDashboard({
         </Link>
 
         {/* ── Quick Actions ─────────────────────────────────── */}
-        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.06)] px-5 pt-4 pb-5">
+        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-slate-200 px-3 pt-5 pb-6">
           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-4">Quick Actions</p>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-1.5">
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
               return (
-                <Link key={action.href} href={`/${slug}/${action.href}`} className="flex flex-col items-center gap-2.5">
-                  <div className={cn(
-                    "w-[52px] h-[52px] rounded-[15px] flex items-center justify-center",
-                    action.primary
-                      ? "bg-[#1a9c38] shadow-[0_4px_14px_rgba(26,156,56,0.38)]"
-                      : "bg-[#f4f6f8]"
-                  )}>
-                    <Icon
-                      aria-hidden="true"
-                      className={cn("w-[19px] h-[19px]", action.primary ? "text-white" : "text-slate-500")}
-                    />
+                <Link key={action.href} href={`/${slug}/${action.href}`} className="flex flex-col items-center">
+                  <div className="w-full h-[96px] rounded-[10px] border border-slate-200 flex flex-col items-center justify-center gap-2.5">
+                    <Icon aria-hidden="true" className={cn("w-[26px] h-[26px]",
+                      action.href === "pos"      ? "text-[#1a9c38]"   :
+                      action.href === "products" ? "text-blue-500"    :
+                      action.href === "invoices" ? "text-violet-500"  :
+                      "text-orange-400"
+                    )} />
+                    <span className="text-[11px] font-normal text-slate-500 text-center leading-tight">
+                      {action.label}
+                    </span>
                   </div>
-                  <span className={cn(
-                    "text-[11px] text-center leading-tight",
-                    action.primary ? "font-semibold text-slate-800" : "font-medium text-slate-500"
-                  )}>
-                    {action.label}
-                  </span>
                 </Link>
               );
             })}
