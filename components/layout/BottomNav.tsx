@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ShoppingCart, Box, Package, Package2, Users, MoreHorizontal, Zap,
+  Home, ShoppingCart, Box, Package, Package2, Users, CircleEllipsis, Zap,
   LayoutDashboard, ClipboardList,
   Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
@@ -124,7 +124,7 @@ const NAV_SECTIONS: NavSection[] = [
 
 const BOTTOM_TABS = [
   { label: "Home",      icon: Home,         href: "dashboard" },
-  { label: "POS",       icon: ShoppingCart, href: "pos"       },
+  { label: "Sales",     icon: ShoppingCart, href: "pos"       },
   { label: "Products",  icon: Box,          href: "products"  },
   { label: "Customers", icon: Users,        href: "customers" },
 ] as const;
@@ -277,7 +277,7 @@ export function BottomNav({ slug }: { slug: string }) {
   const [showMore, setShowMore] = useState(false);
 
   const isService = activeBusiness?.business_type === "service";
-  const posLabel = isService ? "Services" : "POS";
+  const posLabel = isService ? "Services" : "Sales";
   const customersLabel = isService ? "Clients" : "Customers";
 
   // Close when the user navigates to any route
@@ -313,15 +313,15 @@ export function BottomNav({ slug }: { slug: string }) {
               aria-current={isActive ? "page" : undefined}
               aria-label={label}
               className={cn(
-                "flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
-                isActive ? "text-green-600" : "text-slate-400 active:text-slate-600"
+                "flex-1 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
+                isActive ? "text-green-600" : "text-slate-500 active:text-slate-700"
               )}
             >
               <Icon
                 aria-hidden="true"
-                className={cn("w-5 h-5 transition-transform", isActive && "scale-110")}
+                className="w-7 h-7"
               />
-              <span className={cn("text-[10px] font-semibold leading-none", isActive ? "text-green-600" : "text-slate-400")}>
+              <span className={cn("text-[12px] font-normal leading-none", isActive ? "text-green-600" : "text-slate-500")}>
                 {label}
               </span>
             </Link>
@@ -334,15 +334,15 @@ export function BottomNav({ slug }: { slug: string }) {
           aria-label="Open full navigation menu"
           aria-expanded={showMore}
           className={cn(
-            "flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
+            "flex-1 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
             showMore ? "text-green-600" : "text-slate-400 active:text-slate-600"
           )}
         >
-          <MoreHorizontal
+          <CircleEllipsis
             aria-hidden="true"
-            className={cn("w-5 h-5 transition-transform", showMore && "scale-110")}
+            className="w-7 h-7"
           />
-          <span className={cn("text-[10px] font-semibold leading-none", showMore ? "text-green-600" : "text-slate-400")}>
+          <span className={cn("text-[12px] font-normal leading-none", showMore ? "text-green-600" : "text-slate-400")}>
             More
           </span>
         </button>
