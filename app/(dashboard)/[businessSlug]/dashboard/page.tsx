@@ -71,6 +71,13 @@ export default async function DashboardPage({ params }: Props) {
     customersRes,
     newCustomersRes,
     locationsRes,
+    todayItemsSoldRes,
+    weekItemsSoldRes,
+    todayNewCustomersRes,
+    weekNewCustomersRes,
+    todayStoreVisitsRes,
+    weekStoreVisitsRes,
+    monthStoreVisitsRes,
   ] = await Promise.all([
     // Today's full sales (for recent transactions + KPIs)
     supabase
@@ -163,6 +170,56 @@ export default async function DashboardPage({ params }: Props) {
       .eq("business_id", business.id)
       .eq("is_active", true)
       .order("name"),
+
+    // Today items sold (sum of quantities)
+    supabase
+      .from("sales")
+      .select("sale_items(quantity)")
+      .eq("business_id", business.id)
+      .gte("created_at", todayStart.toISOString())
+      .lte("created_at", todayEnd.toISOString()),
+
+    // Week items sold
+    supabase
+      .from("sales")
+      .select("sale_items(quantity)")
+      .eq("business_id", business.id)
+      .gte("created_at", weekStart.toISOString()),
+
+    // Today new customers
+    supabase
+      .from("customers")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", business.id)
+      .gte("created_at", todayStart.toISOString()),
+
+    // Week new customers
+    supabase
+      .from("customers")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", business.id)
+      .gte("created_at", weekStart.toISOString()),
+
+    // Today store visits (unique IPs, deduped daily by unique constraint)
+    supabase
+      .from("store_visits")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", business.id)
+      .gte("visited_at", todayStart.toISOString()),
+
+    // Week store visits
+    supabase
+      .from("store_visits")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", business.id)
+      .gte("visited_at", weekStart.toISOString()),
+
+    // Month store visits
+    supabase
+      .from("store_visits")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", business.id)
+      .gte("visited_at", monthStart.toISOString()),
   ]);
 
   const locations = (locationsRes.data ?? []).map((l) => ({ id: l.id, name: l.name }));
@@ -214,6 +271,24 @@ export default async function DashboardPage({ params }: Props) {
   const totalCustomers = customersRes.count ?? 0;
   const newCustomers = newCustomersRes.count ?? 0;
 
+  const sumItems = (res: { data: { sale_items: { quantity: number }[] | null }[] | null }) =>
+    (res.data ?? [])
+      .flatMap((s) => s.sale_items ?? [])
+      .reduce((sum, item) => sum + item.quantity, 0);
+
+  const todayItemsSold = sumItems(todayItemsSoldRes as any);
+  const weekItemsSold  = sumItems(weekItemsSoldRes as any);
+  const monthItemsSold = (monthCOGSRes.data ?? [])
+    .flatMap((s) => (s.sale_items as { cost_price: number; quantity: number }[] | null) ?? [])
+    .reduce((sum, item) => sum + item.quantity, 0);
+
+  const todayNewCustomers = todayNewCustomersRes.count ?? 0;
+  const weekNewCustomers  = weekNewCustomersRes.count ?? 0;
+
+  const todayStoreVisits = todayStoreVisitsRes.count ?? 0;
+  const weekStoreVisits  = weekStoreVisitsRes.count ?? 0;
+  const monthStoreVisits = monthStoreVisitsRes.count ?? 0;
+
   const netProfit = monthRevenue - monthCOGS - monthExpenses;
   const revenueGrowthPct = lastMonthRevenue > 0
     ? ((monthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
@@ -249,6 +324,14 @@ export default async function DashboardPage({ params }: Props) {
           totalProductsSellValue={totalProductsSellValue}
           totalCustomers={totalCustomers}
           newCustomers={newCustomers}
+          todayItemsSold={todayItemsSold}
+          weekItemsSold={weekItemsSold}
+          monthItemsSold={monthItemsSold}
+          todayNewCustomers={todayNewCustomers}
+          weekNewCustomers={weekNewCustomers}
+          todayStoreVisits={todayStoreVisits}
+          weekStoreVisits={weekStoreVisits}
+          monthStoreVisits={monthStoreVisits}
           locations={locations}
         />
       </div>

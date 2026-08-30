@@ -69,6 +69,14 @@ interface Props {
   totalProductsSellValue: number;
   totalCustomers: number;
   newCustomers: number;
+  todayItemsSold: number;
+  weekItemsSold: number;
+  monthItemsSold: number;
+  todayNewCustomers: number;
+  weekNewCustomers: number;
+  todayStoreVisits: number;
+  weekStoreVisits: number;
+  monthStoreVisits: number;
   locations: { id: string; name: string }[];
 }
 
@@ -86,7 +94,11 @@ export function MobileDashboard({
   weekRevenue, weekSalesCount,
   monthRevenue, monthSalesCount,
   monthExpenses, netProfit, revenueGrowthPct, sales,
-  totalProducts, totalProductsSellValue, totalCustomers, newCustomers, locations,
+  totalProducts, totalProductsSellValue, totalCustomers, newCustomers,
+  todayItemsSold, weekItemsSold, monthItemsSold,
+  todayNewCustomers, weekNewCustomers,
+  todayStoreVisits, weekStoreVisits, monthStoreVisits,
+  locations,
 }: Props) {
   const [hidden, setHidden] = useState(false);
   const [period, setPeriod] = useState<"today" | "week" | "month">("today");
@@ -146,11 +158,15 @@ export function MobileDashboard({
   const milestoneTotal = MILESTONES.length;
   const nextMilestone  = MILESTONES.find((m) => !m.done);
 
+  const itemsSold    = period === "today" ? todayItemsSold  : period === "week" ? weekItemsSold  : monthItemsSold;
+  const periodNewCx  = period === "today" ? todayNewCustomers : period === "week" ? weekNewCustomers : newCustomers;
+  const storeVisits  = period === "today" ? todayStoreVisits : period === "week" ? weekStoreVisits  : monthStoreVisits;
+
   const STATS = [
-    { display: String(txCount),                        label: isService ? "Services" : "Orders",   bg: "bg-slate-50"  },
-    { display: fmtCompact(totalProductsSellValue),     label: "Sold",                              bg: "bg-[#E8F5EC]" },
-    { display: String(totalCustomers),                 label: isService ? "Clients" : "Customers", bg: "bg-[#FEF9EC]" },
-    { display: String(newCustomers),                   label: "Store visits",                      bg: "bg-[#FEF0F0]" },
+    { display: String(txCount),       label: isService ? "Services" : "Orders",         bg: "bg-slate-50"  },
+    { display: String(itemsSold),     label: "Items sold",                               bg: "bg-[#E8F5EC]" },
+    { display: String(periodNewCx),   label: isService ? "New clients" : "New customers", bg: "bg-[#FEF9EC]" },
+    { display: String(storeVisits),   label: "Store visits",                             bg: "bg-[#FEF0F0]" },
   ];
 
   return (

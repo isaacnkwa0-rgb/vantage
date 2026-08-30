@@ -2,6 +2,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { StoreFront } from "@/components/store/StoreFront";
+import { StoreVisitTracker } from "@/components/store/StoreVisitTracker";
 
 interface Props {
   params: Promise<{ businessSlug: string }>;
@@ -102,6 +103,7 @@ export default async function StorePage({ params, searchParams }: Props) {
           </Script>
         </>
       )}
+      <StoreVisitTracker businessId={business.id} />
       <StoreFront
         business={business as any}
         products={(products ?? []) as any}
