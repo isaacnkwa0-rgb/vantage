@@ -104,6 +104,16 @@
   outline-offset: 2px;
 }
 
+/* ── Kill Chrome autofill blue tint ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: rgb(15 23 42) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* ── Sidebar nav item ── */
 .nav-item {
   @apply flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 w-full;

@@ -1,12 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import {
   Eye, EyeOff, ShoppingCart, Box, Users, FileText,
   DollarSign, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, Bell, User, Store, Share2, BarChart2, X, Check, MapPin, Trophy,
+  ChevronDown, Bell, User, Store, Share2, BarChart2, X, Check, MapPin, Download, Copy,
 } from "lucide-react";
+
+const PROMO_SLIDES = [
+  {
+    bg: "#1a9c38",
+    title: "Record Sales Anywhere",
+    body: "Use the Vantage POS to record in-store and online sales with ease.",
+    cta: "Get started",
+    href: "pos",
+    emoji: "🛒",
+  },
+  {
+    bg: "#0f172a",
+    title: "Track Your Inventory",
+    body: "Stay on top of stock levels and never run out of your best sellers.",
+    cta: "Add products",
+    href: "products",
+    emoji: "📦",
+  },
+  {
+    bg: "#6d28d9",
+    title: "Send Professional Invoices",
+    body: "Create and share invoices with your customers in seconds.",
+    cta: "Create invoice",
+    href: "invoices",
+    emoji: "📄",
+  },
+];
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { useBusinessStore } from "@/store/businessStore";
@@ -25,6 +52,9 @@ interface Props {
   businessType: "retail" | "service" | "restaurant";
   slug: string;
   currency: string;
+  avatarUrl?: string | null;
+  firstName?: string;
+  referralCode?: string;
   todayRevenue: number;
   todaySalesCount: number;
   weekRevenue: number;
@@ -36,6 +66,7 @@ interface Props {
   revenueGrowthPct: number | null;
   sales: Sale[];
   totalProducts: number;
+  totalProductsSellValue: number;
   totalCustomers: number;
   newCustomers: number;
   locations: { id: string; name: string }[];
@@ -50,15 +81,25 @@ const METHOD_STYLES: Record<string, string> = {
 };
 
 export function MobileDashboard({
-  businessName, businessType, slug, currency,
+  businessName, businessType, slug, currency, avatarUrl, firstName, referralCode,
   todayRevenue, todaySalesCount,
   weekRevenue, weekSalesCount,
   monthRevenue, monthSalesCount,
   monthExpenses, netProfit, revenueGrowthPct, sales,
-  totalProducts, totalCustomers, newCustomers, locations,
+  totalProducts, totalProductsSellValue, totalCustomers, newCustomers, locations,
 }: Props) {
   const [hidden, setHidden] = useState(false);
   const [period, setPeriod] = useState<"today" | "week" | "month">("today");
+  const [promoSlide, setPromoSlide] = useState(0);
+  const [codeCopied, setCodeCopied] = useState(false);
+  const touchStartX = useRef(0);
+
+  function copyReferralCode() {
+    if (!referralCode) return;
+    navigator.clipboard.writeText(referralCode);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  }
   const [showPeriod, setShowPeriod] = useState(false);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
@@ -79,6 +120,14 @@ export function MobileDashboard({
 
   const fmt = (n: number) => hidden ? "••••••" : formatCurrency(n, currency);
 
+  function fmtCompact(n: number): string {
+    if (hidden) return "••••";
+    const symbol = formatCurrency(0, currency).charAt(0);
+    if (n >= 1_000_000) return `${symbol}${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${symbol}${(n / 1_000).toFixed(1)}K`;
+    return `${symbol}${n.toFixed(0)}`;
+  }
+
   const isFree = activeBusiness?.subscription_tier === "free";
 
   const QUICK_ACTIONS = [
@@ -97,11 +146,11 @@ export function MobileDashboard({
   const milestoneTotal = MILESTONES.length;
   const nextMilestone  = MILESTONES.find((m) => !m.done);
 
-  const STATS: { value: number; label: string; bg: string; green?: boolean }[] = [
-    { value: txCount,        label: isService ? "Services" : "Orders",   bg: "bg-slate-50"  },
-    { value: totalProducts,  label: "Sold",         bg: "bg-[#E8F5EC]" },
-    { value: totalCustomers, label: isService ? "Clients" : "Customers", bg: "bg-[#FEF9EC]" },
-    { value: newCustomers,   label: "Store visits", bg: "bg-[#FEF0F0]" },
+  const STATS = [
+    { display: String(txCount),                        label: isService ? "Services" : "Orders",   bg: "bg-slate-50"  },
+    { display: fmtCompact(totalProductsSellValue),     label: "Sold",                              bg: "bg-[#E8F5EC]" },
+    { display: String(totalCustomers),                 label: isService ? "Clients" : "Customers", bg: "bg-[#FEF9EC]" },
+    { display: String(newCustomers),                   label: "Store visits",                      bg: "bg-[#FEF0F0]" },
   ];
 
   return (
@@ -112,12 +161,20 @@ export function MobileDashboard({
         <div className="bg-[#f6f6f6] px-4 pt-9 pb-7 rounded-b-[32px]">
           {/* Header row */}
           <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-0.5">
-              {/* Avatar – bare person silhouette like Bumpa */}
-              <User className="w-10 h-10 text-slate-300 flex-shrink-0 -ml-2" aria-hidden="true" />
+            <div className="flex items-center gap-3">
+              {/* Avatar – tappable, navigates to profile */}
+              <Link href={`/${slug}/profile`} className="flex-shrink-0">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="profile" className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                    <User className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                  </div>
+                )}
+              </Link>
               <div>
-                <p className="text-[15px] font-bold text-slate-900 leading-tight">
-                  Hi, {businessName.split(" ")[0]}
+                <p className="text-[15px] font-semibold text-slate-900 leading-tight">
+                  Hi, {firstName ?? businessName.split(" ")[0]}
                 </p>
                 <p className="text-[12px] text-[#1a9c38] mt-0.5 flex items-center gap-0.5">
                   Share your website link
@@ -320,8 +377,8 @@ export function MobileDashboard({
         <div className="mx-4 mb-3 grid grid-cols-4 gap-1">
           {STATS.map((s) => (
             <div key={s.label} className={cn("rounded-[8px] h-[70px] flex flex-col items-center justify-center", s.bg)}>
-              <p className="text-[20px] font-bold leading-none text-slate-900">
-                {s.value}
+              <p className="text-[18px] font-bold leading-none text-slate-900">
+                {s.display}
               </p>
               <p className="text-[11px] text-slate-500 mt-1 leading-tight font-medium">{s.label}</p>
             </div>
@@ -348,33 +405,50 @@ export function MobileDashboard({
           </div>
         </Link>
 
+        {/* ── Business Report banner ────────────────────────── */}
+        <Link
+          href={`/${slug}/reports`}
+          className="mx-4 mb-3 flex items-center justify-between bg-[#f6f6f6] rounded-[32px] px-4 h-12"
+        >
+          <p className="text-[13px] font-medium text-slate-500">Your business report is ready.</p>
+          <div className="w-9 h-9 rounded-full bg-[#1a9c38] flex items-center justify-center flex-shrink-0 ml-3">
+            <Download className="w-4 h-4 text-white" aria-hidden="true" />
+          </div>
+        </Link>
+
         {/* ── Quick Actions ─────────────────────────────────── */}
-        <div className="mx-4 mb-3 grid grid-cols-4 gap-2">
-          {QUICK_ACTIONS.map((action) => {
-            const Icon = action.icon;
-            return (
-              <Link key={action.href} href={`/${slug}/${action.href}`} className="flex flex-col items-center gap-2">
-                <div className={cn(
-                  "w-[58px] h-[58px] rounded-[18px] flex items-center justify-center",
-                  action.primary
-                    ? "bg-[#1a9c38] shadow-md shadow-green-900/20"
-                    : "bg-slate-100"
-                )}>
-                  <Icon
-                    aria-hidden="true"
-                    className={cn("w-[22px] h-[22px]", action.primary ? "text-white" : "text-slate-500")}
-                  />
-                </div>
-                <span className="text-[11px] font-semibold text-slate-600 text-center leading-tight">
-                  {action.label}
-                </span>
-              </Link>
-            );
-          })}
+        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.06)] px-5 pt-4 pb-5">
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-4">Quick Actions</p>
+          <div className="grid grid-cols-4 gap-3">
+            {QUICK_ACTIONS.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link key={action.href} href={`/${slug}/${action.href}`} className="flex flex-col items-center gap-2.5">
+                  <div className={cn(
+                    "w-[52px] h-[52px] rounded-[15px] flex items-center justify-center",
+                    action.primary
+                      ? "bg-[#1a9c38] shadow-[0_4px_14px_rgba(26,156,56,0.38)]"
+                      : "bg-[#f4f6f8]"
+                  )}>
+                    <Icon
+                      aria-hidden="true"
+                      className={cn("w-[19px] h-[19px]", action.primary ? "text-white" : "text-slate-500")}
+                    />
+                  </div>
+                  <span className={cn(
+                    "text-[11px] text-center leading-tight",
+                    action.primary ? "font-semibold text-slate-800" : "font-medium text-slate-500"
+                  )}>
+                    {action.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── Recent Sales ──────────────────────────────────── */}
-        <div className="mx-4 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="mx-4 mb-3 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-4">
             <p className="text-[15px] font-bold text-slate-900">
@@ -437,6 +511,95 @@ export function MobileDashboard({
               ))}
             </div>
           )}
+        </div>
+
+        {/* ── Promo Carousel ───────────────────────────────── */}
+        <div className="mx-4 mb-3">
+          <div
+            className="overflow-hidden rounded-[16px]"
+            onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              const diff = touchStartX.current - e.changedTouches[0].clientX;
+              if (diff > 50 && promoSlide < PROMO_SLIDES.length - 1) setPromoSlide((p) => p + 1);
+              if (diff < -50 && promoSlide > 0) setPromoSlide((p) => p - 1);
+            }}
+          >
+            <div
+              className="flex transition-transform duration-300"
+              style={{ transform: `translateX(-${promoSlide * 100}%)` }}
+            >
+              {PROMO_SLIDES.map((slide, i) => (
+                <Link
+                  key={i}
+                  href={`/${slug}/${slide.href}`}
+                  className="w-full flex-shrink-0 px-5 pt-5 pb-6 flex items-center justify-between"
+                  style={{ backgroundColor: slide.bg }}
+                >
+                  <div className="flex-1 pr-3">
+                    <p className="text-[16px] font-bold text-white leading-snug mb-1">{slide.title}</p>
+                    <p className="text-[12px] leading-snug mb-3" style={{ color: "rgba(255,255,255,0.7)" }}>{slide.body}</p>
+                    <span className="text-[12px] font-semibold text-white flex items-center gap-1">
+                      {slide.cta} <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
+                    </span>
+                  </div>
+                  <span className="text-[52px] leading-none flex-shrink-0" aria-hidden="true">{slide.emoji}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          {/* Dots */}
+          <div className="flex justify-center gap-1.5 mt-2.5">
+            {PROMO_SLIDES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setPromoSlide(i)}
+                className={cn(
+                  "rounded-full transition-all",
+                  i === promoSlide ? "w-4 h-1.5 bg-[#1a9c38]" : "w-1.5 h-1.5 bg-slate-200"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* ── Refer & Earn ─────────────────────────────────── */}
+        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.06)] overflow-hidden">
+          <div className="px-4 pt-4 pb-3">
+            <p className="text-[15px] font-bold text-slate-900 mb-0.5">Refer &amp; Earn</p>
+            <p className="text-[12px] text-slate-400 leading-snug">
+              Help other business owners discover Vantage &amp; earn rewards!
+            </p>
+          </div>
+          <div className="px-4 pb-4 space-y-3">
+            <Link
+              href={`/${slug}/referrals`}
+              className="w-full h-10 bg-[#1a9c38] rounded-[8px] flex items-center justify-center"
+            >
+              <span className="text-[13px] font-bold text-white">Join the Vantage Referral Community</span>
+            </Link>
+            {referralCode && (
+              <div className="flex items-center justify-between bg-slate-50 rounded-[8px] px-3 py-2.5">
+                <div>
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-0.5">Referral Code</p>
+                  <p className="text-[15px] font-bold text-slate-900 tracking-widest">{referralCode}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={copyReferralCode}
+                    className="p-1.5 rounded-[6px] bg-white border border-slate-200"
+                    aria-label="Copy referral code"
+                  >
+                    {codeCopied
+                      ? <Check className="w-3.5 h-3.5 text-[#1a9c38]" aria-hidden="true" />
+                      : <Copy className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />}
+                  </button>
+                  <Link href={`/${slug}/referrals`} className="text-[12px] font-semibold text-[#1a9c38] flex items-center gap-0.5">
+                    View Earnings <ChevronRight className="w-3 h-3" aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
       </div>

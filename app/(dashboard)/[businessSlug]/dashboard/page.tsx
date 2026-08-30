@@ -21,6 +21,14 @@ export default async function DashboardPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_url, full_name")
+    .eq("id", user.id)
+    .single();
+
+  const referralCode = user.id.replace(/-/g, "").slice(0, 8).toUpperCase();
+
   const { data: business } = await supabase
     .from("businesses")
     .select("id, name, currency, business_type")
@@ -131,7 +139,7 @@ export default async function DashboardPage({ params }: Props) {
     // Products (all active)
     supabase
       .from("products")
-      .select("id, name, stock_quantity, low_stock_threshold, is_active")
+      .select("id, name, stock_quantity, low_stock_threshold, is_active, selling_price")
       .eq("business_id", business.id)
       .eq("is_active", true),
 
@@ -201,6 +209,7 @@ export default async function DashboardPage({ params }: Props) {
 
   const products = productsRes.data ?? [];
   const lowStockProducts = products.filter((p) => p.stock_quantity <= p.low_stock_threshold);
+  const totalProductsSellValue = products.reduce((sum, p) => sum + (p.selling_price ?? 0) * p.stock_quantity, 0);
 
   const totalCustomers = customersRes.count ?? 0;
   const newCustomers = newCustomersRes.count ?? 0;
@@ -223,6 +232,9 @@ export default async function DashboardPage({ params }: Props) {
           businessType={businessType}
           slug={businessSlug}
           currency={business.currency}
+          avatarUrl={profile?.avatar_url ?? null}
+          firstName={profile?.full_name?.trim().split(" ")[0] ?? businessSlug}
+          referralCode={referralCode}
           todayRevenue={todayRevenue}
           todaySalesCount={todaySalesCount}
           weekRevenue={weekRevenue}
@@ -234,6 +246,7 @@ export default async function DashboardPage({ params }: Props) {
           revenueGrowthPct={revenueGrowthPct}
           sales={todaySales as any}
           totalProducts={products.length}
+          totalProductsSellValue={totalProductsSellValue}
           totalCustomers={totalCustomers}
           newCustomers={newCustomers}
           locations={locations}
