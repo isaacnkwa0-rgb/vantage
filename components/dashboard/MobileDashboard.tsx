@@ -211,20 +211,29 @@ export function MobileDashboard({
 
           {/* Utility buttons row */}
           <div className="flex items-center gap-2">
-            <Link
-              href={`/${slug}/store`}
+            <a
+              href={`/store/${slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-[4px] text-[12px] text-slate-600 border border-slate-200"
             >
               <Store className="w-3.5 h-3.5" aria-hidden="true" />
               Visit store
-            </Link>
-            <Link
-              href={`/${slug}/share`}
+            </a>
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/store/${slug}`;
+                if (navigator.share) {
+                  navigator.share({ title: businessName, url });
+                } else {
+                  navigator.clipboard.writeText(url);
+                }
+              }}
               className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-[4px] text-[12px] text-slate-600 border border-slate-200"
             >
               <Share2 className="w-3.5 h-3.5" aria-hidden="true" />
               Share link
-            </Link>
+            </button>
             <div className="flex-1" />
             <Link
               href={`/${slug}/reports`}
