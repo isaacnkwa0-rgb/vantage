@@ -436,7 +436,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               )}
             </div>
           ) : (
-            <div>
+            <div className="-mx-3 sm:mx-0">
               {/* Desktop column header */}
               <div className="hidden sm:flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2 bg-white border border-slate-200 rounded-t-xl">
                 <div className="w-14 flex-shrink-0" />
@@ -445,7 +445,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                 <div className="w-28 text-right flex-shrink-0 hidden md:block text-xs font-medium text-slate-500 uppercase tracking-wide">{isService ? "Charge" : "Price"}</div>
                 <div className="w-8 flex-shrink-0" />
               </div>
-              <div className="sm:border sm:border-t-0 sm:border-slate-200 sm:rounded-b-xl sm:overflow-hidden bg-white divide-y divide-slate-100">
+              <div className="bg-white divide-y divide-slate-100 sm:border sm:border-t-0 sm:border-slate-200 sm:rounded-b-xl sm:overflow-hidden">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.id}
