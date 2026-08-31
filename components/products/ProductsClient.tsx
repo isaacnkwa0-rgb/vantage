@@ -160,7 +160,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
     <div className="flex-1 flex flex-col min-h-0 bg-[#F5F6F8]">
 
       {/* ── Mobile header (Bumpa-style) ── */}
-      <div className="lg:hidden bg-[#fafefb] flex items-center justify-between px-4 pt-12 pb-3 flex-shrink-0">
+      <div className="lg:hidden bg-[#fafefb] flex items-center justify-between px-4 pt-8 pb-3 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Tag className="w-5 h-5 text-[#0F172A]" />
           <span className="text-xl font-bold text-[#0F172A]">{pageTitle}</span>
@@ -168,7 +168,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
         </div>
         <button
           onClick={() => { setEditingProduct(null); setShowForm(true); }}
-          className="w-10 h-10 rounded-full bg-[#1a9c38] text-white flex items-center justify-center shadow-md shadow-green-900/20 active:scale-95 transition-transform"
+          className="w-10 h-9 rounded-full bg-[#1a9c38] text-white flex items-center justify-center shadow-md shadow-green-900/20 active:scale-95 transition-transform"
           aria-label={isService ? "Add service" : "Add product"}
         >
           <Plus className="w-5 h-5" />
@@ -176,37 +176,38 @@ export function ProductsClient({ products, categories, locations, businessId, cu
       </div>
 
       {/* ── Mobile search + filter row ── */}
-      <div className="lg:hidden bg-[#fafefb] px-3 pb-3 flex items-center gap-2 flex-shrink-0">
+      <div className="lg:hidden bg-[#fafefb] px-3 pb-[10px] flex items-center gap-2 flex-shrink-0">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isService ? "Search services..." : "Search products..."}
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full h-9 pl-9 pr-4 border border-slate-300 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
           />
         </div>
-        <button className="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center flex-shrink-0 active:bg-slate-50">
+        <button className="w-11 h-9 rounded-[6px] border border-slate-300 bg-white flex items-center justify-center flex-shrink-0 active:bg-slate-50">
           <SlidersHorizontal className="w-4 h-4 text-slate-500" />
         </button>
         <button
           onClick={() => window.location.reload()}
-          className="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center flex-shrink-0 active:bg-slate-50"
+          className="w-11 h-9 rounded-[6px] border border-slate-300 bg-white flex items-center justify-center flex-shrink-0 active:bg-slate-50"
         >
           <RefreshCw className="w-4 h-4 text-slate-500" />
         </button>
       </div>
 
       {/* ── Mobile filter tabs ── */}
-      <div className="lg:hidden bg-[#fafefb] px-3 pt-3 pb-1 flex gap-2 overflow-x-auto scrollbar-none flex-shrink-0">
+      <div className="lg:hidden px-3 pt-3 pb-1 flex gap-1.5 flex-shrink-0">
         {MOBILE_TABS.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setSelectedFilter(tab.value)}
+            style={{ flex: `${tab.label.length} 1 0` }}
             className={cn(
-              "flex-shrink-0 px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-colors",
+              "min-w-0 py-1.5 rounded-[6px] text-[12px] font-medium transition-colors text-center",
               selectedFilter === tab.value
-                ? "bg-[#1a9c38] text-white"
+                ? "bg-[#1a9c38] text-white border border-[#1a9c38]"
                 : "bg-white border border-slate-200 text-slate-600 active:bg-slate-50"
             )}
           >

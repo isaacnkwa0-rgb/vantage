@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { X, Loader2, Upload, ScanLine, CheckCircle2, AlertCircle } from "lucide-react";
 import { BarcodeScanner } from "@/components/pos/BarcodeScanner";
 
@@ -26,6 +27,7 @@ const schema = z.object({
   barcode: z.string().optional(),
   description: z.string().optional(),
   track_inventory: z.boolean().default(true),
+  is_active: z.boolean().default(true),
 });
 type FormData = z.infer<typeof schema>;
 
@@ -82,8 +84,9 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           barcode: editingProduct.barcode ?? undefined,
           description: editingProduct.description ?? undefined,
           track_inventory: editingProduct.track_inventory,
+          is_active: editingProduct.is_active ?? true,
         }
-      : { track_inventory: true, cost_price: 0, stock_quantity: 0, low_stock_threshold: 5, min_order_qty: 1 },
+      : { track_inventory: true, is_active: true, cost_price: 0, stock_quantity: 0, low_stock_threshold: 5, min_order_qty: 1 },
   });
 
   async function handleBarcodeScan(barcode: string) {
@@ -112,6 +115,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
   }
 
   const trackInventory = watch("track_inventory");
+  const isPublished = watch("is_active");
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -167,6 +171,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
       barcode: data.barcode || null,
       description: data.description || null,
       track_inventory: data.track_inventory,
+      is_active: data.is_active,
       image_url: imageUrl,
     };
     // only include location_id once the DB column exists (after running the migration SQL)
@@ -487,6 +492,32 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
           </div>
 
           {error && <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg">{error}</div>}
+
+          {/* Publish / Unpublish */}
+          <div className="flex items-center justify-between py-3 px-4 rounded-xl border border-slate-200 bg-slate-50">
+            <div className="min-w-0 pr-3">
+              <p className="text-sm font-semibold text-[#0F172A]">{isPublished ? "Published" : "Unpublished"}</p>
+              <p className="text-xs text-slate-400 mt-0.5 leading-snug">
+                {isPublished
+                  ? "Visible to store visitors"
+                  : "Hidden from store — still counted in inventory & records"}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setValue("is_active", !isPublished, { shouldDirty: true })}
+              className={cn(
+                "w-12 h-6 rounded-full transition-colors relative flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
+                isPublished ? "bg-green-500" : "bg-slate-200"
+              )}
+              aria-label={isPublished ? "Unpublish" : "Publish"}
+            >
+              <span className={cn(
+                "absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform",
+                isPublished ? "translate-x-6" : "translate-x-0.5"
+              )} />
+            </button>
+          </div>
 
           <div className="flex gap-3 pt-2">
             {editingProduct && (
