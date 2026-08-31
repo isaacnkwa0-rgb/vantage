@@ -16,7 +16,10 @@ const schema = z.object({
   stock_quantity: z.coerce.number().int().min(0).default(0),
   low_stock_threshold: z.coerce.number().int().min(0).default(5),
   min_order_qty: z.coerce.number().int().min(1).default(1),
-  max_order_qty: z.coerce.number().int().min(1).optional().or(z.literal(0)).transform(v => v || undefined),
+  max_order_qty: z.preprocess(
+    (v) => (v === "" || v == null ? undefined : Number(v)),
+    z.number().int().min(1).optional()
+  ),
   category_id: z.string().optional(),
   location_id: z.string().optional(),
   sku: z.string().optional(),
