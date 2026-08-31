@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Package, AlertTriangle, MapPin, Plus, Minus, ChevronRight } from "lucide-react";
+import { Package, AlertTriangle, MapPin, Plus, Minus, MoreVertical } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -74,7 +74,8 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
         {/* Name + meta — tapping navigates to detail */}
         <Link href={detailHref} className="flex-1 min-w-0 block">
           <p className="font-medium text-[#0F172A] text-sm truncate">{product.name}</p>
-          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+          {/* Desktop meta: SKU, category, location */}
+          <div className="hidden sm:flex items-center gap-1.5 mt-0.5 flex-wrap">
             {product.sku && (
               <span className="text-xs text-slate-400">SKU: {product.sku}</span>
             )}
@@ -94,42 +95,23 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
             )}
           </div>
           {/* Price shown below name on mobile */}
-          <p className="font-semibold text-emerald-600 text-sm mt-1 md:hidden">
+          <p className="text-slate-500 text-sm mt-0.5 sm:hidden">
             {formatCurrency(product.selling_price, currency)}
-            {!isService && (
-              <span className="text-slate-400 font-normal text-xs ml-1">· {margin.toFixed(0)}% margin</span>
-            )}
           </p>
         </Link>
 
-        {/* Stock controls — standalone, don't navigate */}
+        {/* Stock — standalone, don't navigate */}
         {!hideStock && (
           <>
-            {/* Mobile: compact +/- with quantity number */}
-            <div className="flex items-center gap-1 sm:hidden flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => adjustStock(-1)}
-                disabled={saving || qty === 0}
-                className="w-6 h-6 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition flex-shrink-0"
-              >
-                <Minus className="w-3 h-3" />
-              </button>
-              <span className={cn(
-                "text-xs font-semibold w-7 text-center",
-                isOutOfStock ? "text-red-500" : isLowStock ? "text-amber-500" : "text-slate-700"
-              )}>
-                {qty}
-              </span>
-              <button
-                onClick={() => adjustStock(1)}
-                disabled={saving}
-                className="w-6 h-6 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition flex-shrink-0"
-              >
-                <Plus className="w-3 h-3" />
-              </button>
-            </div>
+            {/* Mobile: plain stock text */}
+            <span className={cn(
+              "text-xs flex-shrink-0 sm:hidden",
+              isOutOfStock ? "text-red-500 font-medium" : isLowStock ? "text-amber-500 font-medium" : "text-slate-400"
+            )} onClick={(e) => e.stopPropagation()}>
+              {isOutOfStock ? "Out of stock" : `${qty} in stock`}
+            </span>
 
-            {/* Desktop: full stock status badge */}
+            {/* Desktop: full stock badge with +/- controls */}
             <div className="w-36 flex-shrink-0 hidden sm:flex items-center gap-1.5">
               <button
                 onClick={() => adjustStock(-1)}
@@ -171,9 +153,9 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
           )}
         </div>
 
-        {/* Chevron — navigates to detail page */}
+        {/* 3-dot menu button */}
         <Link href={detailHref} className="flex-shrink-0 p-1">
-          <ChevronRight className="w-4 h-4 text-slate-300" />
+          <MoreVertical className="w-4 h-4 text-slate-300" />
         </Link>
       </div>
 
