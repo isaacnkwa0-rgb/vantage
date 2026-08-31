@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   Eye, EyeOff, ShoppingCart, Box, Users, FileText,
@@ -105,6 +105,13 @@ export function MobileDashboard({
   const [promoSlide, setPromoSlide] = useState(0);
   const [codeCopied, setCodeCopied] = useState(false);
   const touchStartX = useRef(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPromoSlide((p) => (p + 1) % PROMO_SLIDES.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   function copyReferralCode() {
     if (!referralCode) return;

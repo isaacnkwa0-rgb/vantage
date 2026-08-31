@@ -406,7 +406,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                 key={product.id}
                 product={product}
                 currency={currency}
-                onEdit={() => { setEditingProduct(product); setShowForm(true); }}
+                slug={slug}
                 onStockChange={handleStockChange}
                 hideStock={isService}
                 isService={isService}

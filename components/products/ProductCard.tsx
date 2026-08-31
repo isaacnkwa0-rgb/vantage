@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
-import { Edit2, Package, AlertTriangle, X, MapPin, Plus, Minus, Trash2 } from "lucide-react";
+import { Package, AlertTriangle, MapPin, Plus, Minus, ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -25,16 +25,16 @@ interface Product {
 interface Props {
   product: Product;
   currency: string;
-  onEdit: () => void;
+  slug: string;
+  onEdit?: () => void;
   onDelete?: () => void;
   onStockChange?: (productId: string, newQty: number) => void;
   hideStock?: boolean;
   isService?: boolean;
 }
 
-export function ProductCard({ product, currency, onEdit, onDelete, onStockChange, hideStock = false, isService = false }: Props) {
-  const router = useRouter();
-  const [preview, setPreview] = useState(false);
+export function ProductCard({ product, currency, slug, onEdit, onDelete, onStockChange, hideStock = false, isService = false }: Props) {
+  const detailHref = `/${slug}/products/${product.id}`;
   const [qty, setQty] = useState(product.stock_quantity);
   const [saving, setSaving] = useState(false);
   const isLowStock = qty > 0 && qty <= product.low_stock_threshold;
@@ -53,35 +53,26 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
     onStockChange?.(product.id, newQty);
   }
 
-  async function handleDelete() {
-    if (!window.confirm(`Delete "${product.name}"? This will remove it from your catalog.`)) return;
-    const supabase = createClient();
-    const { error } = await supabase.from("products").update({ is_active: false }).eq("id", product.id);
-    if (error) { alert(`Failed to delete: ${error.message}`); return; }
-    onDelete?.();
-    router.refresh();
-  }
-
   return (
     <>
       <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-slate-50 transition group">
-        {/* Image thumbnail */}
-        <div
+        {/* Thumbnail — tapping navigates to detail */}
+        <Link
+          href={detailHref}
           className={cn(
             "relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200",
-            product.image_url ? "cursor-pointer hover:ring-2 hover:ring-green-400 hover:ring-offset-1" : ""
+            product.image_url ? "hover:ring-2 hover:ring-green-400 hover:ring-offset-1" : ""
           )}
-          onClick={() => product.image_url && setPreview(true)}
         >
           {product.image_url ? (
             <Image src={product.image_url!} alt={product.name} fill className="object-cover" sizes="48px" />
           ) : (
             <Package className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
           )}
-        </div>
+        </Link>
 
-        {/* Name + SKU + category + mobile price */}
-        <div className="flex-1 min-w-0">
+        {/* Name + meta — tapping navigates to detail */}
+        <Link href={detailHref} className="flex-1 min-w-0 block">
           <p className="font-medium text-[#0F172A] text-sm truncate">{product.name}</p>
           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
             {product.sku && (
@@ -109,13 +100,13 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
               <span className="text-slate-400 font-normal text-xs ml-1">· {margin.toFixed(0)}% margin</span>
             )}
           </p>
-        </div>
+        </Link>
 
-        {/* Stock controls */}
+        {/* Stock controls — standalone, don't navigate */}
         {!hideStock && (
           <>
             {/* Mobile: compact +/- with quantity number */}
-            <div className="flex items-center gap-1 sm:hidden flex-shrink-0">
+            <div className="flex items-center gap-1 sm:hidden flex-shrink-0" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => adjustStock(-1)}
                 disabled={saving || qty === 0}
@@ -169,7 +160,7 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
           </>
         )}
 
-        {/* Price column — desktop only (mobile shows below name) */}
+        {/* Price column — desktop only */}
         <div className="text-right flex-shrink-0 w-28 hidden md:block">
           <p className="font-semibold text-[#0F172A] text-sm">
             {formatCurrency(product.selling_price, currency)}
@@ -180,45 +171,12 @@ export function ProductCard({ product, currency, onEdit, onDelete, onStockChange
           )}
         </div>
 
-        {/* Action buttons — always visible on mobile, hover-reveal on desktop */}
-        <div className="flex items-center gap-0.5 flex-shrink-0">
-          <button
-            onClick={onEdit}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition sm:opacity-0 sm:group-hover:opacity-100"
-            title="Edit"
-          >
-            <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-          <button
-            onClick={handleDelete}
-            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition sm:opacity-0 sm:group-hover:opacity-100"
-            title="Delete"
-          >
-            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-        </div>
+        {/* Chevron — navigates to detail page */}
+        <Link href={detailHref} className="flex-shrink-0 p-1">
+          <ChevronRight className="w-4 h-4 text-slate-300" />
+        </Link>
       </div>
 
-      {/* Image preview lightbox */}
-      {preview && product.image_url && (
-        <div
-          className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setPreview(false)}
-        >
-          <button
-            className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition"
-            onClick={() => setPreview(false)}
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
     </>
   );
 }
