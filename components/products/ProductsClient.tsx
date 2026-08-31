@@ -160,7 +160,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
     <div className="flex-1 flex flex-col min-h-0 bg-[#F5F6F8]">
 
       {/* ── Mobile header (Bumpa-style) ── */}
-      <div className="lg:hidden bg-white flex items-center justify-between px-4 pt-12 pb-3 flex-shrink-0">
+      <div className="lg:hidden bg-[#fafefb] flex items-center justify-between px-4 pt-12 pb-3 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Tag className="w-5 h-5 text-[#0F172A]" />
           <span className="text-xl font-bold text-[#0F172A]">{pageTitle}</span>
@@ -176,7 +176,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
       </div>
 
       {/* ── Mobile search + filter row ── */}
-      <div className="lg:hidden bg-white px-3 pb-3 flex items-center gap-2 flex-shrink-0">
+      <div className="lg:hidden bg-[#fafefb] px-3 pb-3 flex items-center gap-2 flex-shrink-0">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -198,7 +198,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
       </div>
 
       {/* ── Mobile filter tabs ── */}
-      <div className="lg:hidden px-3 pt-3 pb-1 flex gap-2 overflow-x-auto scrollbar-none flex-shrink-0">
+      <div className="lg:hidden bg-[#fafefb] px-3 pt-3 pb-1 flex gap-2 overflow-x-auto scrollbar-none flex-shrink-0">
         {MOBILE_TABS.map((tab) => (
           <button
             key={tab.value}
