@@ -253,15 +253,26 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               {isService ? "Service Image" : "Product Image"}
             </label>
             <div className="flex items-center gap-3">
-              {imageUrl ? (
-                <img src={imageUrl} alt="Product" className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
-              ) : (
-                <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-slate-400" />
-                </div>
-              )}
+              <div className="relative w-16 h-16 flex-shrink-0">
+                {imageUrl ? (
+                  <>
+                    <img src={imageUrl} alt="Product" className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
+                    <button
+                      type="button"
+                      onClick={() => setImageUrl(null)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <Upload className="w-5 h-5 text-slate-400" />
+                  </div>
+                )}
+              </div>
               <label className="cursor-pointer text-sm text-green-500 hover:underline font-medium">
-                {uploading ? "Uploading..." : "Upload image"}
+                {uploading ? "Uploading..." : imageUrl ? "Change image" : "Upload image"}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
               </label>
             </div>
