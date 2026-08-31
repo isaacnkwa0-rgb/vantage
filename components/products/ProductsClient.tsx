@@ -436,16 +436,16 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div>
               {/* Desktop column header */}
-              <div className="hidden sm:flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-100">
-                <div className="w-12 flex-shrink-0" />
+              <div className="hidden sm:flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2 bg-white border border-slate-200 rounded-t-xl">
+                <div className="w-14 flex-shrink-0" />
                 <div className="flex-1 text-xs font-medium text-slate-500 uppercase tracking-wide">{isService ? "Service" : "Product"}</div>
                 {!isService && <div className="w-36 flex-shrink-0 text-xs font-medium text-slate-500 uppercase tracking-wide">Stock</div>}
                 <div className="w-28 text-right flex-shrink-0 hidden md:block text-xs font-medium text-slate-500 uppercase tracking-wide">{isService ? "Charge" : "Price"}</div>
                 <div className="w-8 flex-shrink-0" />
               </div>
-              <div className="divide-y divide-slate-100">
+              <div className="sm:border sm:border-t-0 sm:border-slate-200 sm:rounded-b-xl sm:overflow-hidden bg-white divide-y divide-slate-100">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.id}

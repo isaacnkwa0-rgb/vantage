@@ -55,19 +55,18 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
 
   return (
     <>
-      <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-slate-50 transition group">
+      <div className="flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-slate-50 transition group">
         {/* Thumbnail — tapping navigates to detail */}
         <Link
           href={detailHref}
-          className={cn(
-            "relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200",
-            product.image_url ? "hover:ring-2 hover:ring-green-400 hover:ring-offset-1" : ""
-          )}
+          className="relative w-14 h-14 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
         >
           {product.image_url ? (
-            <Image src={product.image_url!} alt={product.name} fill className="object-cover" sizes="48px" />
+            <Image src={product.image_url!} alt={product.name} fill className="object-cover" sizes="56px" />
           ) : (
-            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
+            <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+              <Package className="w-5 h-5 text-slate-300" />
+            </div>
           )}
         </Link>
 
