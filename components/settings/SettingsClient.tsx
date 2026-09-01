@@ -41,6 +41,7 @@ interface Business {
   store_shipping_fee: number;
   store_free_shipping_above: number | null;
   store_delivery_note: string | null;
+  store_maintenance_mode: boolean;
   fb_pixel_id: string | null;
   ga_measurement_id: string | null;
   custom_domain?: string | null;
@@ -118,6 +119,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const initialTab = (searchParams.get("tab") as any) ?? "business";
   const [tab, setTab] = useState<"business" | "categories" | "locations" | "staff" | "billing" | "receipt" | "store">(initialTab);
 
+  const [maintenanceMode, setMaintenanceMode] = useState(business.store_maintenance_mode ?? false);
   const [shippingEnabled, setShippingEnabled] = useState(business.store_shipping_enabled);
   const [shippingFee, setShippingFee] = useState(String(business.store_shipping_fee ?? 0));
   const [freeShippingAbove, setFreeShippingAbove] = useState(String(business.store_free_shipping_above ?? ""));
@@ -408,6 +410,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
     setSavingShipping(true);
     const sb = createClient();
     await sb.from("businesses").update({
+      store_maintenance_mode: maintenanceMode,
       store_shipping_enabled: shippingEnabled,
       store_shipping_fee: parseFloat(shippingFee) || 0,
       store_free_shipping_above: freeShippingAbove ? parseFloat(freeShippingAbove) : null,
@@ -1040,6 +1043,32 @@ export function SettingsClient({ business, members, locations: initialLocations,
       {/* ─── Online Store ─── */}
       {tab === "store" && (
         <div className="max-w-xl space-y-5">
+
+          {/* ── Maintenance Mode ── */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#0F172A]">Maintenance Mode</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {maintenanceMode
+                    ? "Your store is paused — customers see a \"back soon\" page"
+                    : "Your store is live and accepting orders"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMaintenanceMode((v) => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${maintenanceMode ? "bg-amber-500" : "bg-slate-200"}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${maintenanceMode ? "translate-x-5" : "translate-x-0"}`} />
+              </button>
+            </div>
+            {maintenanceMode && (
+              <div className="mt-3 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                <span className="text-amber-600 text-xs font-medium">⚠️ Store is currently paused. Save to apply.</span>
+              </div>
+            )}
+          </div>
 
           {/* ── Shareable store link card ── */}
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">

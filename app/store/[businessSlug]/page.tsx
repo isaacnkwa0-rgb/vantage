@@ -32,7 +32,7 @@ export default async function StorePage({ params, searchParams }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, slug, description, logo_url, currency, phone, email, address, city, social_whatsapp, social_instagram, store_shipping_enabled, store_shipping_fee, store_free_shipping_above, store_delivery_note, fb_pixel_id, ga_measurement_id, invoice_accent_color")
+    .select("id, name, slug, description, logo_url, currency, phone, email, address, city, social_whatsapp, social_instagram, store_shipping_enabled, store_shipping_fee, store_free_shipping_above, store_delivery_note, fb_pixel_id, ga_measurement_id, invoice_accent_color, store_maintenance_mode")
     .eq("slug", businessSlug)
     .eq("is_active", true)
     .single();
@@ -78,6 +78,28 @@ export default async function StorePage({ params, searchParams }: Props) {
     .eq("is_active", true)
     .eq("is_primary", true)
     .maybeSingle();
+
+  if (business.store_maintenance_mode) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5 overflow-hidden">
+          {business.logo_url ? (
+            <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-2xl font-bold text-slate-300">{business.name[0]}</span>
+          )}
+        </div>
+        <h1 className="text-xl font-bold text-[#0F172A] mb-2">{business.name}</h1>
+        <div className="bg-white rounded-2xl px-8 py-7 shadow-sm max-w-sm w-full">
+          <p className="text-3xl mb-3">🔧</p>
+          <p className="text-base font-semibold text-[#0F172A] mb-1">We'll be back soon</p>
+          <p className="text-sm text-slate-500">
+            {business.name} is temporarily paused for maintenance. Please check back shortly.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

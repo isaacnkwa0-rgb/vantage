@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Building2, Tag, MapPin, Users, Printer, Globe,
-  CreditCard, ChevronRight, LogOut,
+  CreditCard, ChevronRight, LogOut, Zap,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useBusinessStore } from "@/store/businessStore";
@@ -14,6 +14,7 @@ interface Business {
   name: string;
   slug: string;
   logo_url: string | null;
+  subscription_tier: string;
 }
 
 interface Props {
@@ -89,6 +90,42 @@ export function SettingsMenu({ business, businessSlug }: Props) {
 
       {/* Scrollable menu */}
       <div className="flex-1 overflow-auto pb-12">
+
+        {/* Upgrade banner — only on free plan */}
+        {business.subscription_tier === "free" && (
+          <div className="px-4 pt-4">
+            <Link
+              href={`/${businessSlug}/pricing`}
+              className="flex items-center gap-3 bg-[#1a9c38] rounded-2xl px-5 py-4 hover:bg-[#168a31] active:bg-[#127a2b] transition"
+            >
+              <Zap className="w-5 h-5 text-white flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-semibold text-[15px]">Upgrade to Pro</p>
+                <p className="text-green-200 text-xs mt-0.5">Unlock all features for your business</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-green-300 flex-shrink-0" />
+            </Link>
+          </div>
+        )}
+
+        {/* Pro plan indicator */}
+        {business.subscription_tier !== "free" && (
+          <div className="px-4 pt-4">
+            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-5 py-3.5">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <Zap className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[#0F172A] font-semibold text-sm capitalize">{business.subscription_tier} Plan</p>
+                <p className="text-slate-400 text-xs mt-0.5">Active subscription</p>
+              </div>
+              <Link href={`/${businessSlug}/pricing`} className="text-xs text-green-600 font-medium">
+                Manage
+              </Link>
+            </div>
+          </div>
+        )}
+
         {SECTIONS.map((section) => (
           <div key={section.label} className="px-4 mt-5">
             <p className="text-[11px] font-bold text-[#0F172A] tracking-widest mb-2 px-1 uppercase">{section.label}</p>
