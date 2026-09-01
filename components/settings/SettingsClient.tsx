@@ -372,7 +372,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
   async function saveBranding() {
     setSavingBranding(true);
     const supabase = createClient();
-    await supabase.from("businesses").update({
+    const { error } = await supabase.from("businesses").update({
       receipt_footer: receiptFooter || null,
       receipt_tagline: receiptTagline || null,
       receipt_show_logo: receiptShowLogo,
@@ -383,6 +383,10 @@ export function SettingsClient({ business, members, locations: initialLocations,
       social_whatsapp: socialWhatsapp || null,
     }).eq("id", business.id);
     setSavingBranding(false);
+    if (error) {
+      alert(`Failed to save: ${error.message}`);
+      return;
+    }
     router.refresh();
   }
 

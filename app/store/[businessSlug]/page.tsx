@@ -4,6 +4,8 @@ import Script from "next/script";
 import { StoreFront } from "@/components/store/StoreFront";
 import { StoreVisitTracker } from "@/components/store/StoreVisitTracker";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ businessSlug: string }>;
   searchParams: Promise<{ order?: string; status?: string }>;
