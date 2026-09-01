@@ -37,6 +37,7 @@ const PROMO_SLIDES = [
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { useBusinessStore } from "@/store/businessStore";
+import { createClient } from "@/lib/supabase/client";
 
 interface Sale {
   id: string;
@@ -104,7 +105,48 @@ export function MobileDashboard({
   const [period, setPeriod] = useState<"today" | "week" | "month">("today");
   const [promoSlide, setPromoSlide] = useState(0);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
   const touchStartX = useRef(0);
+
+  useEffect(() => {
+    async function fetchCount() {
+      const supabase = createClient();
+      const today = new Date().toISOString().split("T")[0];
+      const { data: biz } = await supabase
+        .from("businesses").select("id, business_type").eq("slug", slug).single();
+      if (!biz) return;
+      const bizId = biz.id;
+      const isService = biz.business_type === "service";
+
+      const [productsRes, overdueRes, creditRes, persistedRes] = await Promise.all([
+        isService
+          ? Promise.resolve({ data: [] })
+          : supabase.from("products")
+              .select("stock_quantity, low_stock_threshold")
+              .eq("business_id", bizId).eq("track_inventory", true).eq("is_active", true),
+        supabase.from("invoices").select("id", { count: "exact", head: true })
+          .eq("business_id", bizId).not("status", "in", '("paid","cancelled")')
+          .lt("due_date", today),
+        supabase.from("customers").select("id", { count: "exact", head: true })
+          .eq("business_id", bizId).gt("credit_balance", 0),
+        supabase.from("notifications").select("id", { count: "exact", head: true })
+          .eq("business_id", bizId).is("read_at", null),
+      ]);
+
+      const lowStockCount = (productsRes.data ?? []).filter(
+        (p) => p.stock_quantity <= p.low_stock_threshold
+      ).length;
+
+      setNotifCount(
+        Math.min(lowStockCount, 5) +
+        (overdueRes.count ?? 0) +
+        (creditRes.count ?? 0) +
+        (persistedRes.count ?? 0)
+      );
+    }
+    fetchCount();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -251,10 +293,15 @@ export function MobileDashboard({
             </Link>
             <Link
               href={`/${slug}/notifications`}
-              className="p-1 text-[#1a9c38]"
+              className="relative p-1 text-[#1a9c38]"
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5" aria-hidden="true" />
+              {notifCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+                  {notifCount > 9 ? "9+" : notifCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>

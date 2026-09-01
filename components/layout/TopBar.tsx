@@ -289,9 +289,10 @@ export function TopBar({ title }: TopBarProps) {
         <button
           onClick={handleLogout}
           aria-label="Sign out"
-          className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1 focus-visible:outline-none"
+          className="flex items-center gap-1.5 px-3 py-2 text-red-600 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1 focus-visible:outline-none"
         >
-          <LogOut className="w-5 h-5" aria-hidden="true" />
+          <LogOut className="w-4 h-4" aria-hidden="true" />
+          <span className="hidden sm:inline">Sign out</span>
         </button>
       </div>
     </header>

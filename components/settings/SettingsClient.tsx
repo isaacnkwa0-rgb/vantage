@@ -96,6 +96,7 @@ interface Props {
   categories: Category[];
   currentUserId: string;
   userEmail: string;
+  hideNav?: boolean;
 }
 
 const bizSchema = z.object({
@@ -111,7 +112,7 @@ type BizForm = z.infer<typeof bizSchema>;
 
 const CURRENCIES = ["NGN", "USD", "GHS", "KES", "ZAR", "GBP", "EUR", "XOF", "XAF"];
 
-export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, currentUserId, userEmail }: Props) {
+export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, currentUserId, userEmail, hideNav }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as any) ?? "business";
@@ -430,20 +431,22 @@ export function SettingsClient({ business, members, locations: initialLocations,
   return (
     <div className="flex-1 p-3 sm:p-5">
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 p-1 rounded-xl mb-5 overflow-x-auto scrollbar-none">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key as any)}
-            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition flex-shrink-0 ${
-              tab === t.key ? "bg-white text-[#0F172A] shadow-sm" : "text-slate-500 hover:text-slate-700"
-            }`}
-          >
-            <t.icon className="w-4 h-4 flex-shrink-0" />
-            <span>{t.label}</span>
-          </button>
-        ))}
-      </div>
+      {!hideNav && (
+        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl mb-5 overflow-x-auto scrollbar-none">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key as any)}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition flex-shrink-0 ${
+                tab === t.key ? "bg-white text-[#0F172A] shadow-sm" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <t.icon className="w-4 h-4 flex-shrink-0" />
+              <span>{t.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ─── Business Profile ─── */}
       {tab === "business" && (
@@ -1433,6 +1436,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
           </div>
         </div>
       )}
+
     </div>
   );
 }

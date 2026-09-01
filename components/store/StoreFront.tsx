@@ -4,8 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import {
   ShoppingCart, X, Package, Phone, Mail, Instagram,
-  CheckCircle2, Loader2, Store, Search, Menu, ChevronLeft, ChevronRight,
-  Landmark, CreditCard, Copy, Check,
+  CheckCircle2, Loader2, Search, ChevronLeft, ChevronRight,
+  Landmark, CreditCard, Copy, Check, ChevronDown, ChevronUp, Menu,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
@@ -98,6 +98,9 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
   const [paymentMethod, setPaymentMethod] = useState<"paystack" | "bank_transfer">("paystack");
   const [bankTransferResult, setBankTransferResult] = useState<BankTransferResult | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showFullDesc, setShowFullDesc] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartSubtotal = cart.reduce((s, i) => s + i.qty * i.product.selling_price, 0);
@@ -122,6 +125,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
   const pagedProducts = filteredProducts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   useEffect(() => { setPage(0); }, [search, selectedCategory]);
+  useEffect(() => { setShowFullDesc(false); }, [selectedProduct]);
 
   function addToCart(product: Product) {
     setCart((prev) => {
@@ -143,6 +147,10 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
 
   function isOutOfStock(p: Product) {
     return p.track_inventory && (p.stock_quantity ?? 0) <= 0;
+  }
+
+  function categoryCount(catId: string): number {
+    return products.filter(p => catId.split(",").includes(p.category_id ?? "")).length;
   }
 
   async function checkout() {
@@ -205,14 +213,14 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           alt={business.name}
           width={size}
           height={size}
-          className="object-cover"
+          className="object-cover flex-shrink-0"
           style={{ width: size, height: size, borderRadius: Math.round(size * 0.22) }}
         />
       );
     }
     return (
       <div
-        className="flex items-center justify-center text-white font-extrabold tracking-tight"
+        className="flex items-center justify-center text-white font-extrabold tracking-tight flex-shrink-0"
         style={{ width: size, height: size, borderRadius: Math.round(size * 0.22), backgroundColor: brand, fontSize: Math.round(size * 0.38) }}
       >
         {business.name.slice(0, 2).toUpperCase()}
@@ -223,23 +231,28 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
   function pillStyle(active: boolean) {
     return active
       ? { backgroundColor: brand, color: "#fff", borderColor: brand }
-      : { backgroundColor: "#fff", color: "#64748b", borderColor: "#cbd5e1" };
+      : { backgroundColor: "#fff", color: "#64748b", borderColor: "#e2e8f0" };
   }
+
+  const displayProduct = products.find(p => p.image_url);
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] font-sans">
 
-      {/* ── HEADER — mobile: logo centered; desktop: logo left, search center, actions right ── */}
+      {/* ── STICKY HEADER ── */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-3">
+          {/* Hamburger — mobile only */}
+          <button onClick={() => setMenuOpen(true)} className="md:hidden p-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition flex-shrink-0">
+            <Menu className="w-5 h-5" />
+          </button>
 
-          {/* Logo + name */}
           <div className="flex items-center gap-2.5 flex-shrink-0">
-            {logoMark(44)}
-            <span className="hidden md:block text-base font-extrabold text-[#111] tracking-tight">{business.name}</span>
+            {logoMark(36)}
+            <span className="hidden sm:block font-extrabold text-sm text-[#111] tracking-tight">{business.name}</span>
           </div>
 
-          {/* Search — full width on desktop, hidden on mobile (shown below) */}
+          {/* Desktop search */}
           <div className="hidden md:flex flex-1 relative mx-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             <input
@@ -253,113 +266,72 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
             />
           </div>
 
-          {/* Spacer on mobile to push cart right */}
           <div className="flex-1 md:hidden" />
 
-          {/* Right actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Currency */}
             <span className="hidden md:flex items-center gap-1 text-xs font-semibold text-slate-500 px-2 py-1 bg-slate-50 rounded-lg border border-slate-200">
               {flag && <span>{flag}</span>}
               <span>{business.currency}</span>
             </span>
-            {/* WhatsApp */}
             {waLink && (
-              <a
-                href={waLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href={waLink} target="_blank" rel="noopener noreferrer"
                 className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-opacity hover:opacity-80"
-                style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}
-              >
+                style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}>
                 <WhatsAppIcon className="w-3.5 h-3.5" />
                 Contact Us
               </a>
             )}
-            {/* Cart */}
-            <button
-              onClick={() => setCartOpen(true)}
-              className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
-            >
+            <button onClick={() => setCartOpen(true)} className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 text-white text-[10px] font-bold flex items-center justify-center"
-                  style={{ minWidth: 18, height: 18, borderRadius: 9, backgroundColor: brand, padding: "0 4px" }}
-                >
+                <span className="absolute -top-1 -right-1 text-white text-[10px] font-bold flex items-center justify-center"
+                  style={{ minWidth: 18, height: 18, borderRadius: 9, backgroundColor: brand, padding: "0 4px" }}>
                   {cartCount}
                 </span>
               )}
             </button>
           </div>
         </div>
-
-        {/* Mobile search row */}
-        <div className="md:hidden px-4 pb-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Find Products"
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
-              onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 2px ${brand}55`)}
-              onBlur={(e) => (e.currentTarget.style.boxShadow = "")}
-            />
-          </div>
-        </div>
       </header>
 
-      {/* ── MOBILE: WhatsApp + currency top bar ── */}
-      <div className="md:hidden bg-white border-b border-slate-100 px-4 py-2 flex items-center justify-between">
-        {waLink ? (
-          <a
-            href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-opacity hover:opacity-80"
-            style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}
-          >
-            <WhatsAppIcon className="w-3.5 h-3.5" />
-            Contact Us
-          </a>
-        ) : <div />}
-        <span className="text-xs font-semibold text-slate-600 flex items-center gap-1">
-          {flag && <span>{flag}</span>}
-          <span>{business.currency}</span>
-        </span>
-      </div>
-
-      {/* ── CATEGORY BAR ── */}
-      {categories.length > 0 && (
-        <div className="bg-white border-b border-slate-100">
-          <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold rounded-full border transition"
-              style={pillStyle(!selectedCategory)}
-            >
-              All
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold rounded-full border transition"
-                style={pillStyle(selectedCategory === cat.id)}
-              >
-                {cat.name}
-              </button>
-            ))}
+      {/* ── HERO ── */}
+      <section style={{ background: `linear-gradient(135deg, ${brand}18 0%, ${brand}06 100%)` }} className="border-b border-slate-100 py-7 sm:py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
+          {logoMark(64)}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-[#111] tracking-tight">{business.name}</h1>
+            {business.description && (
+              <p className="text-sm text-slate-500 mt-1.5 max-w-md leading-relaxed">{business.description}</p>
+            )}
+            <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start flex-wrap">
+              {waLink && (
+                <a href={waLink} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-xl border transition-opacity hover:opacity-80"
+                  style={{ color: brand, borderColor: brand, backgroundColor: `${brand}12` }}>
+                  <WhatsAppIcon className="w-3.5 h-3.5" />
+                  WhatsApp Us
+                </a>
+              )}
+              {igLink && (
+                <a href={igLink} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-pink-500 transition px-3 py-2 rounded-xl border border-slate-200 bg-white">
+                  <Instagram className="w-3.5 h-3.5" />
+                  Instagram
+                </a>
+              )}
+              <span className="text-xs text-slate-500 flex items-center gap-1 px-3 py-2 rounded-xl border border-slate-200 bg-white font-semibold">
+                {flag && <span>{flag}</span>}
+                <span>{business.currency}</span>
+              </span>
+            </div>
           </div>
         </div>
-      )}
+      </section>
 
       {/* ── MAIN ── */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-5">
 
-        {/* Banners */}
+        {/* Payment banners */}
         {succeeded && (
           <div className="mb-5 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -382,11 +354,83 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-[#111]">
-                Products
-                <span className="ml-2 text-sm font-normal text-slate-400">({filteredProducts.length})</span>
+            {/* ── ALL ITEMS CARD ── */}
+            <button
+              onClick={() => { setSelectedCategory(null); setSearch(""); }}
+              className="w-full mb-4 rounded-2xl overflow-hidden border border-slate-200 bg-white flex items-stretch shadow-sm hover:shadow-md transition-shadow text-left"
+            >
+              <div className="flex-1 px-5 py-4">
+                <p className="text-base font-extrabold text-[#111]">All Items</p>
+                <p className="text-sm text-slate-400 mt-0.5">{products.length} item{products.length !== 1 ? "s" : ""} available</p>
+                <p className="text-xs mt-2 font-semibold" style={{ color: brand }}>Browse all →</p>
+              </div>
+              <div className="relative w-24 sm:w-32 flex-shrink-0 bg-slate-100">
+                {displayProduct?.image_url ? (
+                  <Image src={displayProduct.image_url} alt="" fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Package className="w-8 h-8 text-slate-300" />
+                  </div>
+                )}
+              </div>
+            </button>
+
+            {/* ── CATEGORY PILLS ── */}
+            {categories.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 mb-4" style={{ scrollbarWidth: "none" }}>
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold rounded-full border transition"
+                  style={pillStyle(!selectedCategory)}
+                >
+                  All
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                    className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold rounded-full border transition whitespace-nowrap"
+                    style={pillStyle(selectedCategory === cat.id)}
+                  >
+                    {cat.name}
+                    <span className="ml-1.5 opacity-70 text-xs">{categoryCount(cat.id)}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* ── MOBILE SEARCH ── */}
+            <div className="md:hidden mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Find products…"
+                  className="w-full pl-10 pr-9 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                  onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 2px ${brand}55`)}
+                  onBlur={(e) => (e.currentTarget.style.boxShadow = "")}
+                />
+                {search && (
+                  <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X className="w-4 h-4 text-slate-400" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* ── PRODUCTS HEADING ── */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-[#111]">
+                {selectedCategory ? (categories.find(c => c.id === selectedCategory)?.name ?? "Products") : "All Products"}
+                <span className="ml-1.5 text-sm font-normal text-slate-400">({filteredProducts.length})</span>
               </h2>
+              {search && (
+                <button onClick={() => setSearch("")} className="text-xs text-slate-400 flex items-center gap-1">
+                  <X className="w-3 h-3" /> Clear
+                </button>
+              )}
             </div>
 
             {pagedProducts.length === 0 ? (
@@ -395,16 +439,14 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                 <p className="text-slate-400 text-sm">No products match your search.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                 {pagedProducts.map((product) => {
                   const qty = getQty(product.id);
                   const oos = isOutOfStock(product);
                   return (
-                    <div
-                      key={product.id}
-                      className={cn("bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow", oos && "opacity-50")}
-                    >
-                      <div className="aspect-square bg-slate-50 relative rounded-b-2xl overflow-hidden">
+                    <div key={product.id} className={cn("bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow", oos && "opacity-60")}>
+                      {/* Image — tap opens detail */}
+                      <button onClick={() => setSelectedProduct(product)} className="aspect-square relative bg-slate-50 w-full overflow-hidden block">
                         {product.image_url ? (
                           <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                         ) : (
@@ -412,29 +454,38 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                             <Package className="w-10 h-10 text-slate-200" />
                           </div>
                         )}
-                      </div>
-                      <div className="p-3 flex flex-col flex-1 gap-1.5">
-                        <p className="text-sm text-slate-800 leading-snug line-clamp-2 font-medium">{product.name}</p>
-                        <p className="text-base font-bold" style={{ color: brand }}>{fmt(product.selling_price)}</p>
-                        <div className="mt-auto pt-2">
-                          {oos ? (
-                            <p className="text-xs text-red-500 font-medium">Out of stock</p>
-                          ) : qty === 0 ? (
-                            <button
-                              onClick={() => addToCart(product)}
-                              className="w-full py-2 rounded-xl text-sm font-semibold border transition hover:opacity-90 active:scale-95"
-                              style={{ color: brand, borderColor: brand, backgroundColor: "transparent" }}
-                            >
-                              Add To Cart
-                            </button>
-                          ) : (
-                            <div className="flex rounded-xl border overflow-hidden" style={{ borderColor: brand }}>
-                              <button onClick={() => updateQty(product.id, -1)} className="flex-1 py-1.5 text-base font-bold hover:bg-slate-50 transition" style={{ color: brand }}>−</button>
-                              <span className="px-3 py-1.5 text-sm font-bold flex items-center justify-center border-l border-r" style={{ color: brand, borderColor: brand }}>{qty}</span>
-                              <button onClick={() => updateQty(product.id, 1)} className="flex-1 py-1.5 text-base font-bold text-white transition" style={{ backgroundColor: brand }}>+</button>
-                            </div>
-                          )}
-                        </div>
+                        {oos && (
+                          <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            Out of Stock
+                          </span>
+                        )}
+                      </button>
+
+                      {/* Info */}
+                      <div className="p-3 flex flex-col flex-1">
+                        <button onClick={() => setSelectedProduct(product)} className="text-left mb-1">
+                          <p className="text-sm font-medium text-slate-800 line-clamp-2 leading-snug">{product.name}</p>
+                        </button>
+                        <p className="text-sm font-bold mb-2" style={{ color: brand }}>{fmt(product.selling_price)}</p>
+                        {!oos && (
+                          <div className="mt-auto">
+                            {qty === 0 ? (
+                              <button
+                                onClick={() => addToCart(product)}
+                                className="w-full py-2 rounded-xl text-xs font-semibold border transition active:scale-95"
+                                style={{ color: brand, borderColor: brand, backgroundColor: "transparent" }}
+                              >
+                                Add To Cart
+                              </button>
+                            ) : (
+                              <div className="flex rounded-xl border overflow-hidden" style={{ borderColor: brand }}>
+                                <button onClick={() => updateQty(product.id, -1)} className="flex-1 py-1.5 text-base font-bold hover:bg-slate-50 transition" style={{ color: brand }}>−</button>
+                                <span className="px-2 py-1.5 text-xs font-bold flex items-center justify-center border-l border-r" style={{ color: brand, borderColor: brand }}>{qty}</span>
+                                <button onClick={() => updateQty(product.id, 1)} className="flex-1 py-1.5 text-base font-bold text-white transition" style={{ backgroundColor: brand }}>+</button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -477,7 +528,6 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
         {/* ── FOOTER ── */}
         <footer className="border-t border-slate-200 mt-16 pt-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            {/* Brand column */}
             <div className="md:col-span-1 flex flex-col gap-3">
               {logoMark(56)}
               <p className="text-base font-bold text-[#111]">{business.name}</p>
@@ -500,7 +550,6 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
               )}
             </div>
 
-            {/* Contact */}
             <div>
               <p className="text-sm font-bold text-[#111] mb-3">Contact Us</p>
               <ul className="space-y-2 text-sm text-slate-500">
@@ -517,7 +566,6 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
               </ul>
             </div>
 
-            {/* Shipping */}
             <div>
               <p className="text-sm font-bold text-[#111] mb-3">Delivery</p>
               <ul className="space-y-2 text-sm text-slate-500">
@@ -535,7 +583,6 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
               </ul>
             </div>
 
-            {/* Payment */}
             <div>
               <p className="text-sm font-bold text-[#111] mb-3">Payment Methods</p>
               <ul className="space-y-2 text-sm text-slate-500">
@@ -670,7 +717,6 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
               ))}
             </div>
 
-            {/* Payment method selector — only shown when business has a bank account */}
             {bankAccount && (
               <div>
                 <p className="text-xs font-medium text-slate-600 mb-2">Payment Method</p>
@@ -720,6 +766,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           </div>
         </div>
       )}
+
       {/* ── BANK TRANSFER SUCCESS MODAL ── */}
       {bankTransferResult && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -734,7 +781,6 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                 Complete your payment by transferring <span className="font-semibold" style={{ color: brand }}>{fmt(bankTransferResult.total)}</span> to the account below.
               </p>
             </div>
-
             {bankTransferResult.bankDetails ? (
               <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Transfer Details</p>
@@ -764,14 +810,12 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                 Bank account details not available. Please contact the store to complete your payment.
               </div>
             )}
-
             <p className="text-xs text-slate-400 text-center">
               Your order will be confirmed once payment is received.{" "}
               {business.social_whatsapp && (
                 <>Send proof of payment on <a href={`https://wa.me/${business.social_whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: brand }}>WhatsApp</a>.</>
               )}
             </p>
-
             <button
               onClick={() => setBankTransferResult(null)}
               className="w-full py-3 rounded-xl text-sm font-bold text-white transition"
@@ -782,6 +826,201 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           </div>
         </div>
       )}
+
+      {/* ── SIDEBAR MENU ── */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMenuOpen(false)} />
+          <div className="relative bg-white w-72 max-w-[85vw] h-full flex flex-col shadow-2xl overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                {logoMark(36)}
+                <span className="font-extrabold text-sm text-[#111] tracking-tight">{business.name}</span>
+              </div>
+              <button onClick={() => setMenuOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Store description */}
+            {business.description && (
+              <p className="text-xs text-slate-500 leading-relaxed px-5 pt-4 pb-0">{business.description}</p>
+            )}
+
+            {/* Categories */}
+            {categories.length > 0 && (
+              <div className="px-5 pt-5">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Categories</p>
+                <ul className="space-y-0.5">
+                  <li>
+                    <button
+                      onClick={() => { setSelectedCategory(null); setMenuOpen(false); }}
+                      className={cn("w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition", !selectedCategory ? "text-white" : "text-slate-600 hover:bg-slate-50")}
+                      style={!selectedCategory ? { backgroundColor: brand } : {}}
+                    >
+                      All Items
+                      <span className="ml-1.5 text-xs opacity-70">{products.length}</span>
+                    </button>
+                  </li>
+                  {categories.map((cat) => (
+                    <li key={cat.id}>
+                      <button
+                        onClick={() => { setSelectedCategory(cat.id); setMenuOpen(false); }}
+                        className={cn("w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition", selectedCategory === cat.id ? "text-white" : "text-slate-600 hover:bg-slate-50")}
+                        style={selectedCategory === cat.id ? { backgroundColor: brand } : {}}
+                      >
+                        {cat.name}
+                        <span className="ml-1.5 text-xs opacity-70">{categoryCount(cat.id)}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Contact */}
+            <div className="px-5 pt-5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Contact</p>
+              <ul className="space-y-3 text-sm text-slate-600">
+                {business.phone && (
+                  <li className="flex items-center gap-2.5">
+                    <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                    {business.phone}
+                  </li>
+                )}
+                {business.email && (
+                  <li className="flex items-start gap-2.5 break-all">
+                    <Mail className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                    {business.email}
+                  </li>
+                )}
+                {business.address && (
+                  <li className="text-slate-500 text-xs leading-relaxed">
+                    {business.address}{business.city ? `, ${business.city}` : ""}
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            {/* Social */}
+            {(waLink || igLink) && (
+              <div className="px-5 pt-5 flex flex-col gap-2">
+                {waLink && (
+                  <a href={waLink} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold border transition-opacity hover:opacity-80"
+                    style={{ color: brand, borderColor: brand, backgroundColor: `${brand}10` }}>
+                    <WhatsAppIcon className="w-4 h-4" />
+                    WhatsApp Us
+                  </a>
+                )}
+                {igLink && (
+                  <a href={igLink} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 text-slate-600 hover:text-pink-500 transition">
+                    <Instagram className="w-4 h-4" />
+                    Instagram
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Currency */}
+            <div className="px-5 pt-4 pb-6 mt-auto">
+              <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                {flag && <span className="text-base">{flag}</span>}
+                Prices in {business.currency}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── PRODUCT DETAIL SHEET ── */}
+      {selectedProduct && (() => {
+        const oos = isOutOfStock(selectedProduct);
+        const qty = getQty(selectedProduct.id);
+        const desc = selectedProduct.description ?? "";
+        const isLong = desc.length > 150;
+        return (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedProduct(null)} />
+            <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
+
+              {/* Image */}
+              <div className="relative w-full flex-shrink-0 bg-slate-100 overflow-hidden" style={{ height: "clamp(180px, 50vw, 300px)" }}>
+                {selectedProduct.image_url ? (
+                  <Image src={selectedProduct.image_url} alt={selectedProduct.name} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Package className="w-16 h-16 text-slate-200" />
+                  </div>
+                )}
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+                >
+                  <X className="w-4 h-4 text-slate-700" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-5">
+                <h3 className="text-lg font-bold text-[#111] leading-snug mb-1">{selectedProduct.name}</h3>
+                <p className="text-2xl font-extrabold mb-4" style={{ color: brand }}>{fmt(selectedProduct.selling_price)}</p>
+
+                {desc && (
+                  <div className="mb-5">
+                    <p className={cn("text-sm text-slate-500 leading-relaxed", !showFullDesc && isLong && "line-clamp-3")}>
+                      {desc}
+                    </p>
+                    {isLong && (
+                      <button
+                        onClick={() => setShowFullDesc(v => !v)}
+                        className="text-xs font-semibold mt-1.5 flex items-center gap-0.5"
+                        style={{ color: brand }}
+                      >
+                        {showFullDesc
+                          ? <><ChevronUp className="w-3.5 h-3.5" /> Show less</>
+                          : <><ChevronDown className="w-3.5 h-3.5" /> Show more</>}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {oos ? (
+                  <div className="bg-red-50 border border-red-100 rounded-2xl px-4 py-5 text-center">
+                    <p className="text-sm font-bold text-red-600">Out of Stock</p>
+                    <p className="text-xs text-red-400 mt-1">This product is currently unavailable</p>
+                  </div>
+                ) : qty === 0 ? (
+                  <button
+                    onClick={() => addToCart(selectedProduct)}
+                    className="w-full py-4 rounded-2xl text-sm font-bold text-white transition active:scale-95"
+                    style={{ backgroundColor: brand }}
+                  >
+                    Add To Cart
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex rounded-2xl border-2 overflow-hidden" style={{ borderColor: brand }}>
+                      <button onClick={() => updateQty(selectedProduct.id, -1)} className="flex-1 py-3 text-xl font-bold hover:bg-slate-50 transition" style={{ color: brand }}>−</button>
+                      <span className="px-6 py-3 text-base font-bold flex items-center justify-center border-l border-r" style={{ color: brand, borderColor: brand }}>{qty}</span>
+                      <button onClick={() => updateQty(selectedProduct.id, 1)} className="flex-1 py-3 text-xl font-bold text-white transition" style={{ backgroundColor: brand }}>+</button>
+                    </div>
+                    <button
+                      onClick={() => { setSelectedProduct(null); setCartOpen(true); }}
+                      className="w-full py-3.5 rounded-2xl text-sm font-bold text-white transition"
+                      style={{ backgroundColor: brand }}
+                    >
+                      View Cart · {qty} item{qty !== 1 ? "s" : ""}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

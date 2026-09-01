@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, CheckCheck, Info, AlertTriangle, XCircle, Megaphone, Trash2 } from "lucide-react";
+import { Bell, CheckCheck, Info, AlertTriangle, XCircle, Megaphone, Trash2, BookOpen, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -16,8 +16,17 @@ interface Notification {
   created_at: string;
 }
 
+interface ComputedAlert {
+  id: string;
+  type: "low_stock" | "overdue_invoice" | "credit_due";
+  title: string;
+  body: string;
+  href: string;
+}
+
 interface Props {
   initial: Notification[];
+  computedAlerts: ComputedAlert[];
   businessId: string;
   businessSlug: string;
 }
@@ -46,7 +55,19 @@ function timeAgo(iso: string) {
   return `${Math.floor(secs / 86400)}d ago`;
 }
 
-export function NotificationsClient({ initial, businessId, businessSlug }: Props) {
+const COMPUTED_ICON: Record<ComputedAlert["type"], React.ReactNode> = {
+  low_stock:       <AlertTriangle className="w-4 h-4 text-amber-500" />,
+  overdue_invoice: <FileText className="w-4 h-4 text-red-500" />,
+  credit_due:      <BookOpen className="w-4 h-4 text-orange-500" />,
+};
+
+const COMPUTED_BG: Record<ComputedAlert["type"], string> = {
+  low_stock:       "bg-amber-50 border-amber-100",
+  overdue_invoice: "bg-red-50 border-red-100",
+  credit_due:      "bg-orange-50 border-orange-100",
+};
+
+export function NotificationsClient({ initial, computedAlerts, businessId, businessSlug }: Props) {
   const supabase = createClient();
   const [notifications, setNotifications] = useState<Notification[]>(initial);
   const [filter, setFilter] = useState<"all" | "unread">("all");
@@ -132,7 +153,28 @@ export function NotificationsClient({ initial, businessId, businessSlug }: Props
         ))}
       </div>
 
-      {visible.length === 0 ? (
+      {/* Live computed alerts — always shown if present, regardless of filter */}
+      {computedAlerts.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Live Alerts</p>
+          {computedAlerts.map((alert) => (
+            <Link key={alert.id} href={alert.href} className="block">
+              <div className="bg-white rounded-xl border border-l-4 border-slate-200 shadow-sm p-4 flex items-start gap-3 hover:shadow-md transition"
+                style={{ borderLeftColor: alert.type === "low_stock" ? "#f59e0b" : alert.type === "overdue_invoice" ? "#ef4444" : "#f97316" }}>
+                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border", COMPUTED_BG[alert.type])}>
+                  {COMPUTED_ICON[alert.type]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#0F172A]">{alert.title}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{alert.body}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {visible.length === 0 && computedAlerts.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center gap-3 text-center">
           <Bell className="w-10 h-10 text-slate-300" />
           <p className="text-sm font-semibold text-[#0F172A]">
@@ -142,7 +184,7 @@ export function NotificationsClient({ initial, businessId, businessSlug }: Props
             Alerts for low stock, overdue invoices, and business events appear here
           </p>
         </div>
-      ) : (
+      ) : visible.length === 0 ? null : (
         <div className="space-y-2">
           {visible.map((n) => {
             const icon = TYPE_ICON[n.type] ?? TYPE_ICON.info;
