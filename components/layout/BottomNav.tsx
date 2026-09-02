@@ -297,7 +297,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                 aria-expanded={isOpen}
                 className="w-full flex items-center justify-between px-1 mb-2 focus-visible:outline-none"
               >
-                <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                <span className="text-[13px] font-extrabold uppercase tracking-wider text-slate-900">
                   {section.label}
                 </span>
                 <ChevronDown
