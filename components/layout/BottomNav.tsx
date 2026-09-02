@@ -4,17 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ShoppingCart, Box, Package, Package2, Users, CircleEllipsis, Zap,
+  Home, ShoppingCart, Box, Package, Package2, Users, CircleEllipsis, Crown,
   LayoutDashboard, ClipboardList,
   Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
   ShoppingBag, Tag, CalendarDays, BookOpen, FileX, Globe, Gift, Share2,
   RefreshCw, Barcode, Thermometer, BellRing, Landmark, Wallet,
-  ChevronRight, ChevronDown, UserCircle,
+  ChevronRight, ChevronDown, Store, MapPin, Plus, X, Check,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBusinessStore } from "@/store/businessStore";
+import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
   label: string;
@@ -32,13 +33,6 @@ interface NavSection {
 }
 
 const NAV_SECTIONS: NavSection[] = [
-  {
-    id: "overview",
-    label: "OVERVIEW",
-    items: [
-      { label: "Dashboard", icon: LayoutDashboard, href: "dashboard" },
-    ],
-  },
   {
     id: "sales",
     label: "SALES",
@@ -137,6 +131,35 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
   const [openSections, setOpenSections] = useState<Set<string>>(
     () => new Set(NAV_SECTIONS.map((s) => s.id))
   );
+  const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string>("");
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [showLocationSheet, setShowLocationSheet] = useState(false);
+  const { selectedLocationId, setSelectedLocation } = useBusinessStore();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase.from("profiles").select("full_name, avatar_url").eq("id", user.id).single()
+        .then(({ data }) => {
+          if (data) {
+            setProfileAvatar(data.avatar_url);
+            setProfileName(data.full_name ?? "");
+          }
+        });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!activeBusiness?.id) return;
+    const supabase = createClient();
+    supabase.from("locations").select("id, name").eq("business_id", activeBusiness.id).eq("is_active", true).order("name")
+      .then(({ data }) => setLocations(data ?? []));
+  }, [activeBusiness?.id]);
+
+  const selectedLocation = locations.find((l) => l.id === selectedLocationId);
+  const locationLabel = selectedLocation?.name ?? "Headquarters";
 
   function toggleSection(id: string) {
     setOpenSections((prev) => {
@@ -148,33 +171,46 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
   }
 
   const visibleSections = NAV_SECTIONS.filter((s) => !(s.retailOnly && isService));
+  const avatarInitial = (profileName || activeBusiness?.name || "?")[0].toUpperCase();
 
   return (
     /* Covers full viewport except the bottom nav (h-16 = 64px) */
     <div className="fixed inset-x-0 top-0 z-50 bg-[#F5F6F8] flex flex-col overflow-hidden" style={{ bottom: "calc(4rem + env(safe-area-inset-bottom))" }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-12 pb-4 bg-[#F5F6F8] flex-shrink-0">
-        <div className="w-9" /> {/* balance the avatar */}
-        <h1 className="text-base font-bold text-slate-900 truncate max-w-[60%] text-center">
-          {activeBusiness?.name ?? ""}
-        </h1>
-        <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
-          <UserCircle className="w-5 h-5 text-slate-400" aria-hidden="true" />
+      {/* Mint hero */}
+      <div className="bg-[#fafefb] px-4 pt-12 pb-5 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          <div className="w-14 h-14 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
+            {profileAvatar ? (
+              <img src={profileAvatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xl font-bold text-green-600">{avatarInitial}</span>
+            )}
+          </div>
+          {/* Name + business */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[15px] font-bold text-slate-900 truncate">
+              {profileName || (activeBusiness?.name ?? "")}
+            </p>
+            {profileName && activeBusiness?.name && (
+              <p className="text-[11px] text-slate-500 mt-0.5 truncate">{activeBusiness.name}</p>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-3">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 space-y-3 pt-3">
 
         {/* Upgrade CTA — free tier only */}
         {activeBusiness?.subscription_tier === "free" && (
           <Link
             href={`/${slug}/settings?tab=billing`}
             onClick={onClose}
-            className="flex items-center gap-3 bg-white rounded-2xl px-4 py-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors"
+            className="flex items-center gap-3 bg-white rounded-xl px-4 py-4 border border-slate-100 active:bg-slate-50 transition-colors"
           >
-            <div className="w-10 h-10 rounded-full border-2 border-green-500 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-5 h-5 text-green-500" aria-hidden="true" />
+            <div className="w-10 h-10 rounded-full bg-amber-50 border-2 border-amber-400 flex items-center justify-center flex-shrink-0">
+              <Crown className="w-5 h-5 text-amber-500" aria-hidden="true" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-slate-900">Upgrade to Starter</p>
@@ -184,6 +220,69 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
           </Link>
         )}
 
+        {/* Branch / location picker */}
+        <button
+          onClick={() => setShowLocationSheet(true)}
+          className="w-full flex items-center gap-3 bg-white rounded-[8px] px-4 h-11 border border-slate-200 active:bg-slate-50 transition-colors"
+        >
+          <Store className="w-5 h-5 text-green-600 flex-shrink-0" aria-hidden="true" />
+          <span className="flex-1 text-left text-[14px] font-medium text-slate-800">{locationLabel}</span>
+          <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
+        </button>
+
+        {/* Location bottom sheet */}
+        {showLocationSheet && (
+          <div
+            className="fixed inset-0 z-[60] bg-black/40 flex items-end"
+            onClick={() => setShowLocationSheet(false)}
+          >
+            <div
+              className="w-full bg-white rounded-t-2xl px-5 pt-5 pb-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-[16px] font-bold text-slate-900">Select Branch</h3>
+                <button onClick={() => setShowLocationSheet(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Headquarters (all branches) */}
+              <button
+                onClick={() => { setSelectedLocation(null); setShowLocationSheet(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-colors ${!selectedLocationId ? "bg-green-50" : "hover:bg-slate-50 active:bg-slate-100"}`}
+              >
+                <Store className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className={`flex-1 text-left text-[14px] font-medium ${!selectedLocationId ? "text-green-700" : "text-slate-700"}`}>Headquarters</span>
+                {!selectedLocationId && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+              </button>
+
+              {/* Other branches */}
+              {locations.map((loc) => (
+                <button
+                  key={loc.id}
+                  onClick={() => { setSelectedLocation(loc.id); setShowLocationSheet(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-colors ${selectedLocationId === loc.id ? "bg-green-50" : "hover:bg-slate-50 active:bg-slate-100"}`}
+                >
+                  <MapPin className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className={`flex-1 text-left text-[14px] font-medium ${selectedLocationId === loc.id ? "text-green-700" : "text-slate-700"}`}>{loc.name}</span>
+                  {selectedLocationId === loc.id && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                </button>
+              ))}
+
+              {/* Add new branch */}
+              <Link
+                href={`/${slug}/settings?tab=locations`}
+                onClick={() => { setShowLocationSheet(false); onClose(); }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-dashed border-slate-200 mt-2 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+              >
+                <Plus className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                <span className="text-[14px] font-medium text-slate-500">Add new branch</span>
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Nav sections */}
         {visibleSections.map((section) => {
           const items = section.items.filter((item) => !(item.retailOnly && isService));
@@ -191,14 +290,14 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
           const isOpen = openSections.has(section.id);
 
           return (
-            <div key={section.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-              {/* Section header */}
+            <div key={section.id}>
+              {/* Section label — outside the card */}
               <button
                 onClick={() => toggleSection(section.id)}
                 aria-expanded={isOpen}
-                className="w-full flex items-center justify-between px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500"
+                className="w-full flex items-center justify-between px-1 mb-2 focus-visible:outline-none"
               >
-                <span className="text-[11px] font-bold uppercase tracking-widest text-slate-600">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
                   {section.label}
                 </span>
                 <ChevronDown
@@ -210,8 +309,9 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                 />
               </button>
 
-              {/* Items */}
-              {isOpen && items.map((item, i) => {
+              {/* Items card */}
+              {isOpen && <div className="bg-[#f9fefb] rounded-2xl overflow-hidden">
+              {items.map((item, i) => {
                 const label = isService && item.serviceLabel ? item.serviceLabel : item.label;
                 const href = `/${slug}/${item.href}`;
                 const isActive = pathname === href || pathname.startsWith(`${href}/`);
@@ -224,26 +324,18 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                     onClick={onClose}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
+                      "flex items-center gap-3 px-4 py-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
                       i >= 0 && "border-t border-slate-100",
                       isActive ? "bg-green-50" : "active:bg-slate-50"
                     )}
                   >
-                    {/* Icon badge */}
-                    <div
+                    <Icon
+                      aria-hidden="true"
                       className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
-                        isActive ? "bg-green-100" : "bg-green-50"
+                        "w-5 h-5 flex-shrink-0",
+                        isActive ? "text-green-700" : "text-green-600"
                       )}
-                    >
-                      <Icon
-                        aria-hidden="true"
-                        className={cn(
-                          "w-5 h-5",
-                          isActive ? "text-green-700" : "text-green-600"
-                        )}
-                      />
-                    </div>
+                    />
 
                     {/* Label */}
                     <span
@@ -263,6 +355,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                   </Link>
                 );
               })}
+              </div>}
             </div>
           );
         })}
