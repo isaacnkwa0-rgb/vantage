@@ -71,6 +71,13 @@ export default async function StorePage({ params, searchParams }: Props) {
     categories = [...nameToIds.entries()].map(([name, ids]) => ({ id: ids.join(","), name }));
   }
 
+  const { data: bundles } = await supabase
+    .from("product_bundles")
+    .select("id, name, description, price, image_url, bundle_items(quantity, products(name))")
+    .eq("business_id", business.id)
+    .eq("is_active", true)
+    .order("name");
+
   const { data: bankAccount } = await supabase
     .from("bank_accounts")
     .select("account_name, bank_name, account_number")
@@ -135,6 +142,7 @@ export default async function StorePage({ params, searchParams }: Props) {
         bankAccount={bankAccount ?? null}
         orderNumber={order}
         paymentStatus={status}
+        bundles={(bundles ?? []) as any}
       />
     </>
   );

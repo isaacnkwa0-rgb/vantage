@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   ShoppingCart, X, Package, Phone, Mail, Instagram,
   CheckCircle2, Loader2, Search, ChevronLeft, ChevronRight,
-  Landmark, CreditCard, Copy, Check, ChevronDown, ChevronUp, Menu,
+  Landmark, CreditCard, Copy, Check, ChevronDown, ChevronUp, Menu, Layers,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
@@ -65,7 +65,22 @@ interface BankAccount {
   account_number: string;
 }
 
+interface BundleItem {
+  quantity: number;
+  products: { name: string } | null;
+}
+
+interface Bundle {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  bundle_items: BundleItem[];
+}
+
 interface CartItem { product: Product; qty: number; }
+interface BundleCartItem { bundle: Bundle; qty: number; }
 
 interface BankTransferResult {
   orderNumber: string;
@@ -80,14 +95,16 @@ interface Props {
   bankAccount?: BankAccount | null;
   orderNumber?: string;
   paymentStatus?: string;
+  bundles?: Bundle[];
 }
 
-export function StoreFront({ business, products, categories, bankAccount, orderNumber, paymentStatus }: Props) {
+export function StoreFront({ business, products, categories, bankAccount, orderNumber, paymentStatus, bundles = [] }: Props) {
   const fmt = (n: number) => formatCurrency(n, business.currency);
   const brand = business.invoice_accent_color || "#1a9c38";
   const flag = CURRENCY_FLAGS[business.currency] ?? "";
 
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [bundleCart, setBundleCart] = useState<BundleCartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
@@ -102,8 +119,8 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
-  const cartSubtotal = cart.reduce((s, i) => s + i.qty * i.product.selling_price, 0);
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0) + bundleCart.reduce((s, i) => s + i.qty, 0);
+  const cartSubtotal = cart.reduce((s, i) => s + i.qty * i.product.selling_price, 0) + bundleCart.reduce((s, i) => s + i.qty * i.bundle.price, 0);
   const shippingFee =
     business.store_shipping_enabled
       ? business.store_free_shipping_above && cartSubtotal >= business.store_free_shipping_above
@@ -149,6 +166,24 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
     return p.track_inventory && (p.stock_quantity ?? 0) <= 0;
   }
 
+  function addBundleToCart(bundle: Bundle) {
+    setBundleCart((prev) => {
+      const existing = prev.find((i) => i.bundle.id === bundle.id);
+      if (existing) return prev.map((i) => i.bundle.id === bundle.id ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { bundle, qty: 1 }];
+    });
+  }
+
+  function updateBundleQty(bundleId: string, delta: number) {
+    setBundleCart((prev) =>
+      prev.map((i) => i.bundle.id === bundleId ? { ...i, qty: i.qty + delta } : i).filter((i) => i.qty > 0)
+    );
+  }
+
+  function getBundleQty(bundleId: string) {
+    return bundleCart.find((i) => i.bundle.id === bundleId)?.qty ?? 0;
+  }
+
   function categoryCount(catId: string): number {
     return products.filter(p => catId.split(",").includes(p.category_id ?? "")).length;
   }
@@ -164,7 +199,10 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
           businessId: business.id,
           businessSlug: business.slug,
           customer: form,
-          items: cart.map((i) => ({ productId: i.product.id, name: i.product.name, price: i.product.selling_price, quantity: i.qty })),
+          items: [
+            ...cart.map((i) => ({ productId: i.product.id, name: i.product.name, price: i.product.selling_price, quantity: i.qty })),
+            ...bundleCart.map((i) => ({ productId: null, name: i.bundle.name, price: i.bundle.price, quantity: i.qty })),
+          ],
           subtotal: cartSubtotal,
           shippingFee,
           total: cartTotal,
@@ -178,6 +216,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
         setCheckoutOpen(false);
         setBankTransferResult({ orderNumber: data.orderNumber, bankDetails: data.bankDetails, total: cartTotal });
         setCart([]);
+        setBundleCart([]);
       } else {
         alert(data.error ?? "Something went wrong. Please try again.");
       }
@@ -344,6 +383,62 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
         {failed && (
           <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-4">
             <p className="text-sm font-semibold text-red-700">Payment failed. Please try again.</p>
+          </div>
+        )}
+
+        {/* ── BUNDLES SECTION ── */}
+        {bundles.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Layers className="w-4 h-4" style={{ color: brand }} />
+              <h2 className="text-base font-bold text-[#111]">Special Bundles</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+              {bundles.map((bundle) => {
+                const bQty = getBundleQty(bundle.id);
+                const itemNames = bundle.bundle_items.map((bi) => bi.products?.name).filter(Boolean).join(", ");
+                return (
+                  <div key={bundle.id} className="flex-shrink-0 w-44 sm:w-52 bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow">
+                    <div className="relative aspect-video bg-slate-50 overflow-hidden">
+                      {bundle.image_url ? (
+                        <Image src={bundle.image_url} alt={bundle.name} fill className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Layers className="w-8 h-8 text-slate-200" />
+                        </div>
+                      )}
+                      <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: brand }}>
+                        Bundle
+                      </span>
+                    </div>
+                    <div className="p-3 flex flex-col flex-1">
+                      <p className="text-sm font-semibold text-slate-800 line-clamp-1 leading-snug mb-0.5">{bundle.name}</p>
+                      {itemNames && (
+                        <p className="text-[11px] text-slate-400 mb-1.5 line-clamp-2 leading-snug">{itemNames}</p>
+                      )}
+                      <p className="text-sm font-bold mb-2" style={{ color: brand }}>{fmt(bundle.price)}</p>
+                      <div className="mt-auto">
+                        {bQty === 0 ? (
+                          <button
+                            onClick={() => addBundleToCart(bundle)}
+                            className="w-full py-1.5 rounded-xl text-xs font-semibold border transition active:scale-95"
+                            style={{ color: brand, borderColor: brand }}
+                          >
+                            Add To Cart
+                          </button>
+                        ) : (
+                          <div className="flex rounded-xl border overflow-hidden" style={{ borderColor: brand }}>
+                            <button onClick={() => updateBundleQty(bundle.id, -1)} className="flex-1 py-1 text-base font-bold hover:bg-slate-50 transition" style={{ color: brand }}>−</button>
+                            <span className="px-2 py-1 text-xs font-bold flex items-center justify-center border-l border-r" style={{ color: brand, borderColor: brand }}>{bQty}</span>
+                            <button onClick={() => updateBundleQty(bundle.id, 1)} className="flex-1 py-1 text-base font-bold text-white transition" style={{ backgroundColor: brand }}>+</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -614,7 +709,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                 <X className="w-4 h-4" />
               </button>
             </div>
-            {cart.length === 0 ? (
+            {cart.length === 0 && bundleCart.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
                 <ShoppingCart className="w-10 h-10 text-slate-300" />
                 <p className="text-sm text-slate-400">Your cart is empty</p>
@@ -639,6 +734,25 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                         <button onClick={() => updateQty(item.product.id, 1)} className="w-6 h-6 rounded-md flex items-center justify-center transition text-sm font-bold text-white" style={{ backgroundColor: brand }}>+</button>
                       </div>
                       <p className="text-sm font-bold text-[#111] w-16 text-right">{fmt(item.qty * item.product.selling_price)}</p>
+                    </div>
+                  ))}
+                  {bundleCart.map((item) => (
+                    <div key={item.bundle.id} className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100">
+                        {item.bundle.image_url
+                          ? <Image src={item.bundle.image_url} alt={item.bundle.name} width={48} height={48} className="object-cover w-full h-full" />
+                          : <div className="w-full h-full flex items-center justify-center"><Layers className="w-5 h-5 text-slate-300" /></div>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#111] truncate">{item.bundle.name}</p>
+                        <p className="text-xs" style={{ color: brand }}>{fmt(item.bundle.price)}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button onClick={() => updateBundleQty(item.bundle.id, -1)} className="w-6 h-6 bg-slate-100 rounded-md flex items-center justify-center hover:bg-slate-200 transition text-sm font-bold text-slate-600">−</button>
+                        <span className="text-sm font-bold w-5 text-center text-[#111]">{item.qty}</span>
+                        <button onClick={() => updateBundleQty(item.bundle.id, 1)} className="w-6 h-6 rounded-md flex items-center justify-center transition text-sm font-bold text-white" style={{ backgroundColor: brand }}>+</button>
+                      </div>
+                      <p className="text-sm font-bold text-[#111] w-16 text-right">{fmt(item.qty * item.bundle.price)}</p>
                     </div>
                   ))}
                 </div>
@@ -676,6 +790,12 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                 <div key={i.product.id} className="flex justify-between text-xs text-slate-600">
                   <span>{i.product.name} × {i.qty}</span>
                   <span className="font-semibold">{fmt(i.qty * i.product.selling_price)}</span>
+                </div>
+              ))}
+              {bundleCart.map((i) => (
+                <div key={i.bundle.id} className="flex justify-between text-xs text-slate-600">
+                  <span>{i.bundle.name} × {i.qty}</span>
+                  <span className="font-semibold">{fmt(i.qty * i.bundle.price)}</span>
                 </div>
               ))}
               {business.store_shipping_enabled && (

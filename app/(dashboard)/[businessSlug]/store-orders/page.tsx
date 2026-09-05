@@ -30,7 +30,7 @@ export default async function StoreOrdersPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Online Store Orders" />
+      <TopBar title="Store Orders" bg="bg-[#fafefb]" border={false} centered />
       <StoreOrdersClient
         orders={(orders ?? []) as any}
         currency={business.currency}

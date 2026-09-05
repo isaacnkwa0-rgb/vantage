@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -15,9 +15,10 @@ export function NotificationsHeader({ businessSlug }: Props) {
       <button
         onClick={() => router.back()}
         aria-label="Go back"
-        className="p-2 -ml-1 rounded-lg text-slate-500 hover:text-[#0F172A] hover:bg-slate-100 transition"
+        className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
+        Back
       </button>
       <h2 className="text-base font-bold text-[#0F172A] flex-1 min-w-0 truncate">Notifications</h2>
     </header>

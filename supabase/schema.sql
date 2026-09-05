@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   email         TEXT NOT NULL,
   avatar_url    TEXT,
   phone         TEXT,
+  date_of_birth DATE,
   created_at    TIMESTAMPTZ DEFAULT NOW(),
   updated_at    TIMESTAMPTZ DEFAULT NOW()
 );
@@ -158,6 +159,8 @@ CREATE TABLE IF NOT EXISTS sales (
   payment_method    TEXT NOT NULL DEFAULT 'cash',
   payment_reference TEXT,
   payment_status    TEXT NOT NULL DEFAULT 'paid',
+  channel           TEXT DEFAULT 'physical',
+  order_date        DATE,
   notes             TEXT,
   served_by         UUID REFERENCES profiles(id),
   created_at        TIMESTAMPTZ DEFAULT NOW(),

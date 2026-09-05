@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Users, AlertCircle, Loader2, Tag, Download, FileText } from "lucide-react";
-import { generateStatementHTML } from "@/lib/utils/statement";
+import { Plus, Search, Users, AlertCircle, Loader2, Tag, Phone, Mail, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { CustomerForm } from "./CustomerForm";
 import { createClient } from "@/lib/supabase/client";
@@ -43,7 +42,37 @@ interface Props {
   businessType?: "retail" | "service";
 }
 
-export function CustomersClient({ customers, tags: initialTags, businessId, userId, currency, businessName, businessPhone, businessAddress, businessType = "retail" }: Props) {
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
+const AVATAR_PALETTES = [
+  "bg-violet-100 text-violet-600",
+  "bg-blue-100 text-blue-600",
+  "bg-amber-100 text-amber-700",
+  "bg-pink-100 text-pink-600",
+  "bg-teal-100 text-teal-600",
+  "bg-indigo-100 text-indigo-600",
+];
+
+function avatarColor(name: string, hasDebt: boolean) {
+  if (hasDebt) return "bg-red-100 text-red-600";
+  return AVATAR_PALETTES[name.charCodeAt(0) % AVATAR_PALETTES.length];
+}
+
+export function CustomersClient({
+  customers,
+  tags: initialTags,
+  businessId,
+  userId,
+  currency,
+  businessName,
+  businessPhone,
+  businessAddress,
+  businessType = "retail",
+}: Props) {
   const isService = businessType === "service";
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -69,84 +98,8 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
 
   const fmt = (n: number) => formatCurrency(n, currency);
   const totalOutstanding = customers.reduce((s, c) => s + (c.credit_balance ?? 0), 0);
-
-  async function printStatement(customer: Customer) {
-    const supabase = createClient();
-    const fromDate = new Date();
-    fromDate.setFullYear(fromDate.getFullYear() - 1);
-
-    const [salesRes, invoicesRes] = await Promise.all([
-      supabase.from("sales")
-        .select("total_amount, amount_paid, payment_method, created_at, sale_number")
-        .eq("customer_id", customer.id)
-        .gte("created_at", fromDate.toISOString())
-        .order("created_at"),
-      supabase.from("invoices")
-        .select("total_amount, amount_paid, status, created_at, invoice_number")
-        .eq("customer_id", customer.id)
-        .gte("created_at", fromDate.toISOString())
-        .order("created_at"),
-    ]);
-
-    let balance = 0;
-    const entries: Array<{ date: string; description: string; type: string; debit: number; credit: number; balance: number }> = [];
-
-    for (const s of (salesRes.data ?? [])) {
-      if (s.payment_method === "credit") {
-        balance += s.total_amount;
-        entries.push({ date: s.created_at, description: `Sale ${s.sale_number} (credit)`, type: "sale", debit: s.total_amount, credit: 0, balance });
-      }
-    }
-    for (const inv of (invoicesRes.data ?? [])) {
-      if (inv.status !== "paid") {
-        const due = inv.total_amount - (inv.amount_paid ?? 0);
-        if (due > 0) {
-          balance += due;
-          entries.push({ date: inv.created_at, description: `Invoice ${inv.invoice_number}`, type: "invoice", debit: due, credit: 0, balance });
-        }
-        if ((inv.amount_paid ?? 0) > 0) {
-          balance -= inv.amount_paid;
-          entries.push({ date: inv.created_at, description: `Payment on ${inv.invoice_number}`, type: "payment", debit: 0, credit: inv.amount_paid, balance });
-        }
-      }
-    }
-
-    entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-    const html = generateStatementHTML(
-      { name: businessName, currency, phone: businessPhone, address: businessAddress },
-      { name: customer.name, phone: customer.phone, email: customer.email },
-      entries as any,
-      0,
-      fromDate.toISOString(),
-      new Date().toISOString()
-    );
-
-    const win = window.open("", "_blank");
-    if (win) { win.document.write(html); win.document.close(); setTimeout(() => win.print(), 500); }
-  }
-
-  function exportCSV() {
-    const headers = ["Name", "Phone", "Email", "Address", "Total Spent", "Credit Balance", "Last Purchase", "Tags"];
-    const rows = customers.map((c) => [
-      c.name,
-      c.phone ?? "",
-      c.email ?? "",
-      c.address ?? "",
-      c.total_spent,
-      c.credit_balance,
-      c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString() : "",
-      getCustomerTags(c).map((t) => t.name).join("; "),
-    ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `customers-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  const totalRevenue = customers.reduce((s, c) => s + c.total_spent, 0);
+  const debtorCount = customers.filter((c) => c.credit_balance > 0).length;
 
   function getCustomerTags(customer: Customer): CustomerTag[] {
     return (customer.customer_tag_assignments ?? [])
@@ -181,199 +134,201 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
     router.refresh();
   }
 
+  const hasFilters = search || debtorFilter || tagFilter;
+
   return (
-    <div className="flex-1 p-5 space-y-4">
-      <div className="flex gap-3">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={isService ? "Search clients..." : "Search customers..."}
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-          />
-        </div>
-        <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-3 py-2.5 rounded-lg text-sm font-medium transition"
-        >
-          <Download className="w-4 h-4" />
-          Export
-        </button>
-        <button
-          onClick={() => { setEditing(null); setShowForm(true); }}
-          className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition"
-        >
-          <Plus className="w-4 h-4" />
-          {isService ? "Add Client" : "Add Customer"}
-        </button>
-      </div>
+    <div className="flex-1 flex flex-col min-h-0 bg-white">
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
-          <p className="text-xl font-bold text-[#0F172A]">{customers.length}</p>
-          <p className="text-xs text-slate-500">{isService ? "Total Clients" : "Total Customers"}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
-          <p className="text-xl font-bold text-emerald-600">
-            {fmt(customers.reduce((s, c) => s + c.total_spent, 0))}
-          </p>
-          <p className="text-xs text-slate-500">Total Revenue</p>
-        </div>
-        <div className="bg-white rounded-xl border border-red-100 p-3 text-center shadow-sm">
-          <p className="text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
-          <p className="text-xs text-slate-500">Outstanding</p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
-          <p className="text-xl font-bold text-[#0F172A]">
-            {customers.filter((c) => c.last_purchase_at).length}
-          </p>
-          <p className="text-xs text-slate-500">Returning</p>
-        </div>
-      </div>
-
-      {/* Filter row */}
-      <div className="flex flex-wrap items-center gap-2">
-        {totalOutstanding > 0 && (
+      {/* Search + New */}
+      <div className="bg-white border-b border-slate-100 px-4 pt-3 pb-3 space-y-3">
+        <div className="flex gap-2 items-stretch h-11">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            />
+          </div>
           <button
-            onClick={() => setDebtorFilter((v) => !v)}
-            className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-full border transition font-medium ${
-              debtorFilter
-                ? "bg-red-50 border-red-300 text-red-600"
-                : "bg-white border-slate-200 text-slate-500 hover:border-red-300 hover:text-red-500"
-            }`}
+            onClick={() => { setEditing(null); setShowForm(true); }}
+            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
           >
-            <AlertCircle className="w-3.5 h-3.5" />
-            {debtorFilter ? "Debtors only" : "Show debtors"} · {customers.filter((c) => c.credit_balance > 0).length}
+            <Plus className="w-4 h-4" />
+            New
           </button>
-        )}
+        </div>
 
-        {tags.length > 0 && (
-          <>
-            <div className="h-4 w-px bg-slate-200" />
-            <Tag className="w-3.5 h-3.5 text-slate-400" />
-            {tags.map((t) => (
+        {/* Filter pills */}
+        {(totalOutstanding > 0 || tags.length > 0) && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
+            {totalOutstanding > 0 && (
               <button
-                key={t.id}
-                onClick={() => setTagFilter(tagFilter === t.id ? null : t.id)}
-                className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition font-semibold"
-                style={
-                  tagFilter === t.id
-                    ? { backgroundColor: t.color, borderColor: t.color, color: "#fff" }
-                    : { borderColor: t.color + "60", color: t.color, backgroundColor: t.color + "15" }
-                }
+                onClick={() => setDebtorFilter((v) => !v)}
+                className={`flex-shrink-0 flex items-center gap-1.5 text-[13px] font-semibold px-3.5 py-1.5 rounded-full border transition ${
+                  debtorFilter
+                    ? "bg-red-500 border-red-500 text-white"
+                    : "bg-white border-slate-200 text-slate-600 active:bg-slate-50"
+                }`}
               >
-                {t.name}
-                {tagFilter === t.id && <span className="opacity-80">×</span>}
+                <AlertCircle className="w-3 h-3" />
+                Debtors · {debtorCount}
               </button>
-            ))}
-          </>
+            )}
+            {tags.length > 0 && (
+              <>
+                <div className="h-5 w-px bg-slate-200 flex-shrink-0" />
+                {tags.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTagFilter(tagFilter === t.id ? null : t.id)}
+                    className="flex-shrink-0 flex items-center gap-1 text-[13px] font-semibold px-3 py-1.5 rounded-full border transition"
+                    style={
+                      tagFilter === t.id
+                        ? { backgroundColor: t.color, borderColor: t.color, color: "#fff" }
+                        : { borderColor: t.color + "60", color: t.color, backgroundColor: t.color + "15" }
+                    }
+                  >
+                    <Tag className="w-2.5 h-2.5" />
+                    {t.name}
+                  </button>
+                ))}
+              </>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Table */}
-      {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Users className="w-14 h-14 text-slate-200 mb-4" />
-          <p className="text-slate-600 font-medium">
-            {search || tagFilter
-              ? `No ${isService ? "clients" : "customers"} found`
-              : `No ${isService ? "clients" : "customers"} yet`}
-          </p>
-          <p className="text-slate-400 text-sm mt-1">
-            {search || tagFilter ? "Try a different search or filter" : `Add your first ${isService ? "client" : "customer"}`}
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                <th className="text-left px-4 py-3">Name</th>
-                <th className="text-left px-4 py-3 hidden sm:table-cell">Contact</th>
-                <th className="text-right px-4 py-3">Total Spent</th>
-                <th className="text-left px-4 py-3 hidden md:table-cell">{isService ? "Last Visit" : "Last Purchase"}</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
+
+        {/* Stats — compact inline chips */}
+        {customers.length > 0 && (
+          <div className="flex gap-3">
+            <div className="flex-1 flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-[8px] px-3 py-2.5">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#1a9c38] to-emerald-500 flex items-center justify-center flex-shrink-0">
+                <Users className="w-3 h-3 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-900 leading-none">{customers.length}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">{isService ? "Clients" : "Customers"}</p>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-[8px] px-3 py-2.5">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-3 h-3 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-emerald-600 leading-none truncate">{fmt(totalRevenue)}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Revenue</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <Users className="w-9 h-9 text-slate-300" />
+            </div>
+            <p className="text-[16px] font-bold text-slate-800">
+              {hasFilters
+                ? `No ${isService ? "clients" : "customers"} found`
+                : `No ${isService ? "clients" : "customers"} yet`}
+            </p>
+            <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">
+              {hasFilters
+                ? "Try adjusting your search or filters"
+                : `Add your first ${isService ? "client" : "customer"} to start tracking`}
+            </p>
+            {!hasFilters && (
+              <button
+                onClick={() => { setEditing(null); setShowForm(true); }}
+                className="mt-6 flex items-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white px-5 py-3 rounded-[8px] text-sm font-semibold transition"
+              >
+                <Plus className="w-4 h-4" />
+                {isService ? "Add Client" : "Add Customer"}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+              {filtered.length} {isService ? "client" : "customer"}{filtered.length !== 1 ? "s" : ""}
+            </p>
+
+            <div className="bg-white rounded-[8px] border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50">
               {filtered.map((customer) => {
                 const customerTags = getCustomerTags(customer);
+                const hasDebt = customer.credit_balance > 0;
+                const contact = customer.phone ?? customer.email;
+                const lastDate = customer.last_purchase_at ? shortDate(customer.last_purchase_at) : null;
+
                 return (
-                  <tr key={customer.id} className="hover:bg-slate-50 transition group">
-                    <td className="px-4 py-3 cursor-pointer" onClick={() => openEdit(customer)}>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-                          customer.credit_balance > 0 ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
-                        }`}>
-                          {customer.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium text-[#0F172A] text-sm">{customer.name}</p>
-                          {customerTags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-0.5">
-                              {customerTags.map((t) => (
-                                <span
-                                  key={t.id}
-                                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
-                                  style={{ backgroundColor: t.color + "20", color: t.color }}
-                                >
-                                  {t.name}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {customer.credit_balance > 0 && (
-                            <span className="text-xs text-red-500 font-semibold">
-                              Owes {fmt(customer.credit_balance)}
+                  <div key={customer.id} className="px-4 py-4">
+                    {/* Main row */}
+                    <div
+                      className="flex items-start gap-3 cursor-pointer active:opacity-70 transition"
+                      onClick={() => openEdit(customer)}
+                    >
+                      {/* Avatar */}
+                      <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[15px] mt-0.5 ${avatarColor(customer.name, hasDebt)}`}>
+                        {customer.name.charAt(0).toUpperCase()}
+                      </div>
+
+                      {/* Left — name + contact */}
+                      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-[15px] text-slate-900 leading-none">{customer.name}</span>
+                          {hasDebt && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-50 text-red-500 border border-red-100 flex-shrink-0">
+                              OWES {fmt(customer.credit_balance)}
                             </span>
                           )}
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <p className="text-sm text-slate-600">{customer.phone ?? customer.email ?? "—"}</p>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="text-sm font-semibold text-emerald-600">
-                        {fmt(customer.total_spent)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-xs text-slate-400">
-                        {customer.last_purchase_at
-                          ? new Date(customer.last_purchase_at).toLocaleDateString()
-                          : "Never"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                        <button
-                          onClick={() => printStatement(customer)}
-                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                          title="Print account statement"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                        </button>
-                        {customer.credit_balance > 0 && (
-                          <button
-                            onClick={() => { setRecordingPaymentFor(customer); setPaymentAmount(""); setPaymentNote(""); }}
-                            className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
-                          >
-                            Record Payment
-                          </button>
+                        {contact && (
+                          <div className="flex items-center gap-1">
+                            {customer.phone
+                              ? <Phone className="w-2.5 h-2.5 text-slate-600 flex-shrink-0" />
+                              : <Mail className="w-2.5 h-2.5 text-slate-600 flex-shrink-0" />}
+                            <span className="text-[13px] text-slate-400 truncate">{contact}</span>
+                          </div>
                         )}
                       </div>
-                    </td>
-                  </tr>
+
+                      {/* Right — amount + label */}
+                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                        <span className="text-[15px] font-bold text-slate-800 leading-none">{fmt(customer.total_spent)}</span>
+                        <span className="text-[11px] text-slate-400">total purchases</span>
+                      </div>
+                    </div>
+
+                    {/* Action row */}
+                    {hasDebt && (
+                      <div className="flex items-center gap-2 mt-3 pl-[52px]">
+                        <button
+                          onClick={() => { setRecordingPaymentFor(customer); setPaymentAmount(""); setPaymentNote(""); }}
+                          className="flex items-center gap-1.5 text-[13px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg transition active:scale-95"
+                        >
+                          Record Payment
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+          </div>
+        )}
 
+        {/* Bottom padding for FAB */}
+        <div className="h-6" />
+      </div>
+
+
+      {/* Add / Edit form */}
       {showForm && (
         <CustomerForm
           businessId={businessId}
@@ -384,23 +339,29 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
         />
       )}
 
+      {/* Record payment sheet */}
       {recordingPaymentFor && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
           <div className="bg-white w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div>
-                <h2 className="font-bold text-[#0F172A]">Record Payment</h2>
-                <p className="text-sm text-slate-400 mt-0.5">
+                <h2 className="font-bold text-slate-900">Record Payment</h2>
+                <p className="text-[13px] text-slate-400 mt-0.5">
                   {recordingPaymentFor.name} owes {fmt(recordingPaymentFor.credit_balance)}
                 </p>
               </div>
-              <button onClick={() => setRecordingPaymentFor(null)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <button
+                onClick={() => setRecordingPaymentFor(null)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-[8px] transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#0F172A] mb-1">Amount received *</label>
+                <label className="block text-[13px] font-semibold text-slate-700 mb-1.5">Amount received</label>
                 <input
                   type="number"
                   step="0.01"
@@ -409,25 +370,32 @@ export function CustomersClient({ customers, tags: initialTags, businessId, user
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
                   placeholder={recordingPaymentFor.credit_balance.toFixed(2)}
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-lg"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-[8px] text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#1a9c38]"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#0F172A] mb-1">Note <span className="text-slate-400 font-normal">(optional)</span></label>
+                <label className="block text-[13px] font-semibold text-slate-700 mb-1.5">
+                  Note <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
                 <input
                   value={paymentNote}
                   onChange={(e) => setPaymentNote(e.target.value)}
                   placeholder="e.g. Part payment"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38]"
                 />
               </div>
-              <div className="flex gap-3">
-                <button onClick={() => setRecordingPaymentFor(null)} className="flex-1 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">Cancel</button>
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={() => setRecordingPaymentFor(null)}
+                  className="flex-1 py-3 border border-slate-200 rounded-[8px] text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
                 <button
                   onClick={recordPayment}
                   disabled={recordingPayment || !paymentAmount || parseFloat(paymentAmount) <= 0}
-                  className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 transition"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-3 rounded-[8px] text-[13px] font-semibold disabled:opacity-50 transition"
                 >
                   {recordingPayment && <Loader2 className="w-4 h-4 animate-spin" />}
                   Confirm Payment

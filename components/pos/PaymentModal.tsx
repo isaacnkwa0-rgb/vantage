@@ -117,6 +117,8 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
         paymentReference: reference,
         loyaltyPointsToEarn: pointsToEarn,
         loyaltyPointsToRedeem,
+        channel: "physical",
+        orderDate: new Date().toISOString().split("T")[0],
         createdAt: new Date().toISOString(),
       });
 

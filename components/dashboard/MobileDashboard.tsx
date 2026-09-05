@@ -38,6 +38,9 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { useBusinessStore } from "@/store/businessStore";
 import { createClient } from "@/lib/supabase/client";
+import {
+  REVENUE_MILESTONES, SALES_MILESTONES, TOTAL_MILESTONES, computeMilestones,
+} from "@/lib/milestones";
 
 interface Sale {
   id: string;
@@ -79,6 +82,8 @@ interface Props {
   weekStoreVisits: number;
   monthStoreVisits: number;
   locations: { id: string; name: string }[];
+  allTimeRevenue: number;
+  allTimeSalesCount: number;
 }
 
 const METHOD_STYLES: Record<string, string> = {
@@ -100,6 +105,8 @@ export function MobileDashboard({
   todayNewCustomers, weekNewCustomers,
   todayStoreVisits, weekStoreVisits, monthStoreVisits,
   locations,
+  allTimeRevenue,
+  allTimeSalesCount,
 }: Props) {
   const [hidden, setHidden] = useState(false);
   const [period, setPeriod] = useState<"today" | "week" | "month">("today");
@@ -198,14 +205,12 @@ export function MobileDashboard({
     { label: "Expense",  icon: Wallet,         href: "expenses",  primary: false },
   ] as const;
 
-  const MILESTONES = [
-    { label: "Record your first sale",    done: monthSalesCount > 0 },
-    { label: "Add your first product",    done: totalProducts > 0   },
-    { label: "Add your first customer",   done: totalCustomers > 0  },
-  ];
-  const milestoneDone  = MILESTONES.filter((m) => m.done).length;
-  const milestoneTotal = MILESTONES.length;
-  const nextMilestone  = MILESTONES.find((m) => !m.done);
+  const revenueMilestones = computeMilestones(REVENUE_MILESTONES, allTimeRevenue);
+  const salesMilestones   = computeMilestones(SALES_MILESTONES, allTimeSalesCount);
+  const totalAchieved     = [...revenueMilestones, ...salesMilestones].filter((m) => m.status === "achieved").length;
+  const nextRevMilestone  = revenueMilestones.find((m) => m.status === "next");
+  const nextSalesMilestone = salesMilestones.find((m) => m.status === "next");
+  const nextMilestone     = nextRevMilestone ?? nextSalesMilestone;
 
   const itemsSold    = period === "today" ? todayItemsSold  : period === "week" ? weekItemsSold  : monthItemsSold;
   const periodNewCx  = period === "today" ? todayNewCustomers : period === "week" ? weekNewCustomers : newCustomers;
@@ -465,22 +470,38 @@ export function MobileDashboard({
         </div>
 
         {/* ── Milestone card ────────────────────────────────── */}
-        <Link href={`/${slug}/targets`} className="mx-4 mb-3 block bg-white rounded-[14px] border border-slate-200 px-4 py-6">
+        <Link href={`/${slug}/targets`} className="mx-4 mb-3 block bg-white rounded-[14px] border border-slate-200 px-4 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <p className="text-[14px] font-bold text-slate-900">Milestone</p>
-              <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">
-                {nextMilestone ? nextMilestone.label : "You've achieved all milestones!"}
-              </p>
-              <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#1a9c38] rounded-full transition-all"
-                  style={{ width: `${(milestoneDone / milestoneTotal) * 100}%` }}
-                />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[14px] font-bold text-slate-900">Growth Milestones</p>
+                <span className="text-[11px] font-semibold text-slate-400 flex-shrink-0">{totalAchieved}/{TOTAL_MILESTONES}</span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1.5">{milestoneDone}/{milestoneTotal}</p>
+              {nextMilestone ? (
+                <>
+                  <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">
+                    Next: <span className="font-semibold text-amber-500">{nextMilestone.emoji} {nextMilestone.label}</span>
+                  </p>
+                  <div className="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-400 rounded-full transition-all"
+                      style={{ width: `${nextMilestone.progress}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">{Math.round(nextMilestone.progress)}% there · tap to see all</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[12px] text-[#1a9c38] font-semibold mt-0.5">🎉 All milestones achieved!</p>
+                  <div className="mt-2 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#1a9c38] rounded-full w-full" />
+                  </div>
+                </>
+              )}
             </div>
-            <span className="text-[52px] leading-none select-none flex-shrink-0" aria-hidden="true">🏆</span>
+            <span className="text-[44px] leading-none select-none flex-shrink-0" aria-hidden="true">
+              {nextMilestone ? nextMilestone.emoji : "🏆"}
+            </span>
           </div>
         </Link>
 
@@ -574,7 +595,7 @@ export function MobileDashboard({
                     <p className="text-[14px] font-bold text-slate-900">
                       {formatCurrency(sale.total_amount, currency)}
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
+                    <p className="text-[10px] text-slate-400 mt-0.5" suppressHydrationWarning>
                       {new Date(sale.created_at).toLocaleTimeString("en-US", {
                         hour: "2-digit", minute: "2-digit",
                       })}

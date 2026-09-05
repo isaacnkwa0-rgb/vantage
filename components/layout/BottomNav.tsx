@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ShoppingCart, Box, Package, Package2, Users, CircleEllipsis, Crown,
+  Home, ShoppingCart, Box, Package, Package2, Users, CircleEllipsis, Crown, Award,
   LayoutDashboard, ClipboardList,
   Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
-  ShoppingBag, Tag, CalendarDays, BookOpen, FileX, Globe, Gift, Share2,
+  CalendarDays, Globe, Gift, Share2,
   RefreshCw, Barcode, Thermometer, BellRing, Landmark, Wallet,
-  ChevronRight, ChevronDown, Store, MapPin, Plus, X, Check,
+  ChevronRight, ChevronDown, Store, MapPin, Plus, X, Check, ArrowRight,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -37,29 +37,23 @@ const NAV_SECTIONS: NavSection[] = [
     id: "sales",
     label: "SALES",
     items: [
-      { label: "Point of Sale", serviceLabel: "Record Service", icon: ShoppingCart, href: "pos" },
       { label: "Transactions", icon: ClipboardList, href: "sales" },
       { label: "Invoices", icon: FileText, href: "invoices" },
-      { label: "Quotes", icon: FilePen, href: "quotes" },
+      { label: "Quotation", icon: FilePen, href: "quotes" },
       { label: "Discounts", icon: Ticket, href: "discounts" },
-      { label: "Recurring Billing", icon: RefreshCw, href: "recurring" },
     ],
   },
   {
     id: "catalog",
     label: "CATALOG",
     items: [
-      { label: "Products", serviceLabel: "Services", icon: Package, href: "products" },
       { label: "Bundles", icon: Package2, href: "bundles", retailOnly: true },
-      { label: "Pricing Tiers", icon: Tag, href: "pricing" },
-      { label: "Barcode Labels", icon: Barcode, href: "barcode-labels", retailOnly: true },
     ],
   },
   {
     id: "customers",
     label: "CUSTOMERS",
     items: [
-      { label: "Customers", serviceLabel: "Clients", icon: Users, href: "customers" },
       { label: "Campaigns", icon: Megaphone, href: "campaigns" },
       { label: "Referrals", icon: Share2, href: "referrals" },
       { label: "Gift Cards", icon: Gift, href: "gift-cards" },
@@ -71,7 +65,6 @@ const NAV_SECTIONS: NavSection[] = [
     retailOnly: true,
     items: [
       { label: "Suppliers", icon: Truck, href: "suppliers" },
-      { label: "Purchase Orders", icon: ShoppingBag, href: "purchase-orders" },
       { label: "Store Orders", icon: Globe, href: "store-orders" },
     ],
   },
@@ -80,8 +73,6 @@ const NAV_SECTIONS: NavSection[] = [
     label: "FINANCE",
     items: [
       { label: "Expenses", icon: Receipt, href: "expenses" },
-      { label: "Cashbook", icon: BookOpen, href: "cashbook" },
-      { label: "Credit Notes", icon: FileX, href: "credit-notes" },
       { label: "Bank Accounts", icon: Landmark, href: "bank-accounts" },
     ],
   },
@@ -90,7 +81,6 @@ const NAV_SECTIONS: NavSection[] = [
     label: "INSIGHTS",
     items: [
       { label: "Reports", icon: BarChart3, href: "reports" },
-      { label: "Analytics", icon: TrendingUp, href: "analytics" },
       { label: "Targets", icon: Target, href: "targets" },
       { label: "Commissions", icon: BadgePercent, href: "commissions" },
     ],
@@ -102,16 +92,14 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Cash Shifts", icon: Vault, href: "shifts" },
       { label: "Appointments", icon: CalendarDays, href: "appointments" },
       { label: "Payroll", icon: Wallet, href: "payroll" },
-      { label: "Thermal Printer", icon: Thermometer, href: "thermal-printer" },
     ],
   },
   {
     id: "system",
     label: "SYSTEM",
     items: [
-      { label: "Notifications", icon: BellRing, href: "notifications" },
-      { label: "Activity", icon: ActivitySquare, href: "activity" },
       { label: "Settings", icon: Settings, href: "settings" },
+      { label: "Activity", icon: ActivitySquare, href: "activity" },
     ],
   },
 ];
@@ -175,9 +163,9 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
 
   return (
     /* Covers full viewport except the bottom nav (h-16 = 64px) */
-    <div className="fixed inset-x-0 top-0 z-50 bg-[#F5F6F8] flex flex-col overflow-hidden" style={{ bottom: "calc(4rem + env(safe-area-inset-bottom))" }}>
-      {/* Mint hero */}
-      <div className="bg-[#fafefb] px-4 pt-12 pb-5 flex-shrink-0">
+    <div className="fixed inset-x-0 top-0 z-50 bg-white flex flex-col overflow-hidden" style={{ bottom: "calc(4rem + env(safe-area-inset-bottom))" }}>
+      {/* Mint hero — profile only */}
+      <div className="bg-[#fafefb] px-4 pt-12 pb-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="w-14 h-14 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
@@ -199,31 +187,31 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
         </div>
       </div>
 
-      {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 space-y-3 pt-3">
-
-        {/* Upgrade CTA — free tier only */}
-        {activeBusiness?.subscription_tier === "free" && (
+      {/* Upgrade CTA */}
+      {activeBusiness?.subscription_tier === "free" && (
+        <div className="px-4 pt-3 pb-5 flex-shrink-0">
           <Link
             href={`/${slug}/settings?tab=billing`}
             onClick={onClose}
-            className="flex items-center gap-3 bg-white rounded-xl px-4 py-4 border border-slate-100 active:bg-slate-50 transition-colors"
+            className="flex items-center gap-3 bg-[#eff3f1] rounded-[8px] px-4 py-5 active:bg-[#e8edea] transition-colors"
           >
-            <div className="w-10 h-10 rounded-full bg-amber-50 border-2 border-amber-400 flex items-center justify-center flex-shrink-0">
-              <Crown className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            </div>
+            <Award className="w-6 h-6 text-green-600 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-slate-900">Upgrade to Starter</p>
               <p className="text-xs text-slate-500 mt-0.5">Unlock the full benefits of VANTAGE</p>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" aria-hidden="true" />
           </Link>
-        )}
+        </div>
+      )}
+
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 space-y-3 pt-3">
 
         {/* Branch / location picker */}
         <button
           onClick={() => setShowLocationSheet(true)}
-          className="w-full flex items-center gap-3 bg-white rounded-[8px] px-4 h-11 border border-slate-200 active:bg-slate-50 transition-colors"
+          className="w-full flex items-center gap-3 bg-white rounded-[8px] px-4 h-11 border border-slate-200 active:bg-slate-50 transition-colors mb-6"
         >
           <Store className="w-5 h-5 text-green-600 flex-shrink-0" aria-hidden="true" />
           <span className="flex-1 text-left text-[14px] font-medium text-slate-800">{locationLabel}</span>
@@ -297,20 +285,24 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                 aria-expanded={isOpen}
                 className="w-full flex items-center justify-between px-1 mb-2 focus-visible:outline-none"
               >
-                <span className="text-[13px] font-extrabold uppercase tracking-wider text-slate-900">
+                <span className="text-[14px] font-bold uppercase tracking-[0.12em] text-slate-900">
                   {section.label}
                 </span>
-                <ChevronDown
+                <svg
                   aria-hidden="true"
+                  width="11" height="6" viewBox="0 0 11 6"
+                  fill="currentColor"
                   className={cn(
-                    "w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0",
+                    "text-slate-400 transition-transform duration-200 flex-shrink-0",
                     !isOpen && "-rotate-90"
                   )}
-                />
+                >
+                  <path d="M0 0L5.5 6L11 0Z" />
+                </svg>
               </button>
 
               {/* Items card */}
-              {isOpen && <div className="bg-[#f9fefb] rounded-2xl overflow-hidden">
+              {isOpen && <div className="bg-[#fafefb] rounded-xl overflow-hidden">
               {items.map((item, i) => {
                 const label = isService && item.serviceLabel ? item.serviceLabel : item.label;
                 const href = `/${slug}/${item.href}`;
@@ -324,9 +316,8 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                     onClick={onClose}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
-                      i >= 0 && "border-t border-slate-100",
-                      isActive ? "bg-green-50" : "active:bg-slate-50"
+                      "flex items-center gap-3 px-4 py-[18px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 active:bg-slate-50",
+                      i > 0 && "border-t border-slate-100"
                     )}
                   >
                     <Icon

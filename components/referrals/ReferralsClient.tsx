@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Share2, Users, CheckCircle2, Clock, Gift, ToggleLeft, ToggleRight, X } from "lucide-react";
+import { Share2, Gift, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ReferralProgram {
@@ -31,16 +31,40 @@ interface Props {
   businessId: string;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-700",
-  converted: "bg-blue-100 text-blue-700",
-  rewarded: "bg-green-100 text-green-700",
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  pending:   { label: "Pending",   bg: "bg-amber-50",   text: "text-amber-700" },
+  converted: { label: "Converted", bg: "bg-blue-50",    text: "text-blue-700" },
+  rewarded:  { label: "Rewarded",  bg: "bg-emerald-50", text: "text-emerald-700" },
 };
 
-export function ReferralsClient({ program: initialProgram, referrals, currency, businessId }: Props) {
-  const supabase = createClient();
-  const fmt = (n: number) => formatCurrency(n, currency);
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px bg-slate-200" />
+      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-slate-200" />
+    </div>
+  );
+}
+
+export function ReferralsClient({ program: initialProgram, referrals, currency, businessId }: Props) {
   const [program, setProgram] = useState<ReferralProgram | null>(initialProgram);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -52,6 +76,7 @@ export function ReferralsClient({ program: initialProgram, referrals, currency, 
 
   async function saveProgram() {
     setSaving(true);
+    const supabase = createClient();
     const payload = {
       business_id: businessId,
       name: form.name,
@@ -70,126 +95,138 @@ export function ReferralsClient({ program: initialProgram, referrals, currency, 
   }
 
   const converted = referrals.filter((r) => r.status !== "pending").length;
-  const rewarded = referrals.filter((r) => r.status === "rewarded").length;
+  const rewarded  = referrals.filter((r) => r.status === "rewarded").length;
 
   return (
-    <div className="flex-1 p-5 space-y-5">
-      {/* Program config */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-[#0F172A]">Program Settings</h3>
+    <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
+
+      {/* Program settings card */}
+      <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <span className="text-[13px] font-semibold text-[#0F172A]">Program Settings</span>
           <button
             onClick={() => setForm((f) => ({ ...f, is_active: !f.is_active }))}
-            className="text-slate-400 hover:text-green-600 transition"
+            className="transition"
           >
             {form.is_active
-              ? <ToggleRight className="w-8 h-8 text-green-600" />
-              : <ToggleLeft className="w-8 h-8" />}
+              ? <ToggleRight className="w-8 h-8 text-[#1a9c38]" />
+              : <ToggleLeft  className="w-8 h-8 text-slate-400" />}
           </button>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Program Name</label>
-            <input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+        <div className="px-4 pt-4 pb-3 space-y-4">
+          <SectionDivider label="Reward" />
+          <div className="space-y-3">
+            <Field label="Program name">
+              <input
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="e.g. Referral Program"
+                className={innerCls}
+              />
+            </Field>
+            <Field label="Reward type">
+              <select
+                value={form.reward_type}
+                onChange={(e) => setForm((f) => ({ ...f, reward_type: e.target.value as ReferralProgram["reward_type"] }))}
+                className={`${innerCls} -ml-0.5`}
+              >
+                <option value="discount">Discount (%)</option>
+                <option value="credit">Store Credit</option>
+                <option value="gift_card">Gift Card</option>
+              </select>
+            </Field>
+            <Field label={`Reward value ${form.reward_type === "discount" ? "(%)" : `(${currency})`}`}>
+              <input
+                type="number"
+                min="0"
+                value={form.reward_value}
+                onChange={(e) => setForm((f) => ({ ...f, reward_value: e.target.value }))}
+                placeholder="0"
+                className={innerCls}
+              />
+            </Field>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Reward Type</label>
-            <select
-              value={form.reward_type}
-              onChange={(e) => setForm({ ...form, reward_type: e.target.value as ReferralProgram["reward_type"] })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              <option value="discount">Discount (%)</option>
-              <option value="credit">Store Credit</option>
-              <option value="gift_card">Gift Card</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">
-              Reward Value {form.reward_type === "discount" ? "(%)" : `(${currency})`}
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={form.reward_value}
-              onChange={(e) => setForm({ ...form, reward_value: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
+          <p className="text-[12px] text-slate-400 leading-relaxed">
+            Customers get a unique referral code. When someone uses their code and makes a purchase, the referrer earns the reward above.
+          </p>
         </div>
 
-        <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500">
-          Customers get a unique referral code when they join. When a new customer uses their code and makes a purchase, the referrer earns the reward above.
+        <div className="px-4 pb-4">
+          <button
+            onClick={saveProgram}
+            disabled={saving}
+            className="w-full flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+          >
+            {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+            {program ? "Update Program" : "Enable Program"}
+          </button>
         </div>
-
-        <button
-          onClick={saveProgram}
-          disabled={saving}
-          className="px-5 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
-        >
-          {saving ? "Saving..." : program ? "Update Program" : "Enable Program"}
-        </button>
       </div>
 
-      {/* Stats */}
+      {/* Stats row */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-[#0F172A]">{referrals.length}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Total Referrals</p>
+        <div className="border border-slate-200 rounded-[8px] p-3 text-center">
+          <p className="text-[20px] font-extrabold text-[#0F172A]">{referrals.length}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Total</p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-blue-600">{converted}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Converted</p>
+        <div className="border border-slate-200 rounded-[8px] p-3 text-center">
+          <p className="text-[20px] font-extrabold text-blue-600">{converted}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Converted</p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-green-600">{rewarded}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Rewarded</p>
+        <div className="border border-slate-200 rounded-[8px] p-3 text-center">
+          <p className="text-[20px] font-extrabold text-[#1a9c38]">{rewarded}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Rewarded</p>
         </div>
       </div>
 
-      {/* Referrals table */}
+      {/* Referrals list */}
       {referrals.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center text-center gap-3">
-          <Share2 className="w-10 h-10 text-slate-300" />
-          <p className="text-sm font-semibold text-[#0F172A]">No referrals yet</p>
-          <p className="text-xs text-slate-400">Customers with referral codes will appear here once they refer someone</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <Share2 className="w-9 h-9 text-slate-300" />
+          </div>
+          <p className="text-[16px] font-bold text-slate-800">No referrals yet</p>
+          <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">
+            Customers with referral codes will appear here once they refer someone
+          </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide bg-slate-50">
-                <th className="text-left px-5 py-3">Code</th>
-                <th className="text-left px-5 py-3">Referrer</th>
-                <th className="text-left px-5 py-3">Referred</th>
-                <th className="text-left px-5 py-3">Status</th>
-                <th className="text-left px-5 py-3">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {referrals.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50 transition">
-                  <td className="px-5 py-3 font-mono text-sm font-bold text-[#0F172A]">{r.referral_code}</td>
-                  <td className="px-5 py-3 text-sm text-slate-600">{r.referrer?.name ?? "—"}</td>
-                  <td className="px-5 py-3 text-sm text-slate-600">{r.referred?.name ?? <span className="text-slate-300">Pending</span>}</td>
-                  <td className="px-5 py-3">
-                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[r.status])}>
-                      {r.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-xs text-slate-400">
-                    {new Date(r.created_at).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+            {referrals.length} referral{referrals.length !== 1 ? "s" : ""}
+          </p>
+          <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {referrals.map((r) => {
+              const sc = STATUS_CONFIG[r.status] ?? STATUS_CONFIG.pending;
+              return (
+                <div key={r.id} className="px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-violet-50 flex-shrink-0 flex items-center justify-center mt-0.5">
+                      <Gift className="w-4 h-4 text-violet-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-[14px] text-[#0F172A]">{r.referral_code}</span>
+                        <span className={cn("text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0", sc.bg, sc.text)}>
+                          {sc.label}
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-slate-500 mt-0.5">
+                        {r.referrer?.name ?? "Unknown"}
+                        {" → "}
+                        {r.referred?.name ?? <span className="text-slate-300">awaiting</span>}
+                      </p>
+                      <span className="text-[12px] text-slate-400 mt-0.5 block" suppressHydrationWarning>
+                        {shortDate(r.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

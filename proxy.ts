@@ -89,7 +89,7 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // Logged-in user visiting auth page or root → send to dashboard.
+  // Logged-in user visiting auth page or root → restore last page or send to dashboard.
   if (isAuthPath || isRoot) {
     const { data: membership } = await supabase
       .from("business_members")
@@ -103,6 +103,16 @@ export async function proxy(request: NextRequest) {
       membership?.businesses as unknown as { slug: string } | null
     )?.slug;
     const url = request.nextUrl.clone();
+
+    // If coming from root (reload/open), restore last visited page
+    if (isRoot) {
+      const lastPath = request.cookies.get("last_path")?.value;
+      if (lastPath) {
+        url.pathname = decodeURIComponent(lastPath);
+        return NextResponse.redirect(url);
+      }
+    }
+
     url.pathname = slug ? `/${slug}/dashboard` : "/onboarding";
     return NextResponse.redirect(url);
   }

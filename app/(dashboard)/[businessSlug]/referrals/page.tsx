@@ -37,7 +37,7 @@ export default async function ReferralsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Referral Program" />
+      <TopBar title="Referral Program" bg="bg-[#fafefb]" border={false} centered />
       <ReferralsClient
         program={programRes.data as any}
         referrals={(referralsRes.data ?? []) as any}

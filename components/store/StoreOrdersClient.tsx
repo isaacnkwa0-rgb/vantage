@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Store, ExternalLink, ChevronDown, ChevronUp, Copy, CheckCheck } from "lucide-react";
+import {
+  Store,
+  Clock, CreditCard, Package, Truck, CheckCircle2, XCircle,
+  ChevronDown, ChevronUp, MapPin, Search, Phone, Mail, SlidersHorizontal,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OrderItem {
@@ -32,189 +36,273 @@ interface Props {
   businessSlug: string;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-700",
-  paid: "bg-blue-100 text-blue-700",
-  processing: "bg-purple-100 text-purple-700",
-  shipped: "bg-indigo-100 text-indigo-700",
-  delivered: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-500",
+const STATUS_CONFIG: Record<string, {
+  label: string; bg: string; text: string;
+  iconBg: string; iconColor: string; Icon: React.ElementType;
+}> = {
+  pending:    { label: "Pending",    bg: "bg-amber-50",   text: "text-amber-700",   iconBg: "bg-amber-50",   iconColor: "text-amber-500",  Icon: Clock         },
+  paid:       { label: "Paid",       bg: "bg-blue-50",    text: "text-blue-700",    iconBg: "bg-blue-50",    iconColor: "text-blue-500",   Icon: CreditCard    },
+  processing: { label: "Processing", bg: "bg-violet-50",  text: "text-violet-700",  iconBg: "bg-violet-50",  iconColor: "text-violet-500", Icon: Package       },
+  shipped:    { label: "Shipped",    bg: "bg-indigo-50",  text: "text-indigo-700",  iconBg: "bg-indigo-50",  iconColor: "text-indigo-500", Icon: Truck         },
+  delivered:  { label: "Delivered",  bg: "bg-emerald-50", text: "text-emerald-700", iconBg: "bg-emerald-50", iconColor: "text-emerald-500",Icon: CheckCircle2  },
+  cancelled:  { label: "Cancelled",  bg: "bg-red-50",     text: "text-red-600",     iconBg: "bg-red-50",     iconColor: "text-red-400",    Icon: XCircle       },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: "Accept Order",
-  paid: "Mark as Processing",
-  processing: "Mark as Shipped",
-  shipped: "Mark as Delivered",
+const STATUS_FLOW: Record<string, { next: string; label: string }> = {
+  pending:    { next: "processing", label: "Accept Order"       },
+  paid:       { next: "processing", label: "Start Processing"   },
+  processing: { next: "shipped",    label: "Mark as Shipped"    },
+  shipped:    { next: "delivered",  label: "Mark as Delivered"  },
 };
 
-const STATUS_FLOW: Record<string, string> = {
-  pending: "processing",
-  paid: "processing",
-  processing: "shipped",
-  shipped: "delivered",
-};
+const FILTER_TABS = [
+  { key: "all",       label: "All"       },
+  { key: "pending",   label: "Pending"   },
+  { key: "active",    label: "Active"    },
+  { key: "delivered", label: "Delivered" },
+  { key: "cancelled", label: "Cancelled" },
+] as const;
+
+type FilterKey = typeof FILTER_TABS[number]["key"];
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
 
 export function StoreOrdersClient({ orders: initialOrders, currency, businessSlug }: Props) {
-  const supabase = createClient();
   const fmt = (n: number) => formatCurrency(n, currency);
 
-  const [orders, setOrders] = useState<StoreOrder[]>(initialOrders);
+  const [orders, setOrders]     = useState<StoreOrder[]>(initialOrders);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [search, setSearch]     = useState("");
+  const [filter, setFilter]     = useState<FilterKey>("all");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [updating, setUpdating] = useState<string | null>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
 
-  // Request notification permission and subscribe to new orders via Realtime
   useEffect(() => {
     if (typeof Notification !== "undefined" && Notification.permission === "default") {
       Notification.requestPermission();
     }
-
-    const businessId = initialOrders[0]?.id ? undefined : undefined; // fetched from orders
+    const supabase = createClient();
     const channel = supabase
       .channel("store-orders-new")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "store_orders" },
-        (payload) => {
-          const newOrder = payload.new as StoreOrder;
-          setOrders((prev) => [newOrder, ...prev]);
-          if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-            new Notification("New Store Order!", {
-              body: `${newOrder.customer_name} placed an order — ${formatCurrency(newOrder.total_amount, currency)}`,
-              icon: "/favicon.ico",
-            });
-          }
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "store_orders" }, (payload) => {
+        const o = payload.new as StoreOrder;
+        setOrders((prev) => [o, ...prev]);
+        if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+          new Notification("New Store Order!", {
+            body: `${o.customer_name} placed an order — ${formatCurrency(o.total_amount, currency)}`,
+            icon: "/favicon.ico",
+          });
         }
-      )
+      })
       .subscribe();
-
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const storeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/store/${businessSlug}`;
-
   async function updateStatus(id: string, status: string) {
+    setUpdating(id + status);
+    const supabase = createClient();
     await supabase.from("store_orders").update({ status }).eq("id", id);
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: status as StoreOrder["status"] } : o)));
+    setUpdating(null);
   }
 
-  function copyStoreLink() {
-    navigator.clipboard.writeText(storeUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  const filtered = orders.filter((o) => {
+    const matchesSearch =
+      o.order_number.toLowerCase().includes(search.toLowerCase()) ||
+      o.customer_name.toLowerCase().includes(search.toLowerCase()) ||
+      (o.customer_email ?? "").toLowerCase().includes(search.toLowerCase());
+    const matchesFilter =
+      filter === "all" ? true :
+      filter === "active" ? ["paid", "processing", "shipped"].includes(o.status) :
+      o.status === filter;
+    return matchesSearch && matchesFilter;
+  });
 
-  const totalRevenue = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.total_amount, 0);
+  const pendingCount   = orders.filter((o) => o.status === "pending").length;
+  const activeCount    = orders.filter((o) => ["paid","processing","shipped"].includes(o.status)).length;
+  const totalRevenue   = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.total_amount, 0);
 
   return (
-    <div className="flex-1 p-5 space-y-4">
-      {/* Store link banner */}
-      <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-        <Store className="w-5 h-5 text-green-600 flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-green-700">Your online store is live</p>
-          <p className="text-xs text-green-600 truncate">{storeUrl}</p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button onClick={copyStoreLink} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-green-200 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-50 transition">
-            {copied ? <CheckCheck className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? "Copied!" : "Copy"}
-          </button>
-          <a href={storeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition">
-            <ExternalLink className="w-3.5 h-3.5" /> View Store
-          </a>
-        </div>
-      </div>
+    <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-[#0F172A]">{orders.length}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Total Orders</p>
+      <div className="border border-slate-200 rounded-[8px] px-4 py-3 flex items-center justify-between">
+        <p className="text-[13px] font-semibold text-slate-500">Total Revenue</p>
+        <p className="text-[20px] font-extrabold text-[#1a9c38] leading-none">{fmt(totalRevenue)}</p>
+      </div>
+
+      {/* Search + Filter */}
+      <div className="flex gap-2 items-stretch h-11">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+          />
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-blue-600">{orders.filter((o) => o.status === "paid" || o.status === "processing").length}</p>
-          <p className="text-xs text-slate-500 mt-0.5">To Fulfil</p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-green-600">{fmt(totalRevenue)}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Total Revenue</p>
+        <div ref={filterRef} className="relative">
+          <button
+            onClick={() => setFilterOpen((v) => !v)}
+            className={cn(
+              "h-full flex items-center gap-1.5 px-3 border rounded-[8px] text-[13px] font-semibold transition",
+              filter !== "all"
+                ? "border-[#1a9c38] text-[#1a9c38] bg-emerald-50"
+                : "border-slate-200 text-slate-600 bg-white hover:bg-slate-50"
+            )}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            {FILTER_TABS.find((t) => t.key === filter)?.label ?? "All"}
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+          {filterOpen && (
+            <div className="absolute right-0 top-full mt-1.5 w-44 bg-white border border-slate-200 rounded-[10px] shadow-lg z-20 overflow-hidden py-1">
+              {FILTER_TABS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => { setFilter(key); setFilterOpen(false); }}
+                  className={cn(
+                    "w-full text-left px-4 py-2.5 text-[13px] font-medium transition",
+                    filter === key
+                      ? "bg-emerald-50 text-[#1a9c38] font-semibold"
+                      : "text-slate-700 hover:bg-slate-50"
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Orders */}
-      {orders.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center text-center gap-3">
-          <Store className="w-10 h-10 text-slate-300" />
-          <p className="text-sm font-semibold text-[#0F172A]">No orders yet</p>
-          <p className="text-xs text-slate-400">Share your store link to start receiving orders</p>
+      {/* Orders list */}
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <Store className="w-9 h-9 text-slate-300" />
+          </div>
+          <p className="text-[16px] font-bold text-slate-800">
+            {search || filter !== "all" ? "No orders found" : "No orders yet"}
+          </p>
+          <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">
+            {search || filter !== "all" ? "Try a different search or filter" : "Share your store link to start receiving orders"}
+          </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {orders.map((order) => {
-            const isExpanded = expanded === order.id;
-            const nextStatus = STATUS_FLOW[order.status];
-            return (
-              <div key={order.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div
-                  className="px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition"
-                  onClick={() => setExpanded(isExpanded ? null : order.id)}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-mono font-bold text-[#0F172A]">{order.order_number}</p>
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[order.status])}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {order.customer_name} · {order.customer_email}
-                      {order.customer_phone ? ` · ${order.customer_phone}` : ""}
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-[#0F172A]">{fmt(order.total_amount)}</p>
-                    <p className="text-xs text-slate-400">{new Date(order.created_at).toLocaleDateString()}</p>
-                  </div>
-                  {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-                </div>
+        <>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+            {filtered.length} order{filtered.length !== 1 ? "s" : ""}
+          </p>
+          <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {filtered.map((order) => {
+              const sc = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+              const { Icon } = sc;
+              const isExpanded = expanded === order.id;
+              const flow = STATUS_FLOW[order.status];
 
-                {isExpanded && (
-                  <div className="border-t border-slate-100 px-5 py-4 space-y-3 bg-slate-50">
-                    {/* Items */}
-                    <div className="space-y-1">
-                      {order.store_order_items.map((item, i) => (
-                        <div key={i} className="flex justify-between text-sm">
-                          <span className="text-slate-600">{item.name} × {item.quantity}</span>
-                          <span className="font-semibold text-[#0F172A]">{fmt(item.total)}</span>
-                        </div>
-                      ))}
+              return (
+                <div key={order.id}>
+                  {/* Summary row — tappable */}
+                  <div
+                    className="px-4 py-4 flex items-start gap-3 cursor-pointer active:bg-slate-50 transition"
+                    onClick={() => setExpanded(isExpanded ? null : order.id)}
+                  >
+                    <div className={cn("w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5", sc.iconBg)}>
+                      <Icon className={cn("w-4 h-4", sc.iconColor)} />
                     </div>
-                    {order.shipping_address && (
-                      <p className="text-xs text-slate-500">Ship to: {order.shipping_address}</p>
-                    )}
-                    {nextStatus && (
-                      <button
-                        onClick={() => updateStatus(order.id, nextStatus)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition"
-                      >
-                        {STATUS_LABELS[order.status] ?? `Mark as ${nextStatus}`}
-                      </button>
-                    )}
-                    {order.status !== "cancelled" && order.status !== "delivered" && (
-                      <button
-                        onClick={() => updateStatus(order.id, "cancelled")}
-                        className="ml-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-100 transition"
-                      >
-                        Cancel
-                      </button>
-                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono font-bold text-[13px] text-[#0F172A] tracking-wide">{order.order_number}</span>
+                          <span className={cn("text-[12px] font-semibold flex-shrink-0", sc.text)}>{sc.label}</span>
+                        </div>
+                        {isExpanded
+                          ? <ChevronUp className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                          : <ChevronDown className="w-4 h-4 text-slate-300 flex-shrink-0" />}
+                      </div>
+                      <p className="text-[14px] font-semibold text-slate-800 mt-0.5 leading-tight">{order.customer_name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[14px] font-bold text-[#0F172A]">{fmt(order.total_amount)}</span>
+                        <span className="text-[12px] text-slate-400" suppressHydrationWarning>· {shortDate(order.created_at)}</span>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+
+                  {/* Expanded detail */}
+                  {isExpanded && (
+                    <div className="border-t border-slate-100 bg-slate-50 px-4 py-4 space-y-4">
+
+                      {/* Customer info */}
+                      <div className="space-y-1.5">
+                        {order.customer_email && (
+                          <a href={`mailto:${order.customer_email}`} className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-[#1a9c38] transition">
+                            <Mail className="w-3.5 h-3.5 flex-shrink-0" />{order.customer_email}
+                          </a>
+                        )}
+                        {order.customer_phone && (
+                          <a href={`tel:${order.customer_phone}`} className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-[#1a9c38] transition">
+                            <Phone className="w-3.5 h-3.5 flex-shrink-0" />{order.customer_phone}
+                          </a>
+                        )}
+                        {order.shipping_address && (
+                          <p className="flex items-start gap-2 text-[13px] text-slate-500">
+                            <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />{order.shipping_address}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Items */}
+                      <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+                        {order.store_order_items.map((item, i) => (
+                          <div key={i} className="flex items-center justify-between px-3 py-2.5">
+                            <div>
+                              <p className="text-[13px] font-medium text-[#0F172A]">{item.name}</p>
+                              <p className="text-[12px] text-slate-400">× {item.quantity} · {fmt(item.price)} each</p>
+                            </div>
+                            <span className="text-[14px] font-bold text-[#0F172A]">{fmt(item.total)}</span>
+                          </div>
+                        ))}
+                        <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50">
+                          <span className="text-[13px] font-semibold text-slate-600">Total</span>
+                          <span className="text-[15px] font-extrabold text-[#0F172A]">{fmt(order.total_amount)}</span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      {order.status !== "delivered" && order.status !== "cancelled" && (
+                        <div className="flex items-center gap-2">
+                          {flow && (
+                            <button
+                              onClick={() => updateStatus(order.id, flow.next)}
+                              disabled={updating === order.id + flow.next}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+                            >
+                              {flow.label}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => updateStatus(order.id, "cancelled")}
+                            disabled={updating === order.id + "cancelled"}
+                            className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 rounded-[8px] text-[13px] font-semibold transition disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

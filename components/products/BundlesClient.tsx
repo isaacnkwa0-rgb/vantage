@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Package, Trash2, Pencil, Loader2, ToggleLeft, ToggleRight, X } from "lucide-react";
+import { Plus, Package, Trash2, Pencil, Loader2, ToggleLeft, ToggleRight, X, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils/currency";
-import Image from "next/image";
 
 interface Product {
   id: string;
@@ -17,9 +16,7 @@ interface Product {
 }
 
 interface BundleItem {
-  id?: string;
   product_id: string;
-  variant_id?: string | null;
   quantity: number;
 }
 
@@ -47,11 +44,34 @@ interface Props {
 
 const EMPTY_FORM = { name: "", description: "", price: "", items: [{ product_id: "", quantity: 1 }] as BundleItem[] };
 
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function SectionDivider({ label, action }: { label: string; action?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px bg-slate-200" />
+      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+      {action && <>{action}</>}
+      <div className="flex-1 h-px bg-slate-200" />
+    </div>
+  );
+}
+
 export function BundlesClient({ bundles: initialBundles, products, businessId, currency }: Props) {
   const router = useRouter();
   const fmt = (n: number) => formatCurrency(n, currency);
 
   const [bundles, setBundles] = useState(initialBundles);
+  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -59,6 +79,10 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const filtered = bundles.filter((b) =>
+    b.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   const componentTotal = (items: BundleItem[]) =>
     items.reduce((s, bi) => {
@@ -83,6 +107,13 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
     });
     setError(null);
     setShowForm(true);
+  }
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setForm(EMPTY_FORM);
+    setError(null);
   }
 
   function addFormItem() {
@@ -117,7 +148,6 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
         description: form.description || null,
         price,
       }).eq("id", editingId);
-      // Replace items
       await supabase.from("bundle_items").delete().eq("bundle_id", editingId);
       await supabase.from("bundle_items").insert(
         validItems.map((i) => ({ bundle_id: editingId, product_id: i.product_id, quantity: i.quantity }))
@@ -135,7 +165,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
     }
 
     setSaving(false);
-    setShowForm(false);
+    closeForm();
     router.refresh();
   }
 
@@ -156,157 +186,65 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
     setDeletingId(null);
   }
 
-  const activeBundles = bundles.filter((b) => b.is_active).length;
-
   return (
-    <div className="flex-1 p-3 sm:p-5 space-y-4">
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Total Bundles</p>
-          <p className="text-xl font-bold text-[#0F172A]">{bundles.length}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Active</p>
-          <p className="text-xl font-bold text-emerald-600">{activeBundles}</p>
+    <div className="flex-1 flex flex-col min-h-0 bg-white overflow-x-hidden">
+
+      {/* Search + New */}
+      <div className="px-4 pt-3 pb-2">
+        <div className="flex gap-2 items-stretch h-11">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            />
+          </div>
+          {!showForm && (
+            <button
+              onClick={openCreate}
+              className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              New
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Header + Add */}
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-[#0F172A]">Product Bundles</h2>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm shadow-green-300/40"
-        >
-          <Plus className="w-4 h-4" />
-          New Bundle
-        </button>
-      </div>
-
-      {/* Bundle list */}
-      {bundles.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Package className="w-14 h-14 text-slate-200 mb-4" />
-          <p className="text-slate-600 font-medium">No bundles yet</p>
-          <p className="text-slate-400 text-sm mt-1">Group products into bundles to sell together at a special price</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {bundles.map((b) => {
-            const componentSum = b.bundle_items.reduce(
-              (s, bi) => s + (bi.products?.selling_price ?? 0) * bi.quantity, 0
-            );
-            const savings = componentSum - b.price;
-
-            return (
-              <div key={b.id} className={`bg-white rounded-xl border shadow-sm p-4 ${b.is_active ? "border-slate-200" : "border-slate-100 opacity-60"}`}>
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0 border border-violet-200 overflow-hidden">
-                    {b.image_url ? (
-                      <Image src={b.image_url} alt={b.name} width={48} height={48} className="object-cover w-full h-full" />
-                    ) : (
-                      <Package className="w-6 h-6 text-violet-400" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold text-[#0F172A]">{b.name}</p>
-                      {!b.is_active && (
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-full">Inactive</span>
-                      )}
-                    </div>
-                    {b.description && <p className="text-xs text-slate-400 mt-0.5 truncate">{b.description}</p>}
-
-                    {/* Components */}
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {b.bundle_items.map((bi, i) => (
-                        <span key={i} className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
-                          {bi.products?.name ?? "Unknown"} ×{bi.quantity}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex-shrink-0 text-right">
-                    <p className="font-bold text-violet-700">{fmt(b.price)}</p>
-                    {savings > 0 && (
-                      <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">Save {fmt(savings)}</p>
-                    )}
-                    {componentSum > 0 && savings <= 0 && (
-                      <p className="text-[10px] text-slate-400 mt-0.5">vs {fmt(componentSum)}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
-                  <button
-                    onClick={() => openEdit(b)}
-                    className="flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-green-600 hover:bg-green-50 px-2.5 py-1.5 rounded-lg transition border border-slate-200"
-                  >
-                    <Pencil className="w-3 h-3" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => toggleActive(b)}
-                    disabled={togglingId === b.id}
-                    className="flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-50 px-2.5 py-1.5 rounded-lg transition border border-slate-200"
-                  >
-                    {b.is_active
-                      ? <ToggleRight className="w-3.5 h-3.5 text-emerald-500" />
-                      : <ToggleLeft className="w-3.5 h-3.5 text-slate-400" />}
-                    {b.is_active ? "Active" : "Inactive"}
-                  </button>
-                  <button
-                    onClick={() => deleteBundle(b.id)}
-                    disabled={deletingId === b.id}
-                    className="ml-auto flex items-center gap-1 text-xs font-medium text-red-500 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition"
-                  >
-                    {deletingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                    Delete
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Bundle form modal */}
+      {/* Inline form */}
       {showForm && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-shrink-0">
-              <h2 className="font-bold text-[#0F172A]">{editingId ? "Edit Bundle" : "New Bundle"}</h2>
-              <button onClick={() => setShowForm(false)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <div className="mx-4 mb-3 border border-slate-200 rounded-[12px] bg-white overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span className="text-[13px] font-semibold text-[#0F172A]">
+              {editingId ? "Edit Bundle" : "New Bundle"}
+            </span>
+            <button onClick={closeForm} className="p-1 text-slate-400 hover:text-slate-600 transition">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#0F172A] mb-1">Bundle Name *</label>
+          <div className="px-4 pt-4 pb-3 space-y-4">
+            <SectionDivider label="Details" />
+            <div className="space-y-3">
+              <Field label="Bundle name *">
                 <input
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Starter Kit, Office Set"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className={innerCls}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#0F172A] mb-1">Description</label>
+              </Field>
+              <Field label="Description (optional)">
                 <input
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  placeholder="Optional short description"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Short description"
+                  className={innerCls}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#0F172A] mb-1">Bundle Price *</label>
+              </Field>
+              <Field label="Bundle price *">
                 <input
                   type="number"
                   min="0.01"
@@ -314,82 +252,190 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                   value={form.price}
                   onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className={innerCls}
                 />
-                {form.items.some((i) => i.product_id) && (() => {
-                  const sum = componentTotal(form.items);
-                  const p = parseFloat(form.price) || 0;
-                  const savings = sum - p;
-                  return sum > 0 ? (
-                    <p className={`text-xs mt-1 ${savings > 0 ? "text-emerald-600" : "text-slate-400"}`}>
-                      Individual total: {fmt(sum)}{savings > 0 ? ` · Save ${fmt(savings)}` : ""}
-                    </p>
-                  ) : null;
-                })()}
-              </div>
+              </Field>
+              {form.items.some((i) => i.product_id) && (() => {
+                const sum = componentTotal(form.items);
+                const p = parseFloat(form.price) || 0;
+                const savings = sum - p;
+                return sum > 0 ? (
+                  <p className={`text-[12px] px-0.5 ${savings > 0 ? "text-emerald-600" : "text-slate-400"}`}>
+                    Individual total: {fmt(sum)}{savings > 0 ? ` · Save ${fmt(savings)}` : ""}
+                  </p>
+                ) : null;
+              })()}
+            </div>
 
-              {/* Items */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-semibold text-[#0F172A]">Products in Bundle</label>
-                  <button onClick={addFormItem} className="text-xs text-green-600 hover:underline font-medium flex items-center gap-1">
-                    <Plus className="w-3.5 h-3.5" /> Add product
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {form.items.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
+            <SectionDivider
+              label="Products"
+              action={
+                <button
+                  onClick={addFormItem}
+                  className="flex items-center gap-1 text-[12px] text-[#1a9c38] font-semibold flex-shrink-0"
+                >
+                  <Plus className="w-3 h-3" /> Add
+                </button>
+              }
+            />
+            <div className="space-y-2">
+              {form.items.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <Field label="Product">
                       <select
                         value={item.product_id}
                         onChange={(e) => updateFormItem(idx, "product_id", e.target.value)}
-                        className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className={`${innerCls} -ml-0.5`}
                       >
-                        <option value="">— Select product —</option>
+                        <option value="">— Select —</option>
                         {products.map((p) => (
                           <option key={p.id} value={p.id}>{p.name} ({fmt(p.selling_price)})</option>
                         ))}
                       </select>
+                    </Field>
+                  </div>
+                  <div className="w-20 flex-shrink-0">
+                    <Field label="Qty">
                       <input
                         type="number"
                         min="1"
                         value={item.quantity}
                         onChange={(e) => updateFormItem(idx, "quantity", parseInt(e.target.value) || 1)}
-                        className="w-16 px-2 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className={innerCls}
                       />
-                      <button
-                        onClick={() => removeFormItem(idx)}
-                        disabled={form.items.length === 1}
-                        className="p-1.5 text-slate-300 hover:text-red-400 disabled:opacity-30 transition"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                    </Field>
+                  </div>
+                  <button
+                    onClick={() => removeFormItem(idx)}
+                    disabled={form.items.length === 1}
+                    className="p-2 text-slate-300 hover:text-red-400 disabled:opacity-30 transition flex-shrink-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
-
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              ))}
             </div>
 
-            <div className="px-5 py-4 border-t border-slate-100 flex gap-3 flex-shrink-0">
-              <button
-                onClick={() => setShowForm(false)}
-                className="flex-1 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60"
-              >
-                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingId ? "Update Bundle" : "Create Bundle"}
-              </button>
-            </div>
+            {error && <p className="text-[13px] text-red-500 bg-red-50 px-3 py-2 rounded-[8px]">{error}</p>}
+          </div>
+
+          <div className="px-4 pb-4 flex gap-3">
+            <button
+              onClick={closeForm}
+              className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+            >
+              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {editingId ? "Save Changes" : "Create Bundle"}
+            </button>
           </div>
         </div>
       )}
+
+      {/* Bundle list */}
+      <div className="flex-1 overflow-y-auto no-scrollbar pb-28">
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+            <Package className="w-14 h-14 text-slate-200 mb-4" />
+            <p className="text-slate-600 font-medium">
+              {search ? "No bundles match your search" : "No bundles yet"}
+            </p>
+            {!search && (
+              <p className="text-slate-400 text-sm mt-1">Group products into bundles to sell together at a special price</p>
+            )}
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {filtered.map((b) => {
+              const componentSum = b.bundle_items.reduce(
+                (s, bi) => s + (bi.products?.selling_price ?? 0) * bi.quantity, 0
+              );
+              const savings = componentSum - b.price;
+
+              return (
+                <div key={b.id} className={`px-4 py-4 ${!b.is_active ? "opacity-60" : ""}`}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-11 h-11 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
+                      <Package className="w-5 h-5 text-violet-500" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-[14px] text-[#0F172A] truncate">{b.name}</p>
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                          b.is_active
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-slate-100 text-slate-500"
+                        }`}>
+                          {b.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                      {b.description && (
+                        <p className="text-[12px] text-slate-400 mt-0.5 truncate">{b.description}</p>
+                      )}
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {b.bundle_items.map((bi, i) => (
+                          <span key={i} className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
+                            {bi.products?.name ?? "Unknown"} ×{bi.quantity}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0 text-right">
+                      <p className="font-bold text-[14px] text-violet-700">{fmt(b.price)}</p>
+                      {savings > 0 && (
+                        <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">Save {fmt(savings)}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action row */}
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                    <button
+                      onClick={() => openEdit(b)}
+                      className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-[8px] transition active:bg-slate-50"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => toggleActive(b)}
+                      disabled={togglingId === b.id}
+                      className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-[8px] transition active:bg-slate-50 disabled:opacity-50"
+                    >
+                      {togglingId === b.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : b.is_active ? (
+                        <ToggleRight className="w-3.5 h-3.5 text-emerald-500" />
+                      ) : (
+                        <ToggleLeft className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                      {b.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button
+                      onClick={() => deleteBundle(b.id)}
+                      disabled={deletingId === b.id}
+                      className="ml-auto flex items-center gap-1.5 text-[12px] font-semibold text-red-500 px-3 py-1.5 rounded-[8px] transition active:bg-red-50 disabled:opacity-50"
+                    >
+                      {deletingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

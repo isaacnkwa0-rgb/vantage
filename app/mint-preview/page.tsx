@@ -1,27 +1,29 @@
+const HERO = "#fafefb";
+
 const SHADES = [
-  { n: 1, hex: "#f9fefb", name: "barely mint" },
-  { n: 2, hex: "#f7fef9", name: "whisper mint" },
-  { n: 3, hex: "#f5fef8", name: "soft mint" },
-  { n: 4, hex: "#f2fef5", name: "light mint" },
-  { n: 5, hex: "#f0fef4", name: "airy mint" },
-  { n: 6, hex: "#edfff3", name: "fresh mint" },
-  { n: 7, hex: "#ebfef1", name: "cool mint" },
-  { n: 8, hex: "#e8fdef", name: "clear mint" },
+  { n: 1, hex: "#f5f7f6" },
+  { n: 2, hex: "#f2f5f3" },
+  { n: 3, hex: "#eff3f1" },
+  { n: 4, hex: "#ecf0ee" },
+  { n: 5, hex: "#e8edea" },
+  { n: 6, hex: "#f4f7f5" },
+  { n: 7, hex: "#f0f4f2" },
+  { n: 8, hex: "#edf1ef" },
 ];
 
 export default function MintPreview() {
   return (
-    <div className="min-h-screen bg-[#F5F6F8] px-4 py-10 space-y-3">
-      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 px-1">Very Light Mint Shades</p>
+    <div className="min-h-screen bg-white px-4 py-10 space-y-2">
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1 px-1">Hero</p>
+      <div style={{ background: HERO }} className="rounded-[8px] px-4 py-5 flex items-center gap-3 mb-6">
+        <span className="text-[13px] font-semibold text-slate-700">Hero — {HERO}</span>
+      </div>
+
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1 px-1">Mint-grey banner options</p>
       {SHADES.map((s) => (
-        <div key={s.n} style={{ background: s.hex }} className="rounded-2xl px-4 py-4 flex items-center gap-4">
-          <div className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center flex-shrink-0">
-            <span className="text-sm font-bold text-slate-700">{s.n}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-slate-800">{s.name}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">{s.hex}</p>
-          </div>
+        <div key={s.n} style={{ background: s.hex }} className="rounded-[8px] px-4 py-5 flex items-center gap-3">
+          <span className="text-[13px] font-bold text-slate-700 w-5">{s.n}</span>
+          <span className="text-[13px] text-slate-500">{s.hex}</span>
         </div>
       ))}
     </div>

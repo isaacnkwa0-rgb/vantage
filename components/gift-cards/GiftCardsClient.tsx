@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Gift, Plus, Search, Copy, CheckCheck, X, Trash2 } from "lucide-react";
+import { Gift, Plus, Search, Copy, CheckCheck, X, Loader2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface GiftCard {
@@ -29,34 +29,63 @@ interface Props {
   userId: string;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  active: "bg-green-100 text-green-700",
-  redeemed: "bg-slate-100 text-slate-500",
-  expired: "bg-amber-100 text-amber-600",
-  voided: "bg-red-100 text-red-500",
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; iconBg: string; iconColor: string }> = {
+  active:   { label: "Active",   bg: "bg-emerald-50",  text: "text-emerald-700", iconBg: "bg-emerald-50",  iconColor: "text-emerald-500" },
+  redeemed: { label: "Redeemed", bg: "bg-slate-100",   text: "text-slate-500",   iconBg: "bg-slate-100",   iconColor: "text-slate-400" },
+  expired:  { label: "Expired",  bg: "bg-amber-50",    text: "text-amber-700",   iconBg: "bg-amber-50",    iconColor: "text-amber-500" },
+  voided:   { label: "Voided",   bg: "bg-red-50",      text: "text-red-600",     iconBg: "bg-red-50",      iconColor: "text-red-400" },
 };
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
 
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from({ length: 16 }, (_, i) => (i > 0 && i % 4 === 0 ? "-" : chars[Math.floor(Math.random() * chars.length)])).join("");
+  return Array.from({ length: 16 }, (_, i) =>
+    (i > 0 && i % 4 === 0 ? "-" : chars[Math.floor(Math.random() * chars.length)])
+  ).join("");
+}
+
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px bg-slate-200" />
+      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-slate-200" />
+    </div>
+  );
 }
 
 export function GiftCardsClient({ cards: initialCards, customers, currency, businessId, userId }: Props) {
-  const supabase = createClient();
   const fmt = (n: number) => formatCurrency(n, currency);
 
-  const [cards, setCards] = useState<GiftCard[]>(initialCards);
-  const [search, setSearch] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [cards, setCards]         = useState<GiftCard[]>(initialCards);
+  const [search, setSearch]       = useState("");
+  const [showForm, setShowForm]   = useState(false);
+  const [copiedId, setCopiedId]   = useState<string | null>(null);
+  const [saving, setSaving]       = useState(false);
+  const [voidingId, setVoidingId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    code: generateCode(),
-    initial_value: "",
-    customer_id: "",
+    code:           generateCode(),
+    initial_value:  "",
+    customer_id:    "",
     customer_email: "",
-    expires_at: "",
+    expires_at:     "",
   });
 
   const filtered = cards.filter((c) =>
@@ -71,177 +100,281 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
     setTimeout(() => setCopiedId(null), 2000);
   }
 
+  function openForm() {
+    setForm({ code: generateCode(), initial_value: "", customer_id: "", customer_email: "", expires_at: "" });
+    setShowForm(true);
+  }
+
   async function create() {
     if (!form.initial_value) return;
     setSaving(true);
+    const supabase = createClient();
     const val = parseFloat(form.initial_value);
     const selectedCustomer = customers.find((c) => c.id === form.customer_id);
     const { data, error } = await supabase
       .from("gift_cards")
       .insert({
-        business_id: businessId,
-        code: form.code,
-        initial_value: val,
-        balance: val,
-        customer_id: form.customer_id || null,
+        business_id:    businessId,
+        code:           form.code,
+        initial_value:  val,
+        balance:        val,
+        customer_id:    form.customer_id || null,
         customer_email: (selectedCustomer?.email ?? form.customer_email) || null,
-        status: "active",
-        expires_at: form.expires_at || null,
-        created_by: userId,
+        status:         "active",
+        expires_at:     form.expires_at || null,
+        created_by:     userId,
       })
       .select("*, customers(name)")
       .single();
     if (!error && data) {
       setCards((prev) => [data as GiftCard, ...prev]);
-      setShowCreate(false);
-      setForm({ code: generateCode(), initial_value: "", customer_id: "", customer_email: "", expires_at: "" });
+      setShowForm(false);
     }
     setSaving(false);
   }
 
   async function voidCard(id: string) {
+    if (!confirm("Void this gift card? It can no longer be used.")) return;
+    setVoidingId(id);
+    const supabase = createClient();
     await supabase.from("gift_cards").update({ status: "voided" }).eq("id", id);
     setCards((prev) => prev.map((c) => (c.id === id ? { ...c, status: "voided" as const } : c)));
+    setVoidingId(null);
   }
 
-  const activeTotal = cards.filter((c) => c.status === "active").reduce((s, c) => s + c.balance, 0);
+  const activeCards   = cards.filter((c) => c.status === "active");
+  const activeTotal   = activeCards.reduce((s, c) => s + c.balance, 0);
+  const redeemedCount = cards.filter((c) => c.status === "redeemed").length;
 
   return (
-    <div className="flex-1 p-5 space-y-4">
-      {/* Toolbar */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+    <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
+
+      {/* Search + New */}
+      <div className="flex gap-2 items-stretch h-11">
+        <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search gift cards..." className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+          />
         </div>
-        <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
-          <Plus className="w-4 h-4" /> Issue Gift Card
-        </button>
+        {!showForm && (
+          <button
+            onClick={openForm}
+            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> New
+          </button>
+        )}
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-[#0F172A]">{cards.filter((c) => c.status === "active").length}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Active Cards</p>
+        <div className="border border-slate-200 rounded-[8px] p-3 text-center">
+          <p className="text-[20px] font-extrabold text-[#0F172A]">{activeCards.length}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Active</p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-green-600">{fmt(activeTotal)}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Outstanding Balance</p>
+        <div className="border border-slate-200 rounded-[8px] p-3 text-center">
+          <p className="text-[15px] font-extrabold text-[#1a9c38] leading-tight mt-0.5">{fmt(activeTotal)}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Outstanding</p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-[#0F172A]">{cards.filter((c) => c.status === "redeemed").length}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Redeemed</p>
+        <div className="border border-slate-200 rounded-[8px] p-3 text-center">
+          <p className="text-[20px] font-extrabold text-slate-500">{redeemedCount}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Redeemed</p>
         </div>
       </div>
 
-      {/* Cards list */}
-      {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center text-center gap-3">
-          <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-            <Gift className="w-6 h-6 text-slate-400" />
+      {/* Inline form */}
+      {showForm && (
+        <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span className="text-[13px] font-semibold text-[#0F172A]">Issue Gift Card</span>
+            <button onClick={() => setShowForm(false)} className="p-1 text-slate-400 hover:text-slate-600 transition">
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <p className="text-sm font-semibold text-[#0F172A]">No gift cards yet</p>
-          <p className="text-xs text-slate-400">Issue a gift card to a customer</p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide bg-slate-50">
-                <th className="text-left px-5 py-3">Code</th>
-                <th className="text-left px-5 py-3">Customer</th>
-                <th className="text-left px-5 py-3">Status</th>
-                <th className="text-right px-5 py-3">Balance</th>
-                <th className="text-right px-5 py-3">Initial</th>
-                <th className="text-left px-5 py-3">Expires</th>
-                <th className="px-5 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filtered.map((card) => (
-                <tr key={card.id} className="hover:bg-slate-50 transition group">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm font-bold text-[#0F172A] tracking-widest">{card.code}</span>
-                      <button onClick={() => copyCode(card.id, card.code)} className="text-slate-300 hover:text-green-600 transition">
-                        {copiedId === card.id ? <CheckCheck className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 text-sm text-slate-600">{card.customers?.name ?? card.customer_email ?? <span className="text-slate-300">—</span>}</td>
-                  <td className="px-5 py-3">
-                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[card.status])}>
-                      {card.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right font-bold text-green-600">{fmt(card.balance)}</td>
-                  <td className="px-5 py-3 text-right text-sm text-slate-400">{fmt(card.initial_value)}</td>
-                  <td className="px-5 py-3 text-xs text-slate-400">{card.expires_at ?? <span className="text-slate-200">—</span>}</td>
-                  <td className="px-5 py-3">
-                    {card.status === "active" && (
-                      <button onClick={() => voidCard(card.id)} className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-300 hover:text-red-500 rounded-lg transition">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
-      {/* Create modal */}
-      {showCreate && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">Issue Gift Card</h3>
-              <button onClick={() => setShowCreate(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
-                <X className="w-4 h-4" />
-              </button>
+          <div className="px-4 pt-4 pb-3 space-y-4">
+            <SectionDivider label="Card" />
+            <div className="space-y-3">
+              {/* Code field with regenerate */}
+              <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+                <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">Card code</legend>
+                <div className="flex items-center gap-2">
+                  <input
+                    value={form.code}
+                    onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+                    className={`${innerCls} font-mono tracking-widest flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, code: generateCode() }))}
+                    className="flex-shrink-0 p-1 text-slate-400 hover:text-[#1a9c38] transition"
+                    title="Regenerate code"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </fieldset>
+
+              <Field label={`Value (${currency}) *`}>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.initial_value}
+                  onChange={(e) => setForm((f) => ({ ...f, initial_value: e.target.value }))}
+                  placeholder="0.00"
+                  className={innerCls}
+                />
+              </Field>
+
+              <Field label="Expiry date (optional)">
+                <input
+                  type="date"
+                  value={form.expires_at}
+                  onChange={(e) => setForm((f) => ({ ...f, expires_at: e.target.value }))}
+                  className={innerCls}
+                />
+              </Field>
             </div>
 
+            <SectionDivider label="Recipient" />
             <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Card Code</label>
-                <div className="flex gap-2">
-                  <input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500" />
-                  <button onClick={() => setForm({ ...form, code: generateCode() })} className="px-3 py-2 border border-slate-200 rounded-lg text-xs text-slate-500 hover:bg-slate-50 transition">Regenerate</button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Value ({currency}) *</label>
-                <input type="number" min="0" value={form.initial_value} onChange={(e) => setForm({ ...form, initial_value: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Customer (optional)</label>
-                <select value={form.customer_id} onChange={(e) => setForm({ ...form, customer_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+              <Field label="Customer (optional)">
+                <select
+                  value={form.customer_id}
+                  onChange={(e) => setForm((f) => ({ ...f, customer_id: e.target.value }))}
+                  className={`${innerCls} -ml-0.5`}
+                >
                   <option value="">— None —</option>
                   {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-              </div>
+              </Field>
               {!form.customer_id && (
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Recipient Email</label>
-                  <input type="email" value={form.customer_email} onChange={(e) => setForm({ ...form, customer_email: e.target.value })} placeholder="recipient@example.com" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
+                <Field label="Recipient email">
+                  <input
+                    type="email"
+                    value={form.customer_email}
+                    onChange={(e) => setForm((f) => ({ ...f, customer_email: e.target.value }))}
+                    placeholder="recipient@example.com"
+                    className={innerCls}
+                  />
+                </Field>
               )}
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Expiry Date (optional)</label>
-                <input type="date" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={create} disabled={saving || !form.initial_value} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
-                {saving ? "Issuing..." : "Issue Card"}
-              </button>
             </div>
           </div>
+
+          <div className="px-4 pb-4 flex gap-3">
+            <button
+              onClick={() => setShowForm(false)}
+              className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={create}
+              disabled={saving || !form.initial_value}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+            >
+              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+              Issue Card
+            </button>
+          </div>
         </div>
+      )}
+
+      {/* Cards list */}
+      {filtered.length === 0 && !showForm ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <Gift className="w-9 h-9 text-slate-300" />
+          </div>
+          <p className="text-[16px] font-bold text-slate-800">
+            {search ? "No gift cards found" : "No gift cards yet"}
+          </p>
+          <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">
+            {search ? "Try a different search" : "Issue a gift card to get started"}
+          </p>
+        </div>
+      ) : filtered.length > 0 && (
+        <>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+            {filtered.length} card{filtered.length !== 1 ? "s" : ""}
+          </p>
+          <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {filtered.map((card) => {
+              const sc = STATUS_CONFIG[card.status] ?? STATUS_CONFIG.active;
+              const isVoiding = voidingId === card.id;
+              const pctUsed = card.initial_value > 0
+                ? Math.round(((card.initial_value - card.balance) / card.initial_value) * 100)
+                : 0;
+
+              return (
+                <div key={card.id} className="px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <div className={cn("w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5", sc.iconBg)}>
+                      <Gift className={cn("w-4 h-4", sc.iconColor)} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-[13px] text-[#0F172A] tracking-wider">{card.code}</span>
+                        <span className={cn("text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0", sc.bg, sc.text)}>
+                          {sc.label}
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-slate-500 mt-0.5">
+                        {card.customers?.name ?? card.customer_email ?? <span className="text-slate-300">No recipient</span>}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1 flex-wrap">
+                        <span className="text-[13px] font-semibold text-[#1a9c38]">{fmt(card.balance)}</span>
+                        <span className="text-[12px] text-slate-400">of {fmt(card.initial_value)}</span>
+                        {card.expires_at && (
+                          <span className="text-[12px] text-slate-400">
+                            · expires {shortDate(card.expires_at)}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Balance bar */}
+                      {card.initial_value > 0 && (
+                        <div className="mt-2 h-1 rounded-full bg-slate-100 overflow-hidden">
+                          <div
+                            className={cn("h-full rounded-full transition-all", card.status === "active" ? "bg-[#1a9c38]" : "bg-slate-300")}
+                            style={{ width: `${100 - pctUsed}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action row */}
+                  <div className="flex items-center gap-2 mt-3 pl-[52px]">
+                    <button
+                      onClick={() => copyCode(card.id, card.code)}
+                      className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition active:scale-95"
+                    >
+                      {copiedId === card.id
+                        ? <><CheckCheck className="w-3 h-3 text-[#1a9c38]" /> Copied</>
+                        : <><Copy className="w-3 h-3" /> Copy Code</>}
+                    </button>
+                    {card.status === "active" && (
+                      <button
+                        onClick={() => voidCard(card.id)}
+                        disabled={isVoiding}
+                        className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
+                      >
+                        {isVoiding ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                        Void
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

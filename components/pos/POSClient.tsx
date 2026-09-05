@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ShoppingCart, Package, Menu, WifiOff, RefreshCw } from "lucide-react";
+import { WifiOff, RefreshCw } from "lucide-react";
 import { ProductSearchPanel } from "./ProductSearchPanel";
 import { CartPanel } from "./CartPanel";
 import { PaymentModal } from "./PaymentModal";
 import { ReceiptModal } from "./ReceiptModal";
 import { ShiftBanner } from "./ShiftBanner";
-import { useCartStore } from "@/store/cartStore";
-import { useUIStore } from "@/store/uiStore";
+import { MobilePOSForm } from "./MobilePOSForm";
 import { useOfflineStore } from "@/store/offlineStore";
 import { createClient } from "@/lib/supabase/client";
 
@@ -109,12 +108,9 @@ interface Props {
 export function POSClient({ products, bundles, customers, business, userId, currentShift }: Props) {
   const [showPayment, setShowPayment] = useState(false);
   const [completedSale, setCompletedSale] = useState<CompletedSale | null>(null);
-  const [mobilePanel, setMobilePanel] = useState<"products" | "cart">("products");
   const [syncing, setSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
 
-  const cartCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
-  const { toggleSidebar } = useUIStore();
   const { pendingSales, removePendingSale, setOnline } = useOfflineStore();
 
   useEffect(() => {
@@ -215,128 +211,93 @@ export function POSClient({ products, bundles, customers, business, userId, curr
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      {/* Mobile header */}
-      <div className="lg:hidden flex items-center gap-3 px-4 h-14 bg-white border-b border-slate-200 flex-shrink-0">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <h2 className="font-bold text-[#0F172A] flex-1">Point of Sale</h2>
-        {pendingSales.length > 0 && (
-          <button
-            onClick={syncPendingSales}
-            disabled={syncing || !isOnline}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-100 text-orange-700 text-xs font-semibold rounded-lg transition hover:bg-orange-200 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-            {pendingSales.length} pending
-          </button>
-        )}
-      </div>
-
-      {/* Offline banner */}
-      {!isOnline && (
-        <div className="flex items-center justify-center gap-2 bg-orange-500 text-white text-sm font-medium py-2 px-4 flex-shrink-0">
-          <WifiOff className="w-4 h-4" />
-          You&apos;re offline — sales are saved locally and will sync automatically.
-        </div>
-      )}
-
-      {/* Shift banner */}
-      <ShiftBanner
-        initialShift={currentShift}
-        businessId={business.id}
-        userId={userId}
-        currency={business.currency}
-      />
-
-      {/* Pending sync banner (online but unsyced) */}
-      {isOnline && pendingSales.length > 0 && (
-        <div className="hidden lg:flex items-center justify-between bg-amber-50 border-b border-amber-200 text-amber-700 text-sm px-4 py-2 flex-shrink-0">
-          <span className="font-medium">{pendingSales.length} offline sale{pendingSales.length > 1 ? "s" : ""} pending sync</span>
-          <button
-            onClick={syncPendingSales}
-            disabled={syncing}
-            className="flex items-center gap-1.5 px-3 py-1 bg-amber-600 text-white text-xs font-semibold rounded-lg hover:bg-amber-700 transition disabled:opacity-60"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "Syncing…" : "Sync now"}
-          </button>
-        </div>
-      )}
-
-      {/* Mobile tab bar */}
-      <div className="lg:hidden flex flex-shrink-0 bg-white border-b border-slate-200">
-        <button
-          onClick={() => setMobilePanel("products")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold border-b-2 transition ${
-            mobilePanel === "products" ? "border-green-600 text-green-600" : "border-transparent text-slate-500"
-          }`}
-        >
-          <Package className="w-4 h-4" />
-          Products
-        </button>
-        <button
-          onClick={() => setMobilePanel("cart")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold border-b-2 transition relative ${
-            mobilePanel === "cart" ? "border-green-600 text-green-600" : "border-transparent text-slate-500"
-          }`}
-        >
-          <ShoppingCart className="w-4 h-4" />
-          Cart
-          {cartCount > 0 && (
-            <span className="absolute top-2 right-[calc(50%-28px)] min-w-[18px] h-[18px] bg-green-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-              {cartCount}
-            </span>
-          )}
-        </button>
-      </div>
-
-      <div className="flex flex-1 overflow-hidden">
-        <div className={`flex-1 flex-col overflow-hidden border-r border-slate-200 ${mobilePanel === "cart" ? "hidden lg:flex" : "flex"}`}>
-          <ProductSearchPanel products={products} bundles={bundles} currency={business.currency} />
-        </div>
-
-        <div className={`flex-col flex-shrink-0 bg-white w-full lg:w-96 ${mobilePanel === "products" ? "hidden lg:flex" : "flex"}`}>
-          <CartPanel
-            customers={customers}
-            currency={business.currency}
-            businessId={business.id}
-            taxEnabled={business.tax_enabled}
-            taxRate={business.tax_rate}
-            taxName={business.tax_name}
-            loyaltyEnabled={business.loyalty_enabled}
-            loyaltyPointsPerDollar={business.loyalty_points_per_dollar}
-            loyaltyRedemptionRate={business.loyalty_redemption_rate}
-            onCheckout={() => setShowPayment(true)}
-          />
-        </div>
-      </div>
-
-      {showPayment && (
-        <PaymentModal
+      {/* ── Mobile: Bumpa-style single-form layout ── */}
+      <div className="flex lg:hidden flex-col flex-1 overflow-hidden">
+        <MobilePOSForm
+          products={products}
+          bundles={bundles}
+          customers={customers}
           business={business}
           userId={userId}
-          customers={customers}
-          loyaltyEnabled={business.loyalty_enabled}
-          loyaltyPointsPerDollar={business.loyalty_points_per_dollar}
-          onClose={() => setShowPayment(false)}
-          onSuccess={(sale) => {
-            setShowPayment(false);
-            setCompletedSale(sale);
-          }}
         />
-      )}
+      </div>
 
-      {completedSale && (
-        <ReceiptModal
-          sale={completedSale}
-          business={business}
-          onClose={() => setCompletedSale(null)}
+      {/* ── Desktop: side-by-side Products + Cart ── */}
+      <div className="hidden lg:flex flex-col flex-1 overflow-hidden">
+        {/* Offline banner */}
+        {!isOnline && (
+          <div className="flex items-center justify-center gap-2 bg-orange-500 text-white text-sm font-medium py-2 px-4 flex-shrink-0">
+            <WifiOff className="w-4 h-4" />
+            You&apos;re offline — sales are saved locally and will sync automatically.
+          </div>
+        )}
+
+        {/* Shift banner */}
+        <ShiftBanner
+          initialShift={currentShift}
+          businessId={business.id}
+          userId={userId}
+          currency={business.currency}
         />
-      )}
+
+        {/* Pending sync banner */}
+        {isOnline && pendingSales.length > 0 && (
+          <div className="flex items-center justify-between bg-amber-50 border-b border-amber-200 text-amber-700 text-sm px-4 py-2 flex-shrink-0">
+            <span className="font-medium">{pendingSales.length} offline sale{pendingSales.length > 1 ? "s" : ""} pending sync</span>
+            <button
+              onClick={syncPendingSales}
+              disabled={syncing}
+              className="flex items-center gap-1.5 px-3 py-1 bg-amber-600 text-white text-xs font-semibold rounded-lg hover:bg-amber-700 transition disabled:opacity-60"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+              {syncing ? "Syncing…" : "Sync now"}
+            </button>
+          </div>
+        )}
+
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden border-r border-slate-200">
+            <ProductSearchPanel products={products} bundles={bundles} currency={business.currency} />
+          </div>
+          <div className="flex flex-col flex-shrink-0 bg-white w-96">
+            <CartPanel
+              customers={customers}
+              currency={business.currency}
+              businessId={business.id}
+              taxEnabled={business.tax_enabled}
+              taxRate={business.tax_rate}
+              taxName={business.tax_name}
+              loyaltyEnabled={business.loyalty_enabled}
+              loyaltyPointsPerDollar={business.loyalty_points_per_dollar}
+              loyaltyRedemptionRate={business.loyalty_redemption_rate}
+              onCheckout={() => setShowPayment(true)}
+            />
+          </div>
+        </div>
+
+        {showPayment && (
+          <PaymentModal
+            business={business}
+            userId={userId}
+            customers={customers}
+            loyaltyEnabled={business.loyalty_enabled}
+            loyaltyPointsPerDollar={business.loyalty_points_per_dollar}
+            onClose={() => setShowPayment(false)}
+            onSuccess={(sale) => {
+              setShowPayment(false);
+              setCompletedSale(sale);
+            }}
+          />
+        )}
+
+        {completedSale && (
+          <ReceiptModal
+            sale={completedSale}
+            business={business}
+            onClose={() => setCompletedSale(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }

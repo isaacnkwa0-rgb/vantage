@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -44,10 +44,11 @@ interface Props {
   business: Business;
   customers: Customer[];
   editingInvoice: ExistingInvoice | null;
-  onClose: () => void;
+  backHref: string;
+  initialItems?: InvoiceItem[];
 }
 
-export function InvoiceForm({ business, customers, editingInvoice, onClose }: Props) {
+export function InvoiceForm({ business, customers, editingInvoice, backHref, initialItems }: Props) {
   const router = useRouter();
   const isEdit = !!editingInvoice;
 
@@ -56,24 +57,27 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
   );
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [clientName, setClientName] = useState(editingInvoice?.client_name ?? "");
+  const [clientPhone, setClientPhone] = useState((editingInvoice as any)?.client_phone ?? "");
   const [clientEmail, setClientEmail] = useState(editingInvoice?.client_email ?? "");
   const [clientAddress, setClientAddress] = useState(editingInvoice?.client_address ?? "");
   const [issueDate, setIssueDate] = useState(
     editingInvoice?.issue_date ?? new Date().toISOString().split("T")[0]
   );
   const [dueDate, setDueDate] = useState(editingInvoice?.due_date ?? "");
-  const [status, setStatus] = useState(editingInvoice?.status ?? "draft");
+  const [status, setStatus] = useState(editingInvoice?.status ?? "sent");
   const [notes, setNotes] = useState(editingInvoice?.notes ?? "");
   const [bankDetails, setBankDetails] = useState(editingInvoice?.bank_details ?? "");
-  const [items, setItems] = useState<InvoiceItem[]>([
-    { description: "", quantity: 1, unit_price: 0 },
-  ]);
+  const [items, setItems] = useState<InvoiceItem[]>(
+    initialItems && initialItems.length > 0
+      ? initialItems
+      : [{ description: "", quantity: 1, unit_price: 0 }]
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingItems, setLoadingItems] = useState(false);
 
   useEffect(() => {
-    if (!editingInvoice?.id) return;
+    if (!editingInvoice?.id || (initialItems && initialItems.length > 0)) return;
     setLoadingItems(true);
     const supabase = createClient();
     supabase
@@ -109,6 +113,7 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
     const c = customers.find((c) => c.id === id);
     if (c) {
       setClientName(c.name);
+      setClientPhone(c.phone ?? "");
       setClientEmail(c.email ?? "");
       setClientAddress(c.address ?? "");
     }
@@ -125,6 +130,7 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
 
     const payload = {
       client_name: clientName || null,
+      client_phone: clientPhone || null,
       client_email: clientEmail || null,
       client_address: clientAddress || null,
       customer_id: clientMode === "existing" && selectedCustomerId ? selectedCustomerId : null,
@@ -145,7 +151,6 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
       await supabase.from("invoices").update(payload).eq("id", invoiceId);
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
     } else {
-      // Generate invoice number
       const { data: numData } = await supabase
         .rpc("generate_invoice_number", { p_business_id: business.id })
         .single<string>();
@@ -165,7 +170,6 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
       invoiceId = inv.id;
     }
 
-    // Insert items
     const validItems = items.filter((i) => i.description.trim());
     await supabase.from("invoice_items").insert(
       validItems.map((i) => ({
@@ -177,7 +181,6 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
       }))
     );
 
-    // Send email when status is "sent" and client has an email
     if (saveStatus === "sent" && clientEmail && invoiceId) {
       await fetch("/api/invoices/send", {
         method: "POST",
@@ -187,225 +190,207 @@ export function InvoiceForm({ business, customers, editingInvoice, onClose }: Pr
     }
 
     setSaving(false);
+    router.push(backHref);
     router.refresh();
-    onClose();
+  }
+
+  const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
+
+  function Field({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+      <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+        <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+        {children}
+      </fieldset>
+    );
+  }
+
+  function SectionDivider({ label, action }: { label: string; action?: React.ReactNode }) {
+    return (
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-slate-200" />
+        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+        {action && <>{action}</>}
+        <div className="flex-1 h-px bg-slate-200" />
+      </div>
+    );
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-shrink-0">
-          <h2 className="font-bold text-[#0F172A]">
-            {isEdit ? `Edit ${editingInvoice.invoice_number}` : "New Invoice"}
-          </h2>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
+    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-5 pb-32 space-y-4">
+
+        {/* Client */}
+        <SectionDivider label="Client" />
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setClientMode("existing")}
+              className={`flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold border transition ${clientMode === "existing" ? "bg-[#1a9c38] text-white border-[#1a9c38]" : "border-slate-200 text-slate-500 bg-white"}`}
+            >
+              Existing customer
+            </button>
+            <button
+              onClick={() => setClientMode("manual")}
+              className={`flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold border transition ${clientMode === "manual" ? "bg-[#1a9c38] text-white border-[#1a9c38]" : "border-slate-200 text-slate-500 bg-white"}`}
+            >
+              Manual entry
+            </button>
+          </div>
+
+          {clientMode === "existing" && (
+            <Field label="Select customer">
+              <select value={selectedCustomerId} onChange={(e) => autofillCustomer(e.target.value)} className={`${innerCls} -ml-0.5`}>
+                <option value="">— Choose —</option>
+                {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </Field>
+          )}
+
+          <Field label="Client name">
+            <input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Precious Okafor" className={innerCls} />
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Phone">
+              <input type="tel" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+234..." className={innerCls} />
+            </Field>
+            <Field label="Email (optional)">
+              <input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="email@..." className={innerCls} />
+            </Field>
+          </div>
+          <Field label="Address (optional)">
+            <input value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder="Client address" className={innerCls} />
+          </Field>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
-          {/* Client section */}
+        {/* Invoice Details */}
+        <SectionDivider label="Invoice Details" />
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Issue date">
+              <input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} className={innerCls} />
+            </Field>
+            <Field label="Due date">
+              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={innerCls} />
+            </Field>
+          </div>
+          <Field label="Status">
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className={`${innerCls} -ml-0.5`}>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </Field>
+        </div>
+
+        {/* Line Items */}
+        <SectionDivider
+          label="Line Items"
+          action={
+            !loadingItems && (
+              <button onClick={addItem} className="flex items-center gap-1 text-[12px] text-[#1a9c38] font-semibold flex-shrink-0">
+                <Plus className="w-3 h-3" /> Add
+              </button>
+            )
+          }
+        />
+
+        {loadingItems ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
+          </div>
+        ) : (
           <div className="space-y-3">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setClientMode("existing")}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${clientMode === "existing" ? "bg-green-600 text-white border-green-600" : "border-slate-200 text-slate-500"}`}
-              >
-                Existing customer
-              </button>
-              <button
-                onClick={() => setClientMode("manual")}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${clientMode === "manual" ? "bg-green-600 text-white border-green-600" : "border-slate-200 text-slate-500"}`}
-              >
-                Manual entry
-              </button>
-            </div>
-
-            {clientMode === "existing" && (
-              <select
-                value={selectedCustomerId}
-                onChange={(e) => autofillCustomer(e.target.value)}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                <option value="">— Select customer —</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            )}
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">Client Name</label>
-                <input
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="Client name"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="client@example.com"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Client Address</label>
-              <input
-                value={clientAddress}
-                onChange={(e) => setClientAddress(e.target.value)}
-                placeholder="Client address"
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-          </div>
-
-          {/* Dates + Status */}
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Issue Date</label>
-              <input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Due Date</label>
-              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>
-              <select value={status} onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                <option value="draft">Draft</option>
-                <option value="sent">Sent</option>
-                <option value="paid">Paid</option>
-                <option value="overdue">Overdue</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Line items */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-semibold text-[#0F172A]">Line Items</label>
-              {!loadingItems && (
-                <button onClick={addItem} className="flex items-center gap-1 text-xs text-green-600 hover:underline font-medium">
-                  <Plus className="w-3.5 h-3.5" /> Add item
-                </button>
-              )}
-            </div>
-
-            {loadingItems ? (
-              <div className="flex items-center justify-center py-6 bg-slate-50 rounded-xl">
-                <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
-              </div>
-            ) : (
-            <div className="bg-slate-50 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wide border-b border-slate-100">
-                <div className="col-span-6">Description</div>
-                <div className="col-span-2 text-center">Qty</div>
-                <div className="col-span-3 text-right">Unit Price</div>
-                <div className="col-span-1" />
-              </div>
-              {items.map((item, idx) => (
-                <div key={idx} className="grid grid-cols-12 gap-2 px-3 py-2 border-b border-slate-100 last:border-0 items-center">
+            {items.map((item, idx) => (
+              <div key={idx} className="rounded-[8px] space-y-2">
+                <Field label="Description">
                   <input
-                    className="col-span-6 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-                    placeholder="Description"
+                    placeholder="Item name or service"
                     value={item.description}
                     onChange={(e) => updateItem(idx, "description", e.target.value)}
+                    className={innerCls}
                   />
-                  <input
-                    className="col-span-2 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-center"
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 1)}
-                  />
-                  <input
-                    className="col-span-3 px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-right"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={item.unit_price || ""}
-                    onChange={(e) => updateItem(idx, "unit_price", parseFloat(e.target.value) || 0)}
-                  />
+                </Field>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 flex-shrink-0">
+                    <Field label="Qty">
+                      <input
+                        type="number" min="1" placeholder="1"
+                        value={item.quantity}
+                        onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 1)}
+                        className={innerCls}
+                      />
+                    </Field>
+                  </div>
+                  <div className="flex-1">
+                    <Field label="Unit price">
+                      <input
+                        type="number" min="0" step="0.01" placeholder="0.00"
+                        value={item.unit_price || ""}
+                        onChange={(e) => updateItem(idx, "unit_price", parseFloat(e.target.value) || 0)}
+                        className={innerCls}
+                      />
+                    </Field>
+                  </div>
                   <button
                     onClick={() => removeItem(idx)}
                     disabled={items.length === 1}
-                    className="col-span-1 flex justify-center p-1 text-slate-300 hover:text-red-400 disabled:opacity-30 transition"
+                    className="p-2 text-slate-300 hover:text-red-400 disabled:opacity-30 transition flex-shrink-0"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-              ))}
-              <div className="flex justify-between items-center px-3 py-2 text-sm font-bold text-[#0F172A] bg-slate-100">
-                <span>Total</span>
-                <span className="">{subtotal.toLocaleString("en", { minimumFractionDigits: 2 })}</span>
+                <div className="flex justify-between text-[13px] text-slate-500 px-0.5">
+                  <span>Line total</span>
+                  <span className="font-semibold text-slate-700">{(item.quantity * item.unit_price).toLocaleString("en", { minimumFractionDigits: 2 })}</span>
+                </div>
               </div>
-            </div>
-            )}
-          </div>
-
-          {/* Notes + Bank details */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Notes</label>
-              <textarea
-                rows={3}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any notes for the client..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Payment / Bank Details</label>
-              <textarea
-                rows={3}
-                value={bankDetails}
-                onChange={(e) => setBankDetails(e.target.value)}
-                placeholder="Bank name, account number..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-              />
+            ))}
+            <div className="flex justify-between items-center px-3 py-3 bg-slate-100 rounded-[8px] text-[15px] font-bold text-[#0F172A]">
+              <span>Total</span>
+              <span>{subtotal.toLocaleString("en", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
+        )}
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+        {/* Additional Info */}
+        <SectionDivider label="Additional Info" />
+        <div className="space-y-3">
+          <Field label="Notes (optional)">
+            <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any notes for the client..." className={`${innerCls} resize-none`} />
+          </Field>
+          <Field label="Payment / Bank details">
+            <textarea rows={3} value={bankDetails} onChange={(e) => setBankDetails(e.target.value)} placeholder="Bank name, account number..." className={`${innerCls} resize-none`} />
+          </Field>
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between gap-3 flex-shrink-0">
-          <button onClick={onClose} className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">
-            Cancel
-          </button>
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleSave("draft")}
-              disabled={saving || loadingItems}
-              className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
-            >
-              Save as Draft
-            </button>
-            <button
-              onClick={() => handleSave("sent")}
-              disabled={saving || loadingItems}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 shadow-sm shadow-green-300/40"
-            >
-              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isEdit ? "Update Invoice" : "Create & Send"}
-            </button>
-          </div>
-        </div>
+        {error && <p className="text-[13px] text-red-500 bg-red-50 px-3 py-2 rounded-[8px]">{error}</p>}
+      </div>
+
+      {/* Sticky footer */}
+      <div className="sticky bottom-0 bg-white border-t border-slate-100 px-4 py-4 flex items-center gap-3">
+        <button
+          onClick={() => router.push(backHref)}
+          className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => handleSave("draft")}
+          disabled={saving || loadingItems}
+          className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition"
+        >
+          Save Draft
+        </button>
+        <button
+          onClick={() => handleSave(isEdit ? status : "sent")}
+          disabled={saving || loadingItems}
+          className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+        >
+          {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isEdit ? "Save Changes" : "Create & Send"}
+        </button>
       </div>
     </div>
   );

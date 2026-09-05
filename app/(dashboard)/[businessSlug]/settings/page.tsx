@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { SettingsMenu } from "@/components/settings/SettingsMenu";
 import { SettingsClient } from "@/components/settings/SettingsClient";
 
@@ -70,10 +70,11 @@ export default async function SettingsPage({ params, searchParams }: Props) {
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-600 via-green-400 to-transparent pointer-events-none" />
         <Link
           href={`/${businessSlug}/settings`}
-          className="p-2 -ml-1 rounded-lg text-slate-500 hover:bg-slate-100 transition"
+          className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium"
           aria-label="Back to settings"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4" />
+          Back
         </Link>
         <h2 className="text-base font-bold text-[#0F172A]">{TAB_LABELS[tab] ?? "Settings"}</h2>
       </header>

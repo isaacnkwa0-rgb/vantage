@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   Search, Receipt, Printer, TrendingUp, ShoppingBag,
   CreditCard, Banknote, ArrowLeftRight, Loader2, Calendar,
-  User, Download, BookOpen, RotateCcw, ChevronRight,
+  User, BookOpen, RotateCcw, SlidersHorizontal, Check,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
@@ -64,10 +64,22 @@ const PAYMENT_COLORS: Record<string, string> = {
 };
 
 export function SalesClient({ sales, business, userId, returnedSaleIds }: Props) {
-  const [search, setSearch]             = useState("");
+  const [search, setSearch]               = useState("");
   const [paymentFilter, setPaymentFilter] = useState("all");
-  const [reprinting, setReprinting]     = useState<string | null>(null);
-  const [receiptSale, setReceiptSale]   = useState<any | null>(null);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [reprinting, setReprinting]       = useState<string | null>(null);
+  const [receiptSale, setReceiptSale]     = useState<any | null>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setShowFilterMenu(false);
+      }
+    }
+    if (showFilterMenu) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showFilterMenu]);
 
   // Return modal state
   const [loadingReturn, setLoadingReturn] = useState<string | null>(null);
@@ -143,14 +155,24 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
     }
   }
 
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const d = new Date(iso);
+    return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  }
+
+  function formatTime(iso: string) {
+    const d = new Date(iso);
+    const h = d.getHours();
+    const m = String(d.getMinutes()).padStart(2, "0");
+    const ampm = h >= 12 ? "PM" : "AM";
+    return `${h % 12 || 12}:${m} ${ampm}`;
+  }
+
+  function formatShortDate(iso: string) {
+    const d = new Date(iso);
+    return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
   }
 
   function exportCSV() {
@@ -177,7 +199,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
   }
 
   return (
-    <div className="flex-1 space-y-0 pb-4">
+    <div className="flex-1 space-y-0 pb-4 bg-white">
 
       {/* ── Desktop summary cards (hidden on mobile) ─── */}
       <div className="hidden sm:grid grid-cols-3 gap-3 px-5 pt-5">
@@ -218,7 +240,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
         </div>
       </div>
 
-      {/* ── Search + export (shared) ─────────────────── */}
+      {/* ── Search + filter dropdown ─────────────────── */}
       <div className="flex items-center gap-2 px-4 pt-4 sm:px-5 sm:pt-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -226,36 +248,43 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by sale number or customer..."
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38] bg-white"
           />
         </div>
-        <button
-          onClick={exportCSV}
-          disabled={filtered.length === 0}
-          className="flex items-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition disabled:opacity-40 bg-white"
-          title="Export CSV"
-        >
-          <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">Export</span>
-        </button>
-      </div>
 
-      {/* ── Filter tabs ───────────────────────────────── */}
-      <div className="flex gap-2 px-4 pt-3 sm:px-5 overflow-x-auto scrollbar-none pb-1">
-        {PAYMENT_TABS.map((tab) => (
+        {/* Filter dropdown */}
+        <div ref={filterRef} className="relative">
           <button
-            key={tab.value}
-            onClick={() => setPaymentFilter(tab.value)}
+            onClick={() => setShowFilterMenu((v) => !v)}
             className={cn(
-              "flex-shrink-0 px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors",
-              paymentFilter === tab.value
-                ? "bg-[#1a9c38] text-white"
-                : "bg-white border border-slate-200 text-slate-600 active:bg-slate-50"
+              "flex items-center gap-1.5 px-3 py-2.5 border rounded-[8px] text-sm font-medium transition bg-white",
+              paymentFilter !== "all"
+                ? "border-[#1a9c38] text-[#1a9c38]"
+                : "border-slate-200 text-slate-600 hover:bg-slate-50"
             )}
           >
-            {tab.label}
+            <SlidersHorizontal className="w-4 h-4" />
+            <span className="hidden sm:inline capitalize">{paymentFilter === "all" ? "Filter" : paymentFilter}</span>
+            {paymentFilter !== "all" && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1a9c38] flex-shrink-0" />
+            )}
           </button>
-        ))}
+
+          {showFilterMenu && (
+            <div className="absolute right-0 top-full mt-1.5 w-40 bg-white rounded-[8px] border border-slate-200 shadow-lg z-20 overflow-hidden">
+              {PAYMENT_TABS.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => { setPaymentFilter(tab.value); setShowFilterMenu(false); }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition"
+                >
+                  {tab.label}
+                  {paymentFilter === tab.value && <Check className="w-3.5 h-3.5 text-[#1a9c38]" />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Sales list ────────────────────────────────── */}
@@ -274,8 +303,8 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
       ) : (
         <>
           {/* Mobile card list */}
-          <div className="sm:hidden px-4 pt-3 pb-4 space-y-0">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50">
+          <div className="sm:hidden px-4 pt-3 pb-4">
+            <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
               {filtered.map((sale) => {
                 const PayIcon = PAYMENT_ICONS[sale.payment_method] ?? Receipt;
                 const payColor = PAYMENT_COLORS[sale.payment_method] ?? "bg-slate-50 text-slate-600";
@@ -284,61 +313,56 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                 return (
                   <div
                     key={sale.id}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3.5",
-                      isReturned && "bg-orange-50/40"
-                    )}
+                    className={cn("px-4 py-4", isReturned && "bg-orange-50/30")}
                   >
-                    {/* Icon avatar */}
-                    <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
-                      isReturned ? "bg-orange-50" : "bg-green-50"
-                    )}>
-                      <PayIcon className={cn("w-4.5 h-4.5", isReturned ? "text-orange-400" : "text-[#1a9c38]")} aria-hidden="true" />
-                    </div>
+                    {/* Row 1: avatar + name + amount */}
+                    <div className="flex items-start gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5",
+                        isReturned ? "bg-orange-50" : "bg-green-50"
+                      )}>
+                        <PayIcon className={cn("w-4 h-4", isReturned ? "text-orange-400" : "text-[#1a9c38]")} />
+                      </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-slate-900 truncate">
-                        {sale.customers?.name ?? "Walk-in"}
-                      </p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <p className="text-[11px] text-slate-400">{sale.sale_number}</p>
+                      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                        <p className="text-[15px] font-semibold text-slate-900 leading-none truncate">
+                          {sale.customers?.name ?? "Walk-in"}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] text-slate-400">{sale.sale_number}</span>
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize",
+                            isReturned ? "bg-orange-100 text-orange-600" : payColor
+                          )}>
+                            {isReturned ? "Returned" : sale.payment_method}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                         <span className={cn(
-                          "px-1.5 rounded-full text-[10px] font-semibold capitalize leading-[18px]",
-                          isReturned ? "bg-orange-100 text-orange-600" : payColor
+                          "text-[15px] font-bold leading-none",
+                          isReturned ? "text-slate-400 line-through" : "text-slate-900"
                         )}>
-                          {isReturned ? "Returned" : sale.payment_method}
+                          {fmt(sale.total_amount)}
                         </span>
+                        <span className="text-[13px] text-slate-400" suppressHydrationWarning>{formatTime(sale.created_at)}</span>
                       </div>
                     </div>
 
-                    {/* Amount + time */}
-                    <div className="text-right flex-shrink-0">
-                      <p className={cn(
-                        "text-[14px] font-bold",
-                        isReturned ? "text-slate-400 line-through" : "text-slate-900"
-                      )}>
-                        {fmt(sale.total_amount)}
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        {new Date(sale.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                      </p>
+                    {/* Row 2: reprint button */}
+                    <div className="flex items-center gap-2 mt-3 pl-[52px]">
+                      <button
+                        onClick={() => handleReprint(sale)}
+                        disabled={reprinting === sale.id}
+                        className="flex items-center gap-1.5 text-[13px] font-medium text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition active:scale-95"
+                      >
+                        {reprinting === sale.id
+                          ? <Loader2 className="w-3 h-3 animate-spin" />
+                          : <Printer className="w-3 h-3" />}
+                        Receipt
+                      </button>
                     </div>
-
-                    {/* Reprint icon */}
-                    <button
-                      onClick={() => handleReprint(sale)}
-                      disabled={reprinting === sale.id}
-                      className="ml-1 p-2 rounded-full text-slate-300 active:text-green-500 transition"
-                      aria-label="Reprint receipt"
-                    >
-                      {reprinting === sale.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Printer className="w-4 h-4" />
-                      )}
-                    </button>
                   </div>
                 );
               })}
@@ -393,7 +417,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
 
                       <div className="w-44 flex-shrink-0 flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />
-                        <span className="text-xs text-slate-500">{formatDate(sale.created_at)}</span>
+                        <span className="text-xs text-slate-500" suppressHydrationWarning>{formatDate(sale.created_at)}</span>
                       </div>
 
                       <div className="w-24 flex-shrink-0">

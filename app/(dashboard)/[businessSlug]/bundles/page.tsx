@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { TopBar } from "@/components/layout/TopBar";
 import { BundlesClient } from "@/components/products/BundlesClient";
 
 interface Props {
@@ -35,11 +36,14 @@ export default async function BundlesPage({ params }: Props) {
   ]);
 
   return (
-    <BundlesClient
-      bundles={(bundlesRes.data ?? []) as any}
-      products={(productsRes.data ?? []) as any}
-      businessId={business.id}
-      currency={business.currency}
-    />
+    <div className="flex flex-col flex-1 overflow-auto">
+      <TopBar title="Bundles" bg="bg-[#fafefb]" border={false} centered />
+      <BundlesClient
+        bundles={(bundlesRes.data ?? []) as any}
+        products={(productsRes.data ?? []) as any}
+        businessId={business.id}
+        currency={business.currency}
+      />
+    </div>
   );
 }

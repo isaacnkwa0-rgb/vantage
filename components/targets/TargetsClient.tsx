@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Target, Plus, Trash2, TrendingUp, ShoppingCart, DollarSign, CheckCircle2, Circle } from "lucide-react";
+import {
+  Target, Plus, Trash2,
+  CheckCircle2, X, Loader2, Lock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  REVENUE_MILESTONES, SALES_MILESTONES, TOTAL_MILESTONES,
+  computeMilestones, type ComputedMilestone,
+} from "@/lib/milestones";
 
 interface SalesTarget {
   id: string;
@@ -21,34 +28,88 @@ interface Props {
   targets: SalesTarget[];
   currency: string;
   businessId: string;
-  businessSlug: string;
   userId: string;
   revenueThisMonth: number;
   transactionsThisMonth: number;
   monthStart: string;
   monthEnd: string;
+  allTimeRevenue: number;
+  allTimeSalesCount: number;
 }
 
 const PERIOD_LABELS: Record<string, string> = {
-  daily: "Daily",
-  weekly: "Weekly",
-  monthly: "Monthly",
-  custom: "Custom",
+  daily: "Daily", weekly: "Weekly", monthly: "Monthly", custom: "Custom",
 };
 
-const TYPE_ICONS: Record<string, typeof DollarSign> = {
-  revenue: DollarSign,
-  units: ShoppingCart,
-  transactions: TrendingUp,
-};
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
 
-function getProgress(target: SalesTarget, revenue: number, transactions: number): number {
-  const current = target.target_type === "revenue" ? revenue : transactions;
-  return Math.min(100, (current / target.target_value) * 100);
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
 }
 
-function getCurrentValue(target: SalesTarget, revenue: number, transactions: number): number {
-  return target.target_type === "revenue" ? revenue : transactions;
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px bg-slate-200" />
+      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-slate-200" />
+    </div>
+  );
+}
+
+function MilestoneRow({ m, fmt, isRevenue }: { m: ComputedMilestone; fmt: (n: number) => string; isRevenue: boolean }) {
+  return (
+    <div className={cn("px-4 py-3", m.status === "future" && "opacity-40")}>
+      <div className="flex items-center gap-3">
+        <div className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+          m.status === "achieved" ? "bg-emerald-50" :
+          m.status === "next"     ? "bg-amber-50"   : "bg-slate-50"
+        )}>
+          {m.status === "future"
+            ? <Lock className="w-4 h-4 text-slate-300" />
+            : <span className="text-xl leading-none">{m.emoji}</span>}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[13px] font-semibold text-[#0F172A] truncate">{m.label}</span>
+            {m.status === "achieved" && (
+              <span className="flex items-center gap-1 text-[11px] font-bold text-[#1a9c38] bg-emerald-50 px-2 py-0.5 rounded-full flex-shrink-0">
+                <CheckCircle2 className="w-3 h-3" /> Done
+              </span>
+            )}
+            {m.status === "next" && (
+              <span className="text-[12px] font-extrabold text-amber-500 flex-shrink-0">
+                {Math.round(m.progress)}%
+              </span>
+            )}
+          </div>
+          <p className="text-[12px] text-slate-400 mt-0.5">
+            {isRevenue ? fmt(m.value) : `${m.value.toLocaleString()} sales`}
+          </p>
+          {m.status === "next" && (
+            <>
+              <div className="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-400 rounded-full transition-all duration-700"
+                  style={{ width: `${m.progress}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">
+                {isRevenue ? fmt(m.current) : m.current.toLocaleString()} of{" "}
+                {isRevenue ? fmt(m.value) : m.value.toLocaleString()}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function TargetsClient({
@@ -60,12 +121,14 @@ export function TargetsClient({
   transactionsThisMonth,
   monthStart,
   monthEnd,
+  allTimeRevenue,
+  allTimeSalesCount,
 }: Props) {
   const supabase = createClient();
   const fmt = (n: number) => formatCurrency(n, currency);
 
   const [targets, setTargets] = useState<SalesTarget[]>(initialTargets);
-  const [showCreate, setShowCreate] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -80,7 +143,6 @@ export function TargetsClient({
 
   function resetForm() {
     setForm({ name: "", period: "monthly", target_type: "revenue", target_value: "", start_date: monthStart, end_date: monthEnd });
-    setShowCreate(false);
   }
 
   async function createTarget() {
@@ -104,6 +166,7 @@ export function TargetsClient({
     setSaving(false);
     if (!error && data) {
       setTargets((prev) => [data as SalesTarget, ...prev]);
+      setShowForm(false);
       resetForm();
     }
   }
@@ -115,213 +178,236 @@ export function TargetsClient({
     setDeletingId(null);
   }
 
-  const activeTargets = targets.filter((t) => t.is_active);
+  const revenueMilestones = computeMilestones(REVENUE_MILESTONES, allTimeRevenue);
+  const salesMilestones   = computeMilestones(SALES_MILESTONES, allTimeSalesCount);
+  const revAchieved   = revenueMilestones.filter((m) => m.status === "achieved").length;
+  const salesAchieved = salesMilestones.filter((m) => m.status === "achieved").length;
+  const totalAchieved = revAchieved + salesAchieved;
 
   return (
-    <div className="flex-1 p-5 space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-bold text-[#0F172A]">Active Targets</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Track progress toward your sales goals</p>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          New Target
-        </button>
-      </div>
+    <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-4 pt-4 pb-6 space-y-5">
 
-      {/* Month summary cards */}
+      {/* This month snapshot */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-xs text-slate-500">Revenue This Month</p>
-          <p className="text-2xl font-bold text-[#0F172A] mt-1">{fmt(revenueThisMonth)}</p>
+        <div className="border border-slate-200 rounded-[8px] px-4 py-3">
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Revenue</p>
+          <p className="text-[17px] font-extrabold text-[#1a9c38] leading-tight mt-0.5">{fmt(revenueThisMonth)}</p>
+          <p className="text-[11px] text-slate-400">This month</p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-xs text-slate-500">Transactions This Month</p>
-          <p className="text-2xl font-bold text-[#0F172A] mt-1">{transactionsThisMonth}</p>
+        <div className="border border-slate-200 rounded-[8px] px-4 py-3">
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Sales</p>
+          <p className="text-[28px] font-extrabold text-[#0F172A] leading-tight mt-0.5">{transactionsThisMonth}</p>
+          <p className="text-[11px] text-slate-400">This month</p>
         </div>
       </div>
 
-      {/* Targets list */}
-      {activeTargets.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center text-center gap-3">
-          <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-            <Target className="w-6 h-6 text-slate-400" />
+      {/* Growth milestones */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <p className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Growth Milestones</p>
+          <span className="text-[12px] font-semibold text-slate-400">{totalAchieved}/{TOTAL_MILESTONES} achieved</span>
+        </div>
+
+        {/* Revenue milestones */}
+        <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+            <span className="text-[13px] font-semibold text-[#0F172A]">Revenue</span>
+            <span className="text-[12px] font-bold text-[#1a9c38]">{revAchieved}/{REVENUE_MILESTONES.length}</span>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-[#0F172A]">No targets yet</p>
-            <p className="text-xs text-slate-400 mt-0.5">Create a target to start tracking your goals</p>
+          <div className="divide-y divide-slate-100">
+            {revenueMilestones.map((m) => (
+              <MilestoneRow key={m.key} m={m} fmt={fmt} isRevenue={true} />
+            ))}
           </div>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {activeTargets.map((target) => {
-            const progress = getProgress(target, revenueThisMonth, transactionsThisMonth);
-            const current = getCurrentValue(target, revenueThisMonth, transactionsThisMonth);
-            const isRevenue = target.target_type === "revenue";
-            const achieved = progress >= 100;
-            const Icon = TYPE_ICONS[target.target_type];
 
-            return (
-              <div key={target.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 group">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", achieved ? "bg-green-100" : "bg-slate-100")}>
-                      <Icon className={cn("w-5 h-5", achieved ? "text-green-600" : "text-slate-500")} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-[#0F172A] truncate">{target.name}</p>
-                        {achieved && <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />}
-                      </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        {PERIOD_LABELS[target.period]} · {target.start_date} → {target.end_date}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => deleteTarget(target.id)}
-                    disabled={deletingId === target.id}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-300 hover:text-red-500 transition rounded-lg"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">
-                      {isRevenue ? fmt(current) : current.toLocaleString()} of{" "}
-                      {isRevenue ? fmt(target.target_value) : target.target_value.toLocaleString()}
-                    </span>
-                    <span className={cn("font-bold", achieved ? "text-green-600" : "text-slate-700")}>
-                      {Math.round(progress)}%
-                    </span>
-                  </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className={cn("h-full rounded-full transition-all duration-500", achieved ? "bg-green-500" : progress > 66 ? "bg-amber-500" : "bg-blue-500")}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  {!achieved && (
-                    <p className="text-xs text-slate-400">
-                      {isRevenue
-                        ? `${fmt(target.target_value - current)} remaining`
-                        : `${(target.target_value - current).toLocaleString()} remaining`}
-                    </p>
-                  )}
-                  {achieved && <p className="text-xs text-green-600 font-medium">Target achieved!</p>}
-                </div>
-              </div>
-            );
-          })}
+        {/* Sales milestones */}
+        <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+            <span className="text-[13px] font-semibold text-[#0F172A]">Sales Count</span>
+            <span className="text-[12px] font-bold text-[#1a9c38]">{salesAchieved}/{SALES_MILESTONES.length}</span>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {salesMilestones.map((m) => (
+              <MilestoneRow key={m.key} m={m} fmt={fmt} isRevenue={false} />
+            ))}
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* Create modal */}
-      {showCreate && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h3 className="text-base font-bold text-[#0F172A]">New Sales Target</h3>
+      {/* My Targets */}
+      <div className="space-y-3">
+        <p className="text-xs font-extrabold text-slate-900 uppercase tracking-wider px-1">My Targets</p>
 
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Target Name</label>
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. August Revenue Goal"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="w-full flex items-center justify-center gap-2 h-11 border-2 border-dashed border-slate-200 rounded-[8px] text-[13px] font-semibold text-slate-400 hover:border-[#1a9c38] hover:text-[#1a9c38] transition"
+          >
+            <Plus className="w-4 h-4" /> Add Target
+          </button>
+        )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Period</label>
-                  <select
-                    value={form.period}
-                    onChange={(e) => setForm({ ...form, period: e.target.value as SalesTarget["period"] })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Target Type</label>
-                  <select
-                    value={form.target_type}
-                    onChange={(e) => setForm({ ...form, target_type: e.target.value as SalesTarget["target_type"] })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option value="revenue">Revenue</option>
-                    <option value="transactions">Transactions</option>
-                    <option value="units">Units Sold</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
-                  Target Value {form.target_type === "revenue" ? `(${currency})` : "(count)"}
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={form.target_value}
-                  onChange={(e) => setForm({ ...form, target_value: e.target.value })}
-                  placeholder="0"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Start Date</label>
+        {showForm && (
+          <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+              <span className="text-[13px] font-semibold text-[#0F172A]">New Target</span>
+              <button onClick={() => { setShowForm(false); resetForm(); }} className="p-1 text-slate-400 hover:text-slate-600 transition">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="px-4 pt-4 pb-3 space-y-4">
+              <SectionDivider label="Target Details" />
+              <div className="space-y-3">
+                <Field label="Target name *">
                   <input
-                    type="date"
-                    value={form.start_date}
-                    onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="e.g. September Revenue Goal"
+                    className={innerCls}
                   />
+                </Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Type">
+                    <select
+                      value={form.target_type}
+                      onChange={(e) => setForm({ ...form, target_type: e.target.value as SalesTarget["target_type"] })}
+                      className={`${innerCls} -ml-0.5`}
+                    >
+                      <option value="revenue">Revenue</option>
+                      <option value="transactions">Transactions</option>
+                      <option value="units">Units Sold</option>
+                    </select>
+                  </Field>
+                  <Field label="Period">
+                    <select
+                      value={form.period}
+                      onChange={(e) => setForm({ ...form, period: e.target.value as SalesTarget["period"] })}
+                      className={`${innerCls} -ml-0.5`}
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </Field>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">End Date</label>
+                <Field label={`Target value ${form.target_type === "revenue" ? `(${currency})` : "(count)"}`}>
                   <input
-                    type="date"
-                    value={form.end_date}
-                    onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    type="number"
+                    min="0"
+                    value={form.target_value}
+                    onChange={(e) => setForm({ ...form, target_value: e.target.value })}
+                    placeholder="0"
+                    className={innerCls}
                   />
-                </div>
+                </Field>
+              </div>
+              <SectionDivider label="Date Range" />
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Start date">
+                  <input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className={innerCls} />
+                </Field>
+                <Field label="End date">
+                  <input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className={innerCls} />
+                </Field>
               </div>
             </div>
-
-            <div className="flex gap-2 pt-1">
+            <div className="px-4 pb-4 flex gap-3">
               <button
-                onClick={resetForm}
-                className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition"
+                onClick={() => { setShowForm(false); resetForm(); }}
+                className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={createTarget}
                 disabled={saving || !form.name.trim() || !form.target_value}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
               >
-                {saving ? "Saving..." : "Create Target"}
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                Create Target
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {targets.length === 0 && !showForm && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+              <Target className="w-6 h-6 text-slate-300" />
+            </div>
+            <p className="text-[15px] font-bold text-slate-800">No targets yet</p>
+            <p className="text-[13px] text-slate-400 mt-1">Add a target to track your sales goals</p>
+          </div>
+        )}
+
+        {targets.length > 0 && (
+          <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {targets.map((target) => {
+              const current = target.target_type === "revenue" ? revenueThisMonth : transactionsThisMonth;
+              const progress = Math.min(100, (current / target.target_value) * 100);
+              const achieved = progress >= 100;
+              const isRevenue = target.target_type === "revenue";
+
+              return (
+                <div key={target.id} className="px-4 py-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[14px] font-semibold text-[#0F172A] truncate">{target.name}</p>
+                        {achieved && <CheckCircle2 className="w-4 h-4 text-[#1a9c38] flex-shrink-0" />}
+                      </div>
+                      <p className="text-[12px] text-slate-400 mt-0.5">
+                        {PERIOD_LABELS[target.period]} · {target.start_date} → {target.end_date}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => deleteTarget(target.id)}
+                      disabled={deletingId === target.id}
+                      className="text-red-400 bg-red-50 hover:bg-red-100 border border-red-100 p-1.5 rounded-lg transition active:scale-95 disabled:opacity-50 flex-shrink-0 mt-0.5"
+                    >
+                      {deletingId === target.id
+                        ? <Loader2 className="w-3 h-3 animate-spin" />
+                        : <Trash2 className="w-3 h-3" />}
+                    </button>
+                  </div>
+
+                  <div className="mt-3 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12px] text-slate-500">
+                        {isRevenue ? fmt(current) : current.toLocaleString()} of{" "}
+                        {isRevenue ? fmt(target.target_value) : target.target_value.toLocaleString()}
+                      </span>
+                      <span className={cn("text-[13px] font-extrabold",
+                        achieved ? "text-[#1a9c38]" : progress > 66 ? "text-amber-500" : "text-blue-500"
+                      )}>
+                        {Math.round(progress)}%
+                      </span>
+                    </div>
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={cn("h-full rounded-full transition-all duration-500",
+                          achieved ? "bg-[#1a9c38]" : progress > 66 ? "bg-amber-400" : "bg-blue-400"
+                        )}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    {achieved
+                      ? <p className="text-[12px] text-[#1a9c38] font-semibold">Target achieved!</p>
+                      : <p className="text-[12px] text-slate-400">
+                          {isRevenue
+                            ? `${fmt(target.target_value - current)} remaining`
+                            : `${(target.target_value - current).toLocaleString()} remaining`}
+                        </p>
+                    }
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Camera } from "lucide-react";
+import { ChevronLeft, Camera } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Props {
@@ -119,7 +119,7 @@ export function ProfileClient({ slug, profile, userId }: Props) {
     const supabase = createClient();
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ full_name, phone: phone || null, avatar_url: avatarUrl || null })
+      .update({ full_name, phone: phone || null, avatar_url: avatarUrl || null, date_of_birth: dob || null })
       .eq("id", userId);
     setSaving(false);
     if (updateError) { setError("Failed to save. Try again."); return; }
@@ -208,8 +208,8 @@ export function ProfileClient({ slug, profile, userId }: Props) {
       )}
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-10 pb-4 bg-[#fafefb]">
-        <button onClick={() => router.back()} className="flex items-center gap-1 text-[#1a9c38] text-[14px] font-medium">
-          <ArrowLeft className="w-4 h-4" />
+        <button onClick={() => router.back()} className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium">
+          <ChevronLeft className="w-4 h-4" />
           Back
         </button>
         <h1 className="text-[16px] font-bold text-slate-900">Profile</h1>

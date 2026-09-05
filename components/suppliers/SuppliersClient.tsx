@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Truck, Search, Phone, Mail, MapPin, Trash2, Edit2, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Plus, Truck, Search, Phone, Mail, MapPin, Trash2, Edit2, X, Loader2, User } from "lucide-react";
 
 interface Supplier {
   id: string;
@@ -29,20 +28,41 @@ const EMPTY_FORM = {
   notes: "",
 };
 
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px bg-slate-200" />
+      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-slate-200" />
+    </div>
+  );
+}
+
 export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Props) {
-  const supabase = createClient();
   const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
-  const [search, setSearch] = useState("");
-  const [showForm, setShowForm] = useState(false);
+  const [search, setSearch]       = useState("");
+  const [showForm, setShowForm]   = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
+  const [form, setForm]           = useState(EMPTY_FORM);
+  const [saving, setSaving]       = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filtered = suppliers.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
     (s.contact_name ?? "").toLowerCase().includes(search.toLowerCase()) ||
-    (s.email ?? "").toLowerCase().includes(search.toLowerCase())
+    (s.email ?? "").toLowerCase().includes(search.toLowerCase()) ||
+    (s.phone ?? "").includes(search)
   );
 
   function openCreate() {
@@ -54,12 +74,12 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
   function openEdit(s: Supplier) {
     setEditingId(s.id);
     setForm({
-      name: s.name,
+      name:         s.name,
       contact_name: s.contact_name ?? "",
-      email: s.email ?? "",
-      phone: s.phone ?? "",
-      address: s.address ?? "",
-      notes: s.notes ?? "",
+      email:        s.email ?? "",
+      phone:        s.phone ?? "",
+      address:      s.address ?? "",
+      notes:        s.notes ?? "",
     });
     setShowForm(true);
   }
@@ -73,33 +93,26 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
   async function save() {
     if (!form.name.trim()) return;
     setSaving(true);
-
+    const supabase = createClient();
     const payload = {
-      name: form.name.trim(),
+      name:         form.name.trim(),
       contact_name: form.contact_name.trim() || null,
-      email: form.email.trim() || null,
-      phone: form.phone.trim() || null,
-      address: form.address.trim() || null,
-      notes: form.notes.trim() || null,
+      email:        form.email.trim() || null,
+      phone:        form.phone.trim() || null,
+      address:      form.address.trim() || null,
+      notes:        form.notes.trim() || null,
     };
 
     if (editingId) {
       const { data, error } = await supabase
-        .from("suppliers")
-        .update(payload)
-        .eq("id", editingId)
-        .select()
-        .single();
+        .from("suppliers").update(payload).eq("id", editingId).select().single();
       if (!error && data) {
         setSuppliers((prev) => prev.map((s) => (s.id === editingId ? (data as Supplier) : s)));
         closeForm();
       }
     } else {
       const { data, error } = await supabase
-        .from("suppliers")
-        .insert({ ...payload, business_id: businessId })
-        .select()
-        .single();
+        .from("suppliers").insert({ ...payload, business_id: businessId }).select().single();
       if (!error && data) {
         setSuppliers((prev) => [data as Supplier, ...prev]);
         closeForm();
@@ -109,169 +122,210 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
   }
 
   async function deleteSupplier(id: string) {
+    if (!confirm("Remove this supplier?")) return;
     setDeletingId(id);
+    const supabase = createClient();
     await supabase.from("suppliers").update({ is_active: false }).eq("id", id);
     setSuppliers((prev) => prev.filter((s) => s.id !== id));
     setDeletingId(null);
   }
 
   return (
-    <div className="flex-1 p-5 space-y-4">
-      {/* Toolbar */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+    <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
+
+      {/* Search + New */}
+      <div className="flex gap-2 items-stretch h-11">
+        <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search suppliers..."
-            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Search"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
           />
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Add Supplier
-        </button>
+        {!showForm && (
+          <button
+            onClick={openCreate}
+            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> New
+          </button>
+        )}
       </div>
 
-      {/* Stats */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center gap-3">
-        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-          <Truck className="w-5 h-5 text-blue-600" />
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-[#0F172A]">{suppliers.length}</p>
-          <p className="text-xs text-slate-400">Total Suppliers</p>
-        </div>
-      </div>
+      {/* Inline form */}
+      {showForm && (
+        <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span className="text-[13px] font-semibold text-[#0F172A]">
+              {editingId ? "Edit Supplier" : "New Supplier"}
+            </span>
+            <button onClick={closeForm} className="p-1 text-slate-400 hover:text-slate-600 transition">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-      {/* List */}
-      {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center text-center gap-3">
-          <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-            <Truck className="w-6 h-6 text-slate-400" />
+          <div className="px-4 pt-4 pb-3 space-y-4">
+            <SectionDivider label="Details" />
+            <div className="space-y-3">
+              <Field label="Supplier name *">
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  placeholder="e.g. ABC Distributors"
+                  className={innerCls}
+                />
+              </Field>
+              <Field label="Contact person">
+                <input
+                  value={form.contact_name}
+                  onChange={(e) => setForm((f) => ({ ...f, contact_name: e.target.value }))}
+                  placeholder="e.g. John Doe"
+                  className={innerCls}
+                />
+              </Field>
+            </div>
+
+            <SectionDivider label="Contact" />
+            <div className="space-y-3">
+              <Field label="Phone">
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  placeholder="+234..."
+                  className={innerCls}
+                />
+              </Field>
+              <Field label="Email">
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="supplier@example.com"
+                  className={innerCls}
+                />
+              </Field>
+              <Field label="Address">
+                <input
+                  value={form.address}
+                  onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                  placeholder="Street, City"
+                  className={innerCls}
+                />
+              </Field>
+            </div>
+
+            <SectionDivider label="Notes" />
+            <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+              <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">Notes</legend>
+              <textarea
+                value={form.notes}
+                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                placeholder="Any additional notes..."
+                rows={2}
+                className={`${innerCls} resize-none`}
+              />
+            </fieldset>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-[#0F172A]">No suppliers yet</p>
-            <p className="text-xs text-slate-400 mt-0.5">Add your first supplier to get started</p>
+
+          <div className="px-4 pb-4 flex gap-3">
+            <button
+              onClick={closeForm}
+              className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={save}
+              disabled={saving || !form.name.trim()}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+            >
+              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {editingId ? "Update Supplier" : "Add Supplier"}
+            </button>
           </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide bg-slate-50">
-                <th className="text-left px-5 py-3">Supplier</th>
-                <th className="text-left px-5 py-3">Contact</th>
-                <th className="text-left px-5 py-3">Phone</th>
-                <th className="text-left px-5 py-3">Email</th>
-                <th className="px-5 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filtered.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-50 transition group">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
-                        {s.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-[#0F172A]">{s.name}</p>
-                        {s.address && (
-                          <p className="text-xs text-slate-400 flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />{s.address}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 text-sm text-slate-600">{s.contact_name ?? <span className="text-slate-300">—</span>}</td>
-                  <td className="px-5 py-3 text-sm text-slate-600">
-                    {s.phone
-                      ? <a href={`tel:${s.phone}`} className="hover:text-green-600 flex items-center gap-1"><Phone className="w-3 h-3" />{s.phone}</a>
-                      : <span className="text-slate-300">—</span>}
-                  </td>
-                  <td className="px-5 py-3 text-sm text-slate-600">
-                    {s.email
-                      ? <a href={`mailto:${s.email}`} className="hover:text-green-600 flex items-center gap-1"><Mail className="w-3 h-3" />{s.email}</a>
-                      : <span className="text-slate-300">—</span>}
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition justify-end">
-                      <button onClick={() => openEdit(s)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => deleteSupplier(s.id)} disabled={deletingId === s.id} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       )}
 
-      {/* Form modal */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">{editingId ? "Edit Supplier" : "Add Supplier"}</h3>
-              <button onClick={closeForm} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { label: "Supplier Name *", key: "name", placeholder: "e.g. ABC Distributors" },
-                { label: "Contact Person", key: "contact_name", placeholder: "e.g. John Doe" },
-                { label: "Phone", key: "phone", placeholder: "+234..." },
-                { label: "Email", key: "email", placeholder: "supplier@example.com" },
-                { label: "Address", key: "address", placeholder: "Street, City" },
-              ].map(({ label, key, placeholder }) => (
-                <div key={key}>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>
-                  <input
-                    value={form[key as keyof typeof form]}
-                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                    placeholder={placeholder}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-              ))}
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
-                <textarea
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  placeholder="Any additional notes..."
-                  rows={2}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-1">
-              <button onClick={closeForm} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
-                Cancel
-              </button>
-              <button
-                onClick={save}
-                disabled={saving || !form.name.trim()}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
-              >
-                {saving ? "Saving..." : editingId ? "Update" : "Add Supplier"}
-              </button>
-            </div>
+      {/* List */}
+      {filtered.length === 0 && !showForm ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <Truck className="w-9 h-9 text-slate-300" />
           </div>
+          <p className="text-[16px] font-bold text-slate-800">
+            {search ? "No suppliers found" : "No suppliers yet"}
+          </p>
+          <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">
+            {search ? "Try a different search" : "Add your first supplier to get started"}
+          </p>
         </div>
+      ) : filtered.length > 0 && (
+        <>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+            {filtered.length} supplier{filtered.length !== 1 ? "s" : ""}
+          </p>
+          <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {filtered.map((s) => (
+              <div key={s.id} className="px-4 py-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex-shrink-0 flex items-center justify-center mt-0.5 text-blue-600 font-extrabold text-[15px]">
+                    {s.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[15px] text-slate-900 leading-tight truncate">{s.name}</p>
+                    {s.contact_name && (
+                      <p className="flex items-center gap-1 text-[13px] text-slate-500 mt-0.5">
+                        <User className="w-3 h-3 flex-shrink-0" />
+                        {s.contact_name}
+                      </p>
+                    )}
+                    <div className="flex flex-col gap-0.5 mt-1">
+                      {s.phone && (
+                        <a href={`tel:${s.phone}`} className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-[#1a9c38] transition">
+                          <Phone className="w-3 h-3 flex-shrink-0" />{s.phone}
+                        </a>
+                      )}
+                      {s.email && (
+                        <a href={`mailto:${s.email}`} className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-[#1a9c38] transition truncate">
+                          <Mail className="w-3 h-3 flex-shrink-0" />{s.email}
+                        </a>
+                      )}
+                      {s.address && (
+                        <p className="flex items-center gap-1.5 text-[12px] text-slate-400">
+                          <MapPin className="w-3 h-3 flex-shrink-0" />{s.address}
+                        </p>
+                      )}
+                    </div>
+                    {s.notes && (
+                      <p className="text-[12px] text-slate-400 mt-1.5 italic line-clamp-2">{s.notes}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action row */}
+                <div className="flex items-center gap-2 mt-3 pl-[52px]">
+                  <button
+                    onClick={() => openEdit(s)}
+                    className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition active:scale-95"
+                  >
+                    <Edit2 className="w-3 h-3" /> Edit
+                  </button>
+                  <button
+                    onClick={() => deleteSupplier(s.id)}
+                    disabled={deletingId === s.id}
+                    className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
+                  >
+                    {deletingId === s.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

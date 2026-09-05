@@ -16,7 +16,7 @@ export default async function InvoicesPage({ params }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, currency, phone, email, address, logo_url, invoice_accent_color, invoice_footer_notes, social_instagram, social_twitter, social_whatsapp")
+    .select("id, name, slug, currency, phone, email, address, logo_url, invoice_accent_color, invoice_footer_notes, social_instagram, social_twitter, social_whatsapp")
     .eq("slug", businessSlug)
     .single();
   if (!business) redirect("/onboarding");
@@ -41,11 +41,12 @@ export default async function InvoicesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Invoices" />
+      <TopBar title="Invoices" bg="bg-[#fafefb]" border={false} centered />
       <InvoicesClient
         invoices={(invoices ?? []) as any}
         business={business as any}
         customers={(customers ?? []) as any}
+        businessSlug={businessSlug}
       />
     </div>
   );

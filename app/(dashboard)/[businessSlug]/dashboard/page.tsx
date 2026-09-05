@@ -78,6 +78,7 @@ export default async function DashboardPage({ params }: Props) {
     todayStoreVisitsRes,
     weekStoreVisitsRes,
     monthStoreVisitsRes,
+    allTimeSalesRes,
   ] = await Promise.all([
     // Today's full sales (for recent transactions + KPIs)
     supabase
@@ -220,6 +221,12 @@ export default async function DashboardPage({ params }: Props) {
       .select("id", { count: "exact", head: true })
       .eq("business_id", business.id)
       .gte("visited_at", monthStart.toISOString()),
+
+    // All-time sales (for growth milestones)
+    supabase
+      .from("sales")
+      .select("total_amount")
+      .eq("business_id", business.id),
   ]);
 
   const locations = (locationsRes.data ?? []).map((l) => ({ id: l.id, name: l.name }));
@@ -289,6 +296,10 @@ export default async function DashboardPage({ params }: Props) {
   const weekStoreVisits  = weekStoreVisitsRes.count ?? 0;
   const monthStoreVisits = monthStoreVisitsRes.count ?? 0;
 
+  const allTimeSales      = allTimeSalesRes.data ?? [];
+  const allTimeRevenue    = allTimeSales.reduce((s, r) => s + r.total_amount, 0);
+  const allTimeSalesCount = allTimeSales.length;
+
   const netProfit = monthRevenue - monthCOGS - monthExpenses;
   const revenueGrowthPct = lastMonthRevenue > 0
     ? ((monthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
@@ -333,6 +344,8 @@ export default async function DashboardPage({ params }: Props) {
           weekStoreVisits={weekStoreVisits}
           monthStoreVisits={monthStoreVisits}
           locations={locations}
+          allTimeRevenue={allTimeRevenue}
+          allTimeSalesCount={allTimeSalesCount}
         />
       </div>
 

@@ -1,15 +1,19 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Bell, LogOut, AlertTriangle, FileText, BookOpen, Loader2, Search } from "lucide-react";
+import { Bell, AlertTriangle, FileText, BookOpen, Loader2, Search, ChevronLeft } from "lucide-react";
 import { useBusinessStore } from "@/store/businessStore";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils/currency";
 
 interface TopBarProps {
   title: string;
+  bg?: string;
+  border?: boolean;
+  centered?: boolean;
+  backHref?: string;
 }
 
 interface Notification {
@@ -20,9 +24,11 @@ interface Notification {
   href: string;
 }
 
-export function TopBar({ title }: TopBarProps) {
-  const { clearBusiness, activeBusiness } = useBusinessStore();
+export function TopBar({ title, bg = "bg-white", border = true, centered = false, backHref }: TopBarProps) {
+  const { activeBusiness } = useBusinessStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const isDashboard = pathname?.endsWith("/dashboard") ?? false;
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [count, setCount] = useState(0);
@@ -167,13 +173,6 @@ export function TopBar({ title }: TopBarProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBusiness?.id]);
 
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    clearBusiness();
-    router.push("/login");
-  }
-
   const ICONS: Record<Notification["type"], React.ReactNode> = {
     low_stock: <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />,
     overdue_invoice: <FileText className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />,
@@ -181,10 +180,22 @@ export function TopBar({ title }: TopBarProps) {
   };
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 flex-shrink-0 relative">
-      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-600 via-green-400 to-transparent pointer-events-none" />
+    <header className={`h-14 ${bg} ${border ? "border-b border-slate-200" : ""} flex items-center px-4 gap-3 flex-shrink-0 relative`}>
 
-      <h2 className="text-base font-bold text-[#0F172A] flex-1 min-w-0 truncate">{title}</h2>
+      {backHref && (
+        <button
+          onClick={() => router.push(backHref)}
+          className="flex-shrink-0 p-1.5 -ml-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+          aria-label="Go back"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      )}
+
+      {centered
+        ? <h2 className="absolute inset-x-0 text-center text-base font-bold text-[#0F172A] pointer-events-none">{title}</h2>
+        : <h2 className="text-base font-bold text-[#0F172A] flex-1 min-w-0 truncate">{title}</h2>
+      }
 
       {/* Command search trigger */}
       <button
@@ -203,7 +214,7 @@ export function TopBar({ title }: TopBarProps) {
       </button>
 
       <div className="flex items-center gap-1">
-        <div ref={bellRef} className="relative">
+        {isDashboard && <div ref={bellRef} className="relative">
           <button
             onClick={() => setShowNotifications((v) => !v)}
             aria-label="Notifications"
@@ -284,16 +295,8 @@ export function TopBar({ title }: TopBarProps) {
               </div>
             </div>
           )}
-        </div>
+        </div>}
 
-        <button
-          onClick={handleLogout}
-          aria-label="Sign out"
-          className="flex items-center gap-1.5 px-3 py-2 text-red-600 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1 focus-visible:outline-none"
-        >
-          <LogOut className="w-4 h-4" aria-hidden="true" />
-          <span className="hidden sm:inline">Sign out</span>
-        </button>
       </div>
     </header>
   );

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Package, AlertTriangle, MapPin, Plus, Minus, MoreVertical } from "lucide-react";
+import { Package, AlertTriangle, MapPin, Plus, Minus, MoreVertical, Pencil, Eye, EyeOff, Share2, Trash2, X, ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -37,6 +37,8 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
   const detailHref = `/${slug}/products/${product.id}`;
   const [qty, setQty] = useState(product.stock_quantity);
   const [saving, setSaving] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [isActive, setIsActive] = useState(product.is_active);
   const isLowStock = qty > 0 && qty <= product.low_stock_threshold;
   const isOutOfStock = qty === 0;
   const profit = product.selling_price - product.cost_price;
@@ -53,10 +55,32 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
     onStockChange?.(product.id, newQty);
   }
 
+  async function handleTogglePublish() {
+    const supabase = createClient();
+    const newActive = !isActive;
+    await supabase.from("products").update({ is_active: newActive }).eq("id", product.id);
+    setIsActive(newActive);
+    setShowMenu(false);
+  }
+
+  async function handleShare() {
+    const url = `${window.location.origin}/store/${slug}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: product.name, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      // user dismissed share sheet — ignore
+    }
+    setShowMenu(false);
+  }
+
   return (
     <>
       <div className="flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-slate-50 transition group">
-        {/* Thumbnail — tapping navigates to detail */}
+        {/* Thumbnail */}
         <Link
           href={detailHref}
           className="relative w-14 h-14 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
@@ -70,14 +94,12 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
           )}
         </Link>
 
-        {/* Name + meta — tapping navigates to detail */}
+        {/* Name + price */}
         <Link href={detailHref} className="flex-1 min-w-0 block">
-          <p className="font-medium text-[#0F172A] text-sm truncate">{product.name}</p>
-          {/* Desktop meta: SKU, category, location */}
+          <p className="font-semibold text-[#0F172A] text-[15px] truncate leading-snug">{product.name}</p>
+          {/* Desktop meta */}
           <div className="hidden sm:flex items-center gap-1.5 mt-0.5 flex-wrap">
-            {product.sku && (
-              <span className="text-xs text-slate-400">SKU: {product.sku}</span>
-            )}
+            {product.sku && <span className="text-xs text-slate-400">SKU: {product.sku}</span>}
             {product.categories && (
               <span
                 className="text-xs font-medium px-1.5 py-0.5 rounded-full text-white"
@@ -93,16 +115,15 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
               </span>
             )}
           </div>
-          {/* Price shown below name on mobile */}
-          <p className="text-slate-500 text-sm mt-0.5 sm:hidden">
+          {/* Price below name on mobile */}
+          <p className="font-semibold text-[#0F172A] text-[12px] mt-2 sm:hidden">
             {formatCurrency(product.selling_price, currency)}
           </p>
         </Link>
 
-        {/* Stock — standalone, don't navigate */}
+        {/* Stock */}
         {!hideStock && (
           <>
-            {/* Mobile: plain stock text */}
             <span className={cn(
               "text-xs flex-shrink-0 sm:hidden",
               isOutOfStock ? "text-red-500 font-medium" : isLowStock ? "text-amber-500 font-medium" : "text-slate-400"
@@ -110,7 +131,6 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
               {isOutOfStock ? "Out of stock" : `${qty} in stock`}
             </span>
 
-            {/* Desktop: full stock badge with +/- controls */}
             <div className="w-36 flex-shrink-0 hidden sm:flex items-center gap-1.5">
               <button
                 onClick={() => adjustStock(-1)}
@@ -121,11 +141,7 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
               </button>
               <span className={cn(
                 "flex-1 inline-flex items-center justify-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
-                isOutOfStock
-                  ? "bg-red-50 text-red-600"
-                  : isLowStock
-                  ? "bg-amber-50 text-amber-600"
-                  : "bg-emerald-50 text-emerald-700"
+                isOutOfStock ? "bg-red-50 text-red-600" : isLowStock ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-700"
               )}>
                 {(isLowStock || isOutOfStock) && <AlertTriangle className="w-3 h-3" />}
                 {isOutOfStock ? "Out of stock" : isLowStock ? `Low: ${qty}` : `${qty} in stock`}
@@ -153,11 +169,82 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
         </div>
 
         {/* 3-dot menu button */}
-        <Link href={detailHref} className="flex-shrink-0 p-1">
-          <MoreVertical className="w-4 h-4 text-slate-300" />
-        </Link>
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowMenu(true); }}
+          className="flex-shrink-0 p-2 -mr-1 rounded-full hover:bg-slate-100 transition"
+        >
+          <MoreVertical className="w-5 h-5 text-slate-500" />
+        </button>
       </div>
 
+      {/* Bottom sheet menu */}
+      {showMenu && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-end"
+          onClick={() => setShowMenu(false)}
+        >
+          <div
+            className="w-full bg-white rounded-t-2xl pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100">
+              <p className="font-bold text-[15px] text-[#0F172A] truncate flex-1 mr-3">{product.name}</p>
+              <button onClick={() => setShowMenu(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Actions */}
+            <Link
+              href={detailHref}
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-4 px-5 py-4 border-b border-slate-100 hover:bg-slate-50 transition"
+            >
+              <Pencil className="w-5 h-5 text-slate-400" />
+              <span className="flex-1 text-[15px] text-[#0F172A]">Edit product</span>
+              <ChevronRight className="w-4 h-4 text-slate-300" />
+            </Link>
+
+            <button
+              onClick={handleTogglePublish}
+              className="w-full flex items-center gap-4 px-5 py-4 border-b border-slate-100 hover:bg-slate-50 transition text-left"
+            >
+              {isActive
+                ? <EyeOff className="w-5 h-5 text-slate-400" />
+                : <Eye className="w-5 h-5 text-slate-400" />}
+              <span className="flex-1 text-[15px] text-[#0F172A]">
+                {isActive ? "Unpublish product" : "Publish product"}
+              </span>
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="w-full flex items-center gap-4 px-5 py-4 border-b border-slate-100 hover:bg-slate-50 transition text-left"
+            >
+              <Share2 className="w-5 h-5 text-slate-400" />
+              <span className="flex-1 text-[15px] text-[#0F172A]">Share product link</span>
+            </button>
+
+            <button
+              onClick={() => { setShowMenu(false); onDelete?.(); }}
+              className="w-full flex items-center gap-4 px-5 py-4 border-b border-slate-100 hover:bg-red-50 transition text-left"
+            >
+              <Trash2 className="w-5 h-5 text-red-500" />
+              <span className="flex-1 text-[15px] text-red-500 font-medium">Delete Product</span>
+            </button>
+
+            <div className="px-5 pt-4">
+              <button
+                onClick={() => setShowMenu(false)}
+                className="w-full h-11 border border-[#1a9c38] text-[#1a9c38] font-bold rounded-[4px] text-[15px]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

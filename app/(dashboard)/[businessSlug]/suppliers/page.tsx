@@ -30,7 +30,7 @@ export default async function SuppliersPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Suppliers" />
+      <TopBar title="Suppliers" bg="bg-[#fafefb]" border={false} centered />
       <SuppliersClient
         suppliers={(suppliers ?? []) as any}
         businessId={business.id}

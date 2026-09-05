@@ -1,20 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Plus, FileText, Search, Printer, CheckCircle2, Clock, AlertCircle, X, Loader2, Download, Link2, ClipboardCheck, MessageCircle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import {
+  Plus, FileText, Search, CheckCircle2, Clock,
+  AlertCircle, X, Loader2,
+  SlidersHorizontal, Check,
+} from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
-import { generateInvoiceHTML } from "@/lib/utils/invoice";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { InvoiceForm } from "./InvoiceForm";
 import { cn } from "@/lib/utils";
-
-interface InvoiceItem {
-  description: string;
-  quantity: number;
-  unit_price: number;
-  line_total: number;
-}
 
 interface Invoice {
   id: string;
@@ -63,60 +58,51 @@ interface Props {
   invoices: Invoice[];
   business: Business;
   customers: Customer[];
+  businessSlug: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  draft:     { label: "Draft",     color: "bg-slate-100 text-slate-600",   icon: FileText },
-  sent:      { label: "Sent",      color: "bg-green-50 text-green-700",      icon: Clock },
-  paid:      { label: "Paid",      color: "bg-emerald-50 text-emerald-700", icon: CheckCircle2 },
-  overdue:   { label: "Overdue",   color: "bg-red-50 text-red-700",        icon: AlertCircle },
-  cancelled: { label: "Cancelled", color: "bg-slate-100 text-slate-400",   icon: X },
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; icon: React.ElementType }> = {
+  draft:     { label: "Draft",     bg: "bg-slate-100",   text: "text-slate-600",   icon: FileText },
+  sent:      { label: "Sent",      bg: "bg-blue-50",     text: "text-blue-600",    icon: Clock },
+  paid:      { label: "Paid",      bg: "bg-emerald-50",  text: "text-emerald-700", icon: CheckCircle2 },
+  overdue:   { label: "Overdue",   bg: "bg-red-50",      text: "text-red-600",     icon: AlertCircle },
+  cancelled: { label: "Cancelled", bg: "bg-slate-100",   text: "text-slate-400",   icon: X },
 };
 
-export function InvoicesClient({ invoices, business, customers }: Props) {
-  const router = useRouter();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [showForm, setShowForm] = useState(false);
-  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
-  const [markingPaid, setMarkingPaid] = useState<string | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+const STATUS_TABS = [
+  { value: "all",      label: "All" },
+  { value: "draft",    label: "Draft" },
+  { value: "sent",     label: "Sent" },
+  { value: "paid",     label: "Paid" },
+  { value: "overdue",  label: "Overdue" },
+] as const;
 
-  function copyPaymentLink(inv: Invoice) {
-    if (!inv.payment_link_token) return;
-    const url = `${window.location.origin}/pay/${inv.payment_link_token}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopiedId(inv.id);
-      setTimeout(() => setCopiedId(null), 2000);
-    });
-  }
+export function InvoicesClient({ invoices, business, customers, businessSlug }: Props) {
+  const router = useRouter();
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  const [search, setSearch]             = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [markingPaid, setMarkingPaid]   = useState<string | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setShowFilterMenu(false);
+      }
+    }
+    if (showFilterMenu) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showFilterMenu]);
 
   const fmt = (n: number) => formatCurrency(n, business.currency);
-
-  function exportCSV() {
-    const headers = ["Invoice #", "Client", "Status", "Issue Date", "Due Date", "Subtotal", "Discount", "Tax", "Total", "Amount Paid"];
-    const rows = invoices.map((inv) => [
-      inv.invoice_number,
-      inv.client_name ?? inv.customers?.name ?? "",
-      inv.status,
-      inv.issue_date,
-      inv.due_date ?? "",
-      inv.subtotal,
-      inv.discount_amount,
-      inv.tax_amount,
-      inv.total_amount,
-      inv.amount_paid,
-    ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `invoices-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
   const filtered = invoices.filter((inv) => {
     const q = search.toLowerCase();
@@ -127,54 +113,6 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
     return matchSearch && matchStatus;
   });
 
-  const totalOutstanding = invoices
-    .filter((i) => i.status !== "paid" && i.status !== "cancelled")
-    .reduce((s, i) => s + (i.total_amount - i.amount_paid), 0);
-
-  const totalPaid = invoices
-    .filter((i) => i.status === "paid")
-    .reduce((s, i) => s + i.total_amount, 0);
-
-  function handlePrint(inv: Invoice) {
-    const invoiceData = {
-      invoice_number: inv.invoice_number,
-      issue_date: inv.issue_date,
-      due_date: inv.due_date,
-      status: inv.status,
-      client_name: inv.client_name ?? inv.customers?.name ?? null,
-      client_email: inv.client_email,
-      client_address: inv.client_address,
-      subtotal: inv.subtotal,
-      discount_amount: inv.discount_amount,
-      tax_amount: inv.tax_amount,
-      total_amount: inv.total_amount,
-      amount_paid: inv.amount_paid,
-      notes: inv.notes,
-      bank_details: inv.bank_details,
-      items: [],
-    };
-    // Fetch items then print
-    const supabase = createClient();
-    supabase
-      .from("invoice_items")
-      .select("description, quantity, unit_price, line_total")
-      .eq("invoice_id", inv.id)
-      .then(({ data }) => {
-        const html = generateInvoiceHTML(
-          { ...invoiceData, items: (data ?? []) as InvoiceItem[] },
-          business
-        );
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-        const doc = iframe.contentDocument;
-        if (!doc) return;
-        doc.open();
-        doc.write(html);
-        doc.close();
-        iframe.onload = () => iframe.contentWindow?.print();
-      });
-  }
-
   async function markAsPaid(inv: Invoice) {
     setMarkingPaid(inv.id);
     const supabase = createClient();
@@ -184,219 +122,178 @@ export function InvoicesClient({ invoices, business, customers }: Props) {
   }
 
   return (
-    <div className="flex-1 p-3 sm:p-5 space-y-4">
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-        <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 to-green-400" />
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200 flex-shrink-0">
-              <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
-            </div>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Invoices</p>
-          </div>
-          <p className="text-sm sm:text-xl font-bold text-[#0F172A]">{invoices.length}</p>
-          <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">all time</p>
-        </div>
+    <div className="flex-1 flex flex-col min-h-0 bg-white overflow-x-hidden">
 
-        <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200 flex-shrink-0">
-              <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
-            </div>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Collected</p>
+      {/* Search + filter + new */}
+      <div className="px-4 pt-3 pb-2">
+        <div className="flex gap-2 items-stretch h-11">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            />
           </div>
-          <p className="text-sm sm:text-xl font-bold text-emerald-600">{fmt(totalPaid)}</p>
-          <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">from paid invoices</p>
-        </div>
 
-        <div className="bg-white rounded-2xl border border-red-50 p-3 sm:p-4 shadow-sm overflow-hidden relative col-span-2 sm:col-span-1">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-red-500 to-red-400" />
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center shadow-sm shadow-red-200 flex-shrink-0">
-              <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
-            </div>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Outstanding</p>
+          {/* Status filter */}
+          <div ref={filterRef} className="relative">
+            <button
+              onClick={() => setShowFilterMenu((v) => !v)}
+              className={cn(
+                "h-full flex items-center gap-1.5 px-3 border rounded-[8px] text-[13px] font-medium transition bg-white",
+                statusFilter !== "all"
+                  ? "border-[#1a9c38] text-[#1a9c38]"
+                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
+              )}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              {statusFilter !== "all" && <span className="w-1.5 h-1.5 rounded-full bg-[#1a9c38]" />}
+            </button>
+            {showFilterMenu && (
+              <div className="absolute right-0 top-full mt-1.5 w-40 bg-white rounded-[8px] border border-slate-200 shadow-lg z-20 overflow-hidden">
+                {STATUS_TABS.map((tab) => (
+                  <button
+                    key={tab.value}
+                    onClick={() => { setStatusFilter(tab.value); setShowFilterMenu(false); }}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    {tab.label}
+                    {statusFilter === tab.value && <Check className="w-3.5 h-3.5 text-[#1a9c38]" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <p className="text-sm sm:text-xl font-bold text-red-500">{fmt(totalOutstanding)}</p>
-          <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">pending collection</p>
+
+          {/* New Invoice */}
+          <button
+            onClick={() => router.push(`/${businessSlug}/invoices/new`)}
+            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            New
+          </button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by invoice # or client..."
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-        >
-          <option value="all">All statuses</option>
-          <option value="draft">Draft</option>
-          <option value="sent">Sent</option>
-          <option value="paid">Paid</option>
-          <option value="overdue">Overdue</option>
-        </select>
-        <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-3 py-2.5 rounded-lg text-sm font-medium transition"
-        >
-          <Download className="w-4 h-4" />
-          Export
-        </button>
-        <button
-          onClick={() => { setEditingInvoice(null); setShowForm(true); }}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm shadow-green-300/40"
-        >
-          <Plus className="w-4 h-4" />
-          New Invoice
-        </button>
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-4 pb-4 pt-2 space-y-4">
+
+        {/* Empty state */}
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <FileText className="w-9 h-9 text-slate-300" />
+            </div>
+            <p className="text-[16px] font-bold text-slate-800">
+              {search || statusFilter !== "all" ? "No invoices found" : "No invoices yet"}
+            </p>
+            <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">
+              {search || statusFilter !== "all"
+                ? "Try adjusting your search or filter"
+                : "Create your first invoice to get started"}
+            </p>
+            {!search && statusFilter === "all" && (
+              <button
+                onClick={() => router.push(`/${businessSlug}/invoices/new`)}
+                className="mt-6 flex items-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition"
+              >
+                <Plus className="w-4 h-4" />
+                New Invoice
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+              {filtered.length} invoice{filtered.length !== 1 ? "s" : ""}
+            </p>
+
+            <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+              {filtered.map((inv) => {
+                const cfg = STATUS_CONFIG[inv.status] ?? STATUS_CONFIG.draft;
+                const StatusIcon = cfg.icon;
+                const clientName = inv.client_name ?? inv.customers?.name ?? "Unknown";
+                const balanceDue = inv.total_amount - inv.amount_paid;
+                const isOverdue = inv.due_date && inv.status !== "paid" && new Date(inv.due_date) < new Date();
+                const isPending = inv.status !== "paid" && inv.status !== "cancelled";
+
+                return (
+                  <div key={inv.id} className="px-4 py-4">
+                    {/* Main row */}
+                    <div
+                      className="flex items-start gap-3 cursor-pointer active:opacity-70 transition"
+                      onClick={() => router.push(`/${businessSlug}/invoices/${inv.id}/edit`)}
+                    >
+                      {/* Status icon avatar */}
+                      <div className={cn("w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5", cfg.bg)}>
+                        <StatusIcon className={cn("w-4 h-4", cfg.text)} />
+                      </div>
+
+                      {/* Left — client + invoice # */}
+                      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-[15px] text-slate-900 leading-none truncate max-w-[140px]">{clientName}</span>
+                          <span className={cn("text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0", cfg.bg, cfg.text)}>
+                            {cfg.label}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] text-slate-400">{inv.invoice_number}</span>
+                          {inv.due_date && (
+                            <span className={cn("text-[13px]", isOverdue ? "text-red-500 font-semibold" : "text-slate-400")}>
+                              · Due <span suppressHydrationWarning>{shortDate(inv.due_date)}</span>
+                              {isOverdue && " ⚠"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right — amount + balance */}
+                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0 min-w-0 max-w-[100px]">
+                        <span className="text-[15px] font-bold text-slate-900 leading-none truncate w-full text-right">{fmt(inv.total_amount)}</span>
+                        {balanceDue > 0 && isPending ? (
+                          <span className="text-[11px] font-semibold text-red-500">Due {fmt(balanceDue)}</span>
+                        ) : inv.status === "paid" ? (
+                          <span className="text-[11px] text-emerald-600 font-semibold">Paid</span>
+                        ) : (
+                          <span className="text-[11px] text-slate-300">—</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Single action — Mark Paid only for pending invoices */}
+                    {isPending && (
+                      <div className="mt-3 pl-[52px]">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); markAsPaid(inv); }}
+                          disabled={markingPaid === inv.id}
+                          className="flex items-center gap-1.5 text-[13px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
+                        >
+                          {markingPaid === inv.id
+                            ? <Loader2 className="w-3 h-3 animate-spin" />
+                            : <CheckCircle2 className="w-3 h-3" />}
+                          Mark Paid
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="text-center text-[11px] text-slate-400 pt-1">
+              {filtered.length} of {invoices.length} invoices
+            </p>
+          </div>
+        )}
+
+        <div className="h-6" />
       </div>
 
-      {/* Invoice list */}
-      {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <FileText className="w-14 h-14 text-slate-200 mb-4" />
-          <p className="text-slate-600 font-medium">
-            {search ? "No invoices match your search" : "No invoices yet"}
-          </p>
-          <p className="text-slate-400 text-sm mt-1">
-            {search ? "Try a different keyword" : "Create your first invoice for a client"}
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-4 px-4 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            <div className="w-32 flex-shrink-0">Invoice #</div>
-            <div className="flex-1">Client</div>
-            <div className="w-24 flex-shrink-0 hidden sm:block">Status</div>
-            <div className="w-32 flex-shrink-0 hidden md:block">Due Date</div>
-            <div className="w-28 text-right flex-shrink-0">Amount</div>
-            <div className="w-28 flex-shrink-0" />
-          </div>
 
-          <div className="divide-y divide-slate-50">
-            {filtered.map((inv) => {
-              const cfg = STATUS_CONFIG[inv.status] ?? STATUS_CONFIG.draft;
-              const StatusIcon = cfg.icon;
-              const clientName = inv.client_name ?? inv.customers?.name ?? "Unknown";
-              const balanceDue = inv.total_amount - inv.amount_paid;
-              const isOverdue = inv.due_date && inv.status !== "paid" && new Date(inv.due_date) < new Date();
-
-              return (
-                <div key={inv.id} className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition group">
-                  <div className="w-32 flex-shrink-0">
-                    <span className="text-sm font-bold text-[#0F172A]">{inv.invoice_number}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#0F172A] truncate">{clientName}</p>
-                    <p className="text-xs text-slate-400">
-                      {new Date(inv.issue_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                    </p>
-                  </div>
-                  <div className="w-24 flex-shrink-0 hidden sm:block">
-                    <span className={cn("inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg", cfg.color)}>
-                      <StatusIcon className="w-3 h-3" />
-                      {cfg.label}
-                    </span>
-                  </div>
-                  <div className="w-32 flex-shrink-0 hidden md:block text-xs text-slate-500">
-                    {inv.due_date
-                      ? <span className={isOverdue ? "text-red-500 font-medium" : ""}>
-                          {new Date(inv.due_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                        </span>
-                      : "—"}
-                  </div>
-                  <div className="w-28 text-right flex-shrink-0">
-                    <p className="font-bold text-sm text-[#0F172A]">{fmt(inv.total_amount)}</p>
-                    {balanceDue > 0 && inv.status !== "cancelled" && (
-                      <p className="text-xs text-red-500">Due: {fmt(balanceDue)}</p>
-                    )}
-                  </div>
-                  <div className="w-28 flex-shrink-0 flex items-center gap-1 justify-end">
-                    <button
-                      onClick={() => handlePrint(inv)}
-                      className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition opacity-0 group-hover:opacity-100"
-                      title="Print invoice"
-                    >
-                      <Printer className="w-3.5 h-3.5" />
-                    </button>
-                    {(inv.client_email || inv.customers?.name) && inv.payment_link_token && (
-                      <a
-                        href={(() => {
-                          const phone = (inv.customers as any)?.phone ?? "";
-                          let p = phone.replace(/\s+/g, "");
-                          if (p.startsWith("0")) p = "234" + p.slice(1);
-                          if (p.startsWith("+")) p = p.slice(1);
-                          const msg = `Hello${inv.client_name ? ` ${inv.client_name}` : ""}, please find your invoice ${inv.invoice_number} for ${fmt(inv.total_amount)} here: ${typeof window !== "undefined" ? window.location.origin : ""}/pay/${inv.payment_link_token}`;
-                          return `https://wa.me/${p}?text=${encodeURIComponent(msg)}`;
-                        })()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition opacity-0 group-hover:opacity-100"
-                        title="Send via WhatsApp"
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    {inv.payment_link_token && inv.status !== "paid" && inv.status !== "cancelled" && (
-                      <button
-                        onClick={() => copyPaymentLink(inv)}
-                        className="p-1.5 rounded-lg transition opacity-0 group-hover:opacity-100"
-                        title="Copy payment link"
-                      >
-                        {copiedId === inv.id
-                          ? <ClipboardCheck className="w-3.5 h-3.5 text-emerald-600" />
-                          : <Link2 className="w-3.5 h-3.5 text-slate-400 hover:text-blue-600" />}
-                      </button>
-                    )}
-                    {inv.status !== "paid" && inv.status !== "cancelled" && (
-                      <button
-                        onClick={() => markAsPaid(inv)}
-                        disabled={markingPaid === inv.id}
-                        className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                      >
-                        {markingPaid === inv.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
-                        Paid
-                      </button>
-                    )}
-                    <button
-                      onClick={() => { setEditingInvoice(inv); setShowForm(true); }}
-                      className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition opacity-0 group-hover:opacity-100"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="px-4 py-3 border-t border-slate-100 bg-slate-50 text-xs text-slate-400">
-            Showing {filtered.length} of {invoices.length} invoices
-          </div>
-        </div>
-      )}
-
-      {showForm && (
-        <InvoiceForm
-          business={business}
-          customers={customers}
-          editingInvoice={editingInvoice}
-          onClose={() => { setShowForm(false); setEditingInvoice(null); }}
-        />
-      )}
-
-      <iframe ref={iframeRef} className="hidden" title="invoice-print" />
     </div>
   );
 }

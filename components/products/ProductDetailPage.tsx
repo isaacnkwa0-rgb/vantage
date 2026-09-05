@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ArrowLeft, Share2, Trash2, Package, MapPin,
+  ChevronLeft, Share2, Trash2, Package, MapPin,
   Tag, Eye, EyeOff, Loader2, AlertTriangle,
   ChevronRight, History, BarChart3,
 } from "lucide-react";
@@ -165,9 +165,9 @@ export function ProductDetailPage({
       <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-100 flex items-center px-4 h-14 gap-3 flex-shrink-0">
         <Link
           href={`/${slug}/products`}
-          className="flex items-center gap-1 text-green-600 text-sm font-medium flex-shrink-0"
+          className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium flex-shrink-0"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4" />
           <span>Products</span>
         </Link>
         <h1 className="flex-1 text-center font-bold text-slate-900 text-[15px] truncate px-2">

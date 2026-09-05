@@ -28,6 +28,8 @@ export interface PendingSale {
   paymentReference: string;
   loyaltyPointsToEarn: number;
   loyaltyPointsToRedeem: number;
+  channel: string;
+  orderDate: string;
   createdAt: string;
 }
 

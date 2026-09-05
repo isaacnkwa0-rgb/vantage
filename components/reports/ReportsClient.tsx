@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
-import { TrendingUp, TrendingDown, DollarSign, ShoppingBag, Loader2 } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   businessId: string;
@@ -28,23 +29,66 @@ interface ReportData {
   }>;
 }
 
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+const PRESETS = [
+  { key: "today",  label: "Today"      },
+  { key: "week",   label: "7 Days"     },
+  { key: "month",  label: "This Month" },
+  { key: "year",   label: "This Year"  },
+] as const;
+
+const METHOD_COLORS: Record<string, string> = {
+  cash:     "text-emerald-600",
+  card:     "text-blue-600",
+  transfer: "text-violet-600",
+  pos:      "text-orange-500",
+};
+
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function PLRow({ label, value, color, bold, divider }: { label: string; value: string; color: string; bold?: boolean; divider?: boolean }) {
+  return (
+    <>
+      {divider && <div className="h-px bg-slate-100" />}
+      <div className={cn("flex items-center justify-between gap-3 py-2.5", bold && "py-3")}>
+        <span className={cn("text-[13px] text-slate-500 flex-shrink-0", bold && "text-[14px] font-semibold text-[#0F172A]")}>{label}</span>
+        <span className={cn("text-[14px] font-semibold text-right", bold && "text-[16px] font-extrabold", color)}>{value}</span>
+      </div>
+    </>
+  );
+}
+
 export function ReportsClient({ businessId, currency }: Props) {
   const today = new Date();
   const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   const [startDate, setStartDate] = useState(firstOfMonth.toISOString().split("T")[0]);
-  const [endDate, setEndDate] = useState(today.toISOString().split("T")[0]);
-  const [data, setData] = useState<ReportData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [endDate, setEndDate]     = useState(today.toISOString().split("T")[0]);
+  const [activePreset, setActivePreset] = useState<string>("month");
+  const [data, setData]           = useState<ReportData | null>(null);
+  const [loading, setLoading]     = useState(false);
 
   const fmt = (n: number) => formatCurrency(n, currency);
 
-  async function fetchReport() {
+  async function fetchReport(start = startDate, end = endDate) {
     setLoading(true);
     const supabase = createClient();
-
-    const startISO = `${startDate}T00:00:00.000Z`;
-    const endISO = `${endDate}T23:59:59.999Z`;
+    const startISO = `${start}T00:00:00.000Z`;
+    const endISO   = `${end}T23:59:59.999Z`;
 
     const [salesRes, itemsRes, expensesRes] = await Promise.all([
       supabase
@@ -62,144 +106,173 @@ export function ReportsClient({ businessId, currency }: Props) {
         .from("expenses")
         .select("amount")
         .eq("business_id", businessId)
-        .gte("expense_date", startDate)
-        .lte("expense_date", endDate),
+        .gte("expense_date", start)
+        .lte("expense_date", end),
     ]);
 
-    const sales = salesRes.data ?? [];
-    const saleIds = new Set(sales.map((s) => s.id));
-    const items = (itemsRes.data ?? []).filter((i) => saleIds.has(i.sale_id));
+    const sales    = salesRes.data ?? [];
+    const saleIds  = new Set(sales.map((s) => s.id));
+    const items    = (itemsRes.data ?? []).filter((i) => saleIds.has(i.sale_id));
     const expenses = expensesRes.data ?? [];
 
-    const grossRevenue = sales.reduce((s, r) => s + r.total_amount, 0);
-    const cogs = items.reduce((s, i) => s + i.cost_price * i.quantity, 0);
-    const grossProfit = grossRevenue - cogs;
-    const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
-    const netProfit = grossProfit - totalExpenses;
-    const marginPercent = grossRevenue > 0 ? (netProfit / grossRevenue) * 100 : 0;
+    const grossRevenue   = sales.reduce((s, r) => s + r.total_amount, 0);
+    const cogs           = items.reduce((s, i) => s + i.cost_price * i.quantity, 0);
+    const grossProfit    = grossRevenue - cogs;
+    const totalExpenses  = expenses.reduce((s, e) => s + e.amount, 0);
+    const netProfit      = grossProfit - totalExpenses;
+    const marginPercent  = grossRevenue > 0 ? (netProfit / grossRevenue) * 100 : 0;
 
-    setData({
-      grossRevenue,
-      cogs,
-      grossProfit,
-      totalExpenses,
-      netProfit,
-      marginPercent,
-      salesCount: sales.length,
-      sales: sales as any,
-    });
+    setData({ grossRevenue, cogs, grossProfit, totalExpenses, netProfit, marginPercent, salesCount: sales.length, sales: sales as any });
     setLoading(false);
   }
 
   useEffect(() => { fetchReport(); }, []);
 
-  function setPreset(preset: string) {
+  function applyPreset(preset: string) {
     const now = new Date();
     let start: Date;
-    let end = new Date(now);
+    const end = new Date(now);
     switch (preset) {
-      case "today": start = new Date(now.setHours(0, 0, 0, 0)); end = new Date(); break;
-      case "week": start = new Date(now); start.setDate(start.getDate() - 7); break;
+      case "today": start = new Date(now.getFullYear(), now.getMonth(), now.getDate()); break;
+      case "week":  start = new Date(now); start.setDate(start.getDate() - 7); break;
       case "month": start = new Date(now.getFullYear(), now.getMonth(), 1); break;
-      case "year": start = new Date(now.getFullYear(), 0, 1); break;
+      case "year":  start = new Date(now.getFullYear(), 0, 1); break;
       default: return;
     }
-    setStartDate(start.toISOString().split("T")[0]);
-    setEndDate(end.toISOString().split("T")[0]);
+    const s = start.toISOString().split("T")[0];
+    const e = end.toISOString().split("T")[0];
+    setStartDate(s);
+    setEndDate(e);
+    setActivePreset(preset);
+    fetchReport(s, e);
   }
 
   return (
-    <div className="flex-1 p-5 space-y-5">
-      {/* Date filter */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex gap-1.5">
-            {["today", "week", "month", "year"].map((p) => (
-              <button key={p} onClick={() => setPreset(p)} className="px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-lg hover:bg-slate-50 capitalize transition">
-                {p === "week" ? "7 days" : p === "year" ? "This year" : p === "month" ? "This month" : "Today"}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 ml-auto">
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-            <span className="text-slate-400 text-sm">to</span>
-            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-            <button onClick={fetchReport} disabled={loading} className="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 disabled:opacity-60 shadow-sm shadow-green-300/40">
-              {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              Apply
-            </button>
-          </div>
-        </div>
+    <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-4 pt-4 pb-6 space-y-4">
+
+      {/* Preset pills */}
+      <div className="flex gap-2">
+        {PRESETS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => applyPreset(key)}
+            className={cn(
+              "flex-1 py-2 rounded-[8px] text-[13px] font-semibold transition border",
+              activePreset === key
+                ? "bg-[#1a9c38] text-white border-[#1a9c38]"
+                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+      {/* Custom date range */}
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <Field label="From">
+              <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setActivePreset(""); }} className={innerCls} />
+            </Field>
+          </div>
+          <div className="flex-1">
+            <Field label="To">
+              <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setActivePreset(""); }} className={innerCls} />
+            </Field>
+          </div>
         </div>
-      ) : data ? (
+        <button
+          onClick={() => fetchReport()}
+          disabled={loading}
+          className="w-full h-11 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition disabled:opacity-60"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          Apply
+        </button>
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-[#1a9c38]" />
+        </div>
+      )}
+
+      {/* Report data */}
+      {!loading && data && (
         <>
-          {/* P&L Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {[
-              { label: "Gross Revenue", value: fmt(data.grossRevenue), color: "text-emerald-600", bg: "bg-emerald-50", icon: TrendingUp },
-              { label: "Cost of Goods", value: fmt(data.cogs), color: "text-slate-600", bg: "bg-slate-50", icon: ShoppingBag },
-              { label: "Gross Profit", value: fmt(data.grossProfit), color: "text-green-600", bg: "bg-green-50", icon: DollarSign },
-              { label: "Total Expenses", value: fmt(data.totalExpenses), color: "text-red-500", bg: "bg-red-50", icon: TrendingDown },
-              { label: "Net Profit", value: fmt(data.netProfit), color: data.netProfit >= 0 ? "text-emerald-700" : "text-red-600", bg: data.netProfit >= 0 ? "bg-emerald-50" : "bg-red-50", icon: DollarSign },
-              { label: "Profit Margin", value: `${data.marginPercent.toFixed(1)}%`, color: data.marginPercent >= 0 ? "text-emerald-700" : "text-red-600", bg: data.marginPercent >= 0 ? "bg-emerald-50" : "bg-red-50", icon: TrendingUp },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-                <div className={`w-8 h-8 ${stat.bg} rounded-lg flex items-center justify-center mb-2`}>
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                </div>
-                <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{stat.label}</p>
+          {/* P&L card */}
+          <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+              <span className="text-[13px] font-semibold text-[#0F172A]">Profit & Loss</span>
+              <span className="text-[12px] text-slate-400">{data.salesCount} sale{data.salesCount !== 1 ? "s" : ""}</span>
+            </div>
+            <div className="px-4 divide-y divide-slate-100">
+              <PLRow label="Gross Revenue"   value={fmt(data.grossRevenue)}  color="text-[#1a9c38]" />
+              <PLRow label="Cost of Goods"   value={`− ${fmt(data.cogs)}`}   color="text-slate-500" />
+              <PLRow label="Gross Profit"    value={fmt(data.grossProfit)}   color={data.grossProfit >= 0 ? "text-[#1a9c38]" : "text-red-500"} bold divider />
+              <PLRow label="Total Expenses"  value={`− ${fmt(data.totalExpenses)}`} color="text-red-500" />
+              <PLRow
+                label="Net Profit"
+                value={fmt(data.netProfit)}
+                color={data.netProfit >= 0 ? "text-[#1a9c38]" : "text-red-500"}
+                bold
+                divider
+              />
+            </div>
+            {/* Margin strip */}
+            <div className={cn(
+              "flex items-center justify-between px-4 py-3 border-t border-slate-100",
+              data.marginPercent >= 0 ? "bg-emerald-50" : "bg-red-50"
+            )}>
+              <div className="flex items-center gap-1.5">
+                {data.marginPercent >= 0
+                  ? <TrendingUp className="w-4 h-4 text-[#1a9c38]" />
+                  : <TrendingDown className="w-4 h-4 text-red-500" />}
+                <span className="text-[13px] font-semibold text-slate-600">Net Profit Margin</span>
               </div>
-            ))}
+              <span className={cn("text-[18px] font-extrabold", data.marginPercent >= 0 ? "text-[#1a9c38]" : "text-red-500")}>
+                {data.marginPercent.toFixed(1)}%
+              </span>
+            </div>
           </div>
 
-          {/* Sales Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-semibold text-[#0F172A]">Sales ({data.salesCount})</h3>
+          {/* Sales list */}
+          {data.sales.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-[16px] font-bold text-slate-800">No sales in this period</p>
+              <p className="text-[13px] text-slate-400 mt-1.5">Try a different date range</p>
             </div>
-            {data.sales.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 text-sm">No sales in this period</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase">
-                      <th className="text-left px-4 py-3">Receipt</th>
-                      <th className="text-left px-4 py-3 hidden sm:table-cell">Customer</th>
-                      <th className="text-left px-4 py-3 hidden md:table-cell">Method</th>
-                      <th className="text-left px-4 py-3 hidden md:table-cell">Date</th>
-                      <th className="text-right px-4 py-3">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {data.sales.map((sale) => (
-                      <tr key={sale.id} className="hover:bg-slate-50 transition text-sm">
-                        <td className="px-4 py-3 font-medium text-[#0F172A]">{sale.sale_number}</td>
-                        <td className="px-4 py-3 hidden sm:table-cell text-slate-600">{(sale.customers as any)?.name ?? "Walk-in"}</td>
-                        <td className="px-4 py-3 hidden md:table-cell">
-                          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full capitalize">{sale.payment_method}</span>
-                        </td>
-                        <td className="px-4 py-3 hidden md:table-cell text-slate-400 text-xs">
-                          {new Date(sale.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 text-right font-semibold text-emerald-600">
-                          {fmt(sale.total_amount)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          ) : (
+            <>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+                {data.salesCount} sale{data.salesCount !== 1 ? "s" : ""}
+              </p>
+              <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+                {data.sales.map((sale) => {
+                  const methodColor = METHOD_COLORS[sale.payment_method] ?? "text-slate-500";
+                  return (
+                    <div key={sale.id} className="px-4 py-3 flex items-center gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono font-bold text-[13px] text-[#0F172A] flex-shrink-0">{sale.sale_number}</span>
+                          <span className={cn("text-[12px] font-semibold capitalize flex-shrink-0", methodColor)}>{sale.payment_method}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                          <span className="text-[12px] text-slate-500 truncate">{(sale.customers as any)?.name ?? "Walk-in"}</span>
+                          <span className="text-[12px] text-slate-400 flex-shrink-0" suppressHydrationWarning>· {shortDate(sale.created_at)}</span>
+                        </div>
+                      </div>
+                      <span className="text-[14px] font-extrabold text-[#1a9c38] flex-shrink-0">{fmt(sale.total_amount)}</span>
+                    </div>
+                  );
+                })}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </>
-      ) : null}
+      )}
     </div>
   );
 }

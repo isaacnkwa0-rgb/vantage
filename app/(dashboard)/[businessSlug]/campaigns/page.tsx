@@ -44,7 +44,7 @@ export default async function CampaignsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Campaigns" />
+      <TopBar title="Campaigns" bg="bg-[#fafefb]" border={false} centered />
       <CampaignsClient
         campaigns={(campaignsRes.data ?? []) as any}
         tags={(tagsRes.data ?? []) as any}

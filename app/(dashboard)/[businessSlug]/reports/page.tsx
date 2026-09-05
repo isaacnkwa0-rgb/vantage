@@ -23,7 +23,7 @@ export default async function ReportsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Reports" />
+      <TopBar title="Reports" bg="bg-[#fafefb]" border={false} centered />
       <ReportsClient businessId={business.id} currency={business.currency} />
     </div>
   );

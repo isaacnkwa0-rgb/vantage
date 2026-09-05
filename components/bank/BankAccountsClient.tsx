@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { formatCurrency } from "@/lib/utils/currency";
-import { Plus, CreditCard, ArrowUpCircle, ArrowDownCircle, ArrowLeftRight, Star, X, Trash2 } from "lucide-react";
+import { Plus, CreditCard, Star, Trash2, X, Loader2, Copy, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BankAccount {
@@ -17,16 +16,6 @@ interface BankAccount {
   is_primary: boolean;
 }
 
-interface BankTransaction {
-  id: string;
-  account_id: string;
-  type: "deposit" | "withdrawal" | "transfer";
-  amount: number;
-  description: string | null;
-  reference: string | null;
-  date: string;
-}
-
 interface Props {
   accounts: BankAccount[];
   transactions: BankTransaction[];
@@ -35,295 +24,218 @@ interface Props {
   userId: string;
 }
 
-const EMPTY_ACCOUNT: { account_name: string; bank_name: string; account_number: string; account_type: BankAccount["account_type"]; currency: string } = { account_name: "", bank_name: "", account_number: "", account_type: "current", currency: "NGN" };
-const EMPTY_TX: { account_id: string; type: BankTransaction["type"]; amount: string; description: string; reference: string; date: string } = { account_id: "", type: "deposit", amount: "", description: "", reference: "", date: new Date().toISOString().split("T")[0] };
+// kept in interface for prop compatibility
+interface BankTransaction { id: string; }
 
 const TYPE_LABELS = { current: "Current", savings: "Savings", merchant: "Merchant" };
-const TX_ICONS = {
-  deposit:    <ArrowUpCircle className="w-4 h-4 text-green-500" />,
-  withdrawal: <ArrowDownCircle className="w-4 h-4 text-red-500" />,
-  transfer:   <ArrowLeftRight className="w-4 h-4 text-blue-500" />,
-};
 
-export function BankAccountsClient({ accounts: initial, transactions: initialTx, currency, businessId, userId }: Props) {
-  const supabase = createClient();
-  const fmt = (n: number, cur?: string) => formatCurrency(n, cur ?? currency);
-  const [accounts, setAccounts] = useState<BankAccount[]>(initial);
-  const [transactions, setTransactions] = useState<BankTransaction[]>(initialTx);
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(initial[0]?.id ?? null);
-  const [showAddAccount, setShowAddAccount] = useState(false);
-  const [showAddTx, setShowAddTx] = useState(false);
-  const [form, setForm] = useState(EMPTY_ACCOUNT);
-  const [txForm, setTxForm] = useState({ ...EMPTY_TX, account_id: initial[0]?.id ?? "" });
-  const [saving, setSaving] = useState(false);
+const EMPTY_FORM = { account_name: "", bank_name: "", account_number: "", account_type: "current" as BankAccount["account_type"], currency: "NGN" };
+
+const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-px bg-slate-200" />
+      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-slate-200" />
+    </div>
+  );
+}
+
+export function BankAccountsClient({ accounts: initial, businessId }: Props) {
+  const [accounts, setAccounts]           = useState<BankAccount[]>(initial);
+  const [showForm, setShowForm]           = useState(false);
+  const [form, setForm]                   = useState(EMPTY_FORM);
+  const [saving, setSaving]               = useState(false);
+  const [deletingId, setDeletingId]       = useState<string | null>(null);
+  const [copiedId, setCopiedId]           = useState<string | null>(null);
 
   async function addAccount() {
     if (!form.account_name.trim() || !form.bank_name.trim()) return;
     setSaving(true);
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("bank_accounts")
-      .insert({ business_id: businessId, ...form, is_primary: accounts.length === 0 })
-      .select()
-      .single();
+      .insert({ business_id: businessId, ...form, balance: 0, is_primary: accounts.length === 0 })
+      .select().single();
     if (!error && data) {
       setAccounts((p) => [...p, data as BankAccount]);
-      if (accounts.length === 0) setSelectedAccount(data.id);
-      setShowAddAccount(false);
-      setForm(EMPTY_ACCOUNT);
+      setShowForm(false);
+      setForm(EMPTY_FORM);
     }
     setSaving(false);
   }
 
   async function makePrimary(id: string) {
+    const supabase = createClient();
     await supabase.from("bank_accounts").update({ is_primary: false }).eq("business_id", businessId);
     await supabase.from("bank_accounts").update({ is_primary: true }).eq("id", id);
     setAccounts((p) => p.map((a) => ({ ...a, is_primary: a.id === id })));
   }
 
   async function deleteAccount(id: string) {
+    if (!confirm("Remove this account?")) return;
+    setDeletingId(id);
+    const supabase = createClient();
     await supabase.from("bank_accounts").update({ is_active: false }).eq("id", id);
     setAccounts((p) => p.filter((a) => a.id !== id));
-    if (selectedAccount === id) setSelectedAccount(accounts.find((a) => a.id !== id)?.id ?? null);
+    setDeletingId(null);
   }
 
-  async function addTransaction() {
-    if (!txForm.account_id || !txForm.amount) return;
-    setSaving(true);
-    const amount = parseFloat(txForm.amount);
-    const { data, error } = await supabase
-      .from("bank_transactions")
-      .insert({
-        business_id: businessId,
-        account_id: txForm.account_id,
-        type: txForm.type,
-        amount,
-        description: txForm.description.trim() || null,
-        reference: txForm.reference.trim() || null,
-        date: txForm.date,
-        created_by: userId,
-      })
-      .select()
-      .single();
-
-    if (!error && data) {
-      setTransactions((p) => [data as BankTransaction, ...p]);
-      const delta = txForm.type === "deposit" ? amount : -amount;
-      const { data: updated } = await supabase
-        .from("bank_accounts")
-        .update({ balance: (accounts.find((a) => a.id === txForm.account_id)?.balance ?? 0) + delta })
-        .eq("id", txForm.account_id)
-        .select()
-        .single();
-      if (updated) setAccounts((p) => p.map((a) => a.id === txForm.account_id ? { ...a, balance: (updated as BankAccount).balance } : a));
-      setShowAddTx(false);
-      setTxForm({ ...EMPTY_TX, account_id: txForm.account_id });
-    }
-    setSaving(false);
+  function copyNumber(id: string, number: string) {
+    navigator.clipboard.writeText(number);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   }
-
-  const account = accounts.find((a) => a.id === selectedAccount);
-  const accountTx = transactions.filter((t) => t.account_id === selectedAccount);
-  const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0);
 
   return (
-    <div className="flex-1 p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-bold text-[#0F172A]">Bank Accounts</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Total across all accounts: {fmt(totalBalance)}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {accounts.length > 0 && (
-            <button onClick={() => setShowAddTx(true)} className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
-              <ArrowUpCircle className="w-4 h-4" /> Add Transaction
-            </button>
-          )}
-          <button onClick={() => setShowAddAccount(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
-            <Plus className="w-4 h-4" /> Add Account
-          </button>
-        </div>
-      </div>
+    <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
 
-      {accounts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center gap-3 text-center">
-          <CreditCard className="w-10 h-10 text-slate-300" />
-          <p className="text-sm font-semibold text-[#0F172A]">No bank accounts yet</p>
-          <p className="text-xs text-slate-400">Add your business bank accounts to track balances and movements</p>
+      {/* Info banner */}
+      <p className="text-[13px] text-slate-500 leading-relaxed">
+        These accounts are shown to customers at checkout when they choose bank transfer as their payment method.
+      </p>
+
+      {/* Add account dashed button */}
+      {!showForm && (
+        <button
+          onClick={() => setShowForm(true)}
+          className="w-full flex items-center justify-center gap-2 h-11 border-2 border-dashed border-slate-200 rounded-[8px] text-[13px] font-semibold text-slate-400 hover:border-[#1a9c38] hover:text-[#1a9c38] transition"
+        >
+          <Plus className="w-4 h-4" /> Add Payment Account
+        </button>
+      )}
+
+      {/* Inline form */}
+      {showForm && (
+        <div className="border border-slate-200 rounded-[12px] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span className="text-[13px] font-semibold text-[#0F172A]">Add Payment Account</span>
+            <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); }} className="p-1 text-slate-400 hover:text-slate-600 transition">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="px-4 pt-4 pb-3 space-y-4">
+            <SectionDivider label="Account Details" />
+            <div className="space-y-3">
+              <Field label="Account name *">
+                <input value={form.account_name} onChange={(e) => setForm((f) => ({ ...f, account_name: e.target.value }))} placeholder="e.g. Main Business Account" className={innerCls} />
+              </Field>
+              <Field label="Bank name *">
+                <input value={form.bank_name} onChange={(e) => setForm((f) => ({ ...f, bank_name: e.target.value }))} placeholder="e.g. Access Bank" className={innerCls} />
+              </Field>
+              <Field label="Account number">
+                <input value={form.account_number} onChange={(e) => setForm((f) => ({ ...f, account_number: e.target.value }))} placeholder="0123456789" className={`${innerCls} font-mono tracking-widest`} />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Account type">
+                  <select value={form.account_type} onChange={(e) => setForm((f) => ({ ...f, account_type: e.target.value as BankAccount["account_type"] }))} className={`${innerCls} -ml-0.5`}>
+                    {Object.entries(TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                  </select>
+                </Field>
+                <Field label="Currency">
+                  <select value={form.currency} onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value }))} className={`${innerCls} -ml-0.5`}>
+                    {["NGN","USD","GBP","EUR","CAD","GHS","KES","ZAR"].map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </Field>
+              </div>
+            </div>
+          </div>
+          <div className="px-4 pb-4 flex gap-3">
+            <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); }} className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition">Cancel</button>
+            <button onClick={addAccount} disabled={saving || !form.account_name.trim() || !form.bank_name.trim()} className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20">
+              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+              Save Account
+            </button>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Account list */}
-          <div className="space-y-2">
-            {accounts.map((a) => (
-              <div
-                key={a.id}
-                onClick={() => setSelectedAccount(a.id)}
-                className={cn(
-                  "bg-white rounded-xl border shadow-sm p-4 cursor-pointer transition group",
-                  selectedAccount === a.id ? "border-green-500 ring-1 ring-green-500" : "border-slate-200 hover:border-slate-300"
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-semibold text-[#0F172A]">{a.account_name}</p>
-                      {a.is_primary && <Star className="w-3 h-3 text-amber-400 fill-amber-400" />}
-                    </div>
-                    <p className="text-xs text-slate-400 mt-0.5">{a.bank_name} · {TYPE_LABELS[a.account_type]}</p>
-                    {a.account_number && <p className="text-xs text-slate-400 font-mono mt-0.5">{a.account_number}</p>}
+      )}
+
+      {/* Empty state */}
+      {accounts.length === 0 && !showForm && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <CreditCard className="w-9 h-9 text-slate-300" />
+          </div>
+          <p className="text-[16px] font-bold text-slate-800">No payment accounts yet</p>
+          <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">Add the bank accounts customers should transfer to at checkout</p>
+        </div>
+      )}
+
+      {/* Account list */}
+      {accounts.length > 0 && (
+        <>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">
+            {accounts.length} account{accounts.length !== 1 ? "s" : ""}
+          </p>
+          <div className="bg-white rounded-[8px] border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {accounts.map((account) => (
+              <div key={account.id} className="px-4 py-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex-shrink-0 flex items-center justify-center mt-0.5 text-blue-600 font-extrabold text-[15px]">
+                    {account.bank_name.charAt(0).toUpperCase()}
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-                    {!a.is_primary && (
-                      <button onClick={(e) => { e.stopPropagation(); makePrimary(a.id); }} title="Set primary" className="p-1 text-slate-400 hover:text-amber-500 transition">
-                        <Star className="w-3.5 h-3.5" />
-                      </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-[15px] text-slate-900 leading-tight truncate">{account.account_name}</p>
+                      {account.is_primary && (
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                          <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" /> Primary
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[13px] text-slate-500 mt-0.5">
+                      {account.bank_name} · {TYPE_LABELS[account.account_type]} · {account.currency}
+                    </p>
+                    {account.account_number && (
+                      <p className="font-mono text-[15px] font-bold text-[#0F172A] mt-1.5 tracking-widest">{account.account_number}</p>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); deleteAccount(a.id); }} className="p-1 text-slate-400 hover:text-red-500 transition">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
                   </div>
                 </div>
-                <p className="text-lg font-bold text-[#0F172A] mt-2">{fmt(a.balance, a.currency)}</p>
+
+                {/* Action row */}
+                <div className="flex items-center gap-2 mt-3 pl-[52px]">
+                  {account.account_number && (
+                    <button
+                      onClick={() => copyNumber(account.id, account.account_number!)}
+                      className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition active:scale-95"
+                    >
+                      {copiedId === account.id
+                        ? <><CheckCheck className="w-3 h-3 text-[#1a9c38]" /> Copied</>
+                        : <><Copy className="w-3 h-3" /> Copy Number</>}
+                    </button>
+                  )}
+                  {!account.is_primary && (
+                    <button
+                      onClick={() => makePrimary(account.id)}
+                      className="flex items-center gap-1.5 text-[13px] font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-100 px-3 py-1.5 rounded-lg transition active:scale-95"
+                    >
+                      <Star className="w-3 h-3" /> Set Primary
+                    </button>
+                  )}
+                  <button
+                    onClick={() => deleteAccount(account.id)}
+                    disabled={deletingId === account.id}
+                    className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
+                  >
+                    {deletingId === account.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-
-          {/* Transaction list */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100">
-              <h3 className="text-sm font-semibold text-[#0F172A]">
-                {account ? `${account.account_name} — Transactions` : "Transactions"}
-              </h3>
-            </div>
-            {accountTx.length === 0 ? (
-              <div className="p-12 text-center">
-                <p className="text-sm text-slate-400">No transactions yet for this account</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-50">
-                {accountTx.map((t) => (
-                  <div key={t.id} className="flex items-center justify-between px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      {TX_ICONS[t.type]}
-                      <div>
-                        <p className="text-sm font-medium text-[#0F172A]">{t.description ?? t.type.charAt(0).toUpperCase() + t.type.slice(1)}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <p className="text-xs text-slate-400">{t.date}</p>
-                          {t.reference && <p className="text-xs text-slate-400">· Ref: {t.reference}</p>}
-                        </div>
-                      </div>
-                    </div>
-                    <p className={cn("text-sm font-bold", t.type === "deposit" ? "text-green-600" : "text-red-500")}>
-                      {t.type === "deposit" ? "+" : "−"}{fmt(t.amount)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Add Account modal */}
-      {showAddAccount && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">Add Bank Account</h3>
-              <button onClick={() => setShowAddAccount(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"><X className="w-4 h-4" /></button>
-            </div>
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Account Name *</label>
-                  <input value={form.account_name} onChange={(e) => setForm({ ...form, account_name: e.target.value })} placeholder="e.g. Main Business" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Bank Name *</label>
-                  <input value={form.bank_name} onChange={(e) => setForm({ ...form, bank_name: e.target.value })} placeholder="e.g. Access Bank" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Account Number</label>
-                <input value={form.account_number} onChange={(e) => setForm({ ...form, account_number: e.target.value })} placeholder="0123456789" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Account Type</label>
-                  <select value={form.account_type} onChange={(e) => setForm({ ...form, account_type: e.target.value as BankAccount["account_type"] })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    {Object.entries(TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Currency</label>
-                  <select value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    {["NGN","USD","GBP","EUR","CAD","GHS","KES","ZAR"].map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowAddAccount(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={addAccount} disabled={saving || !form.account_name.trim() || !form.bank_name.trim()} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
-                {saving ? "Saving..." : "Add Account"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add Transaction modal */}
-      {showAddTx && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">Add Transaction</h3>
-              <button onClick={() => setShowAddTx(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"><X className="w-4 h-4" /></button>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Account *</label>
-                <select value={txForm.account_id} onChange={(e) => setTxForm({ ...txForm, account_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                  {accounts.map((a) => <option key={a.id} value={a.id}>{a.account_name} ({a.bank_name})</option>)}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Type *</label>
-                  <select value={txForm.type} onChange={(e) => setTxForm({ ...txForm, type: e.target.value as BankTransaction["type"] })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="deposit">Deposit</option>
-                    <option value="withdrawal">Withdrawal</option>
-                    <option value="transfer">Transfer</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Amount *</label>
-                  <input type="number" min="0" value={txForm.amount} onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
-                <input value={txForm.description} onChange={(e) => setTxForm({ ...txForm, description: e.target.value })} placeholder="e.g. Cash deposit from sales" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Reference</label>
-                  <input value={txForm.reference} onChange={(e) => setTxForm({ ...txForm, reference: e.target.value })} placeholder="TXN123..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                  <input type="date" value={txForm.date} onChange={(e) => setTxForm({ ...txForm, date: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowAddTx(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={addTransaction} disabled={saving || !txForm.account_id || !txForm.amount} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
-                {saving ? "Saving..." : "Add"}
-              </button>
-            </div>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

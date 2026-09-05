@@ -29,7 +29,7 @@ export default async function DiscountsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Discounts & Promo Codes" />
+      <TopBar title="Discounts" bg="bg-[#fafefb]" border={false} centered />
       <DiscountsClient
         codes={codes ?? []}
         businessId={business.id}
