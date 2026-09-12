@@ -38,7 +38,7 @@ export default async function PayrollPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Staff Payroll" />
+      <TopBar title="Payroll" bg="bg-[#fafefb]" border={false} centered />
       <PayrollClient
         staff={(staffRes.data ?? []) as any}
         runs={(runsRes.data ?? []) as any}

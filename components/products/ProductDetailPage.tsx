@@ -13,6 +13,8 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
 import { ProductForm } from "./ProductForm";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface Product {
   id: string;
@@ -85,6 +87,7 @@ export function ProductDetailPage({
   const [toggling, setToggling] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const fmt = (n: number) => formatCurrency(n, currency);
   const isLow = qty <= product.low_stock_threshold && qty > 0;
@@ -119,10 +122,11 @@ export function ProductDetailPage({
   }
 
   async function handleDelete() {
-    if (!confirm(`Delete "${product.name}"? This cannot be undone.`)) return;
     setDeleting(true);
     const supabase = createClient();
-    await supabase.from("products").update({ is_active: false }).eq("id", product.id);
+    const { error } = await supabase.from("products").update({ is_active: false }).eq("id", product.id);
+    setDeleting(false);
+    if (error) { toast.error("Failed to delete product"); return; }
     router.push(`/${slug}/products`);
     router.refresh();
   }
@@ -160,6 +164,16 @@ export function ProductDetailPage({
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (
+    <>
+    <ConfirmDialog
+      open={confirmOpen}
+      title={`Delete "${product.name}"?`}
+      message="This product will be removed from your inventory. This cannot be undone."
+      confirmLabel="Delete"
+      loading={deleting}
+      onConfirm={handleDelete}
+      onCancel={() => setConfirmOpen(false)}
+    />
     <div className="flex flex-col flex-1 min-h-0 bg-[#F5F6F8]">
       {/* Mobile header — hidden on lg (TopBar handles that) */}
       <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-100 flex items-center px-4 h-14 gap-3 flex-shrink-0">
@@ -382,7 +396,7 @@ export function ProductDetailPage({
           {/* Bottom actions */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <button
-              onClick={handleDelete}
+              onClick={() => setConfirmOpen(true)}
               disabled={deleting}
               className="flex items-center justify-center gap-2 border border-red-200 text-red-500 rounded-2xl h-12 text-sm font-semibold active:bg-red-50 transition disabled:opacity-50"
             >
@@ -415,5 +429,6 @@ export function ProductDetailPage({
         />
       )}
     </div>
+    </>
   );
 }

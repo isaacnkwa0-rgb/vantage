@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Plus, ShoppingBag, Search, Trash2, Eye, X, ChevronDown } from "lucide-react";
+import { Plus, ShoppingBag, Search, Trash2, Eye, X, ChevronDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface POItem {
   id?: string;
@@ -132,13 +133,15 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
   async function updateStatus(id: string, status: PurchaseOrder["status"]) {
     const patch: Record<string, string> = { status };
     if (status === "received") patch.received_date = new Date().toISOString().split("T")[0];
-    await supabase.from("purchase_orders").update(patch).eq("id", id);
+    const { error } = await supabase.from("purchase_orders").update(patch).eq("id", id);
+    if (error) { toast.error("Failed to update order status"); return; }
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...patch } : o)));
     if (viewOrder?.id === id) setViewOrder((v) => (v ? { ...v, ...patch } : v));
   }
 
   async function deletePO(id: string) {
-    await supabase.from("purchase_orders").delete().eq("id", id);
+    const { error } = await supabase.from("purchase_orders").delete().eq("id", id);
+    if (error) { toast.error("Failed to delete purchase order"); return; }
     setOrders((prev) => prev.filter((o) => o.id !== id));
     if (viewOrder?.id === id) setViewOrder(null);
   }

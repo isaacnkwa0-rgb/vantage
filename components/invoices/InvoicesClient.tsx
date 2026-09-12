@@ -6,6 +6,7 @@ import {
   AlertCircle, X, Loader2,
   SlidersHorizontal, Check,
 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -116,8 +117,9 @@ export function InvoicesClient({ invoices, business, customers, businessSlug }: 
   async function markAsPaid(inv: Invoice) {
     setMarkingPaid(inv.id);
     const supabase = createClient();
-    await supabase.from("invoices").update({ status: "paid", amount_paid: inv.total_amount }).eq("id", inv.id);
+    const { error } = await supabase.from("invoices").update({ status: "paid", amount_paid: inv.total_amount }).eq("id", inv.id);
     setMarkingPaid(null);
+    if (error) { toast.error("Failed to mark invoice as paid"); return; }
     router.refresh();
   }
 

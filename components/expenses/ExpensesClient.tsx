@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Plus, Receipt, Trash2, Search, SlidersHorizontal, ChevronDown, Loader2, X } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,9 +91,10 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
   async function deleteExpense(id: string) {
     setDeleting(id);
     const supabase = createClient();
-    await supabase.from("expenses").delete().eq("id", id);
-    router.refresh();
+    const { error } = await supabase.from("expenses").delete().eq("id", id);
     setDeleting(null);
+    if (error) { toast.error("Failed to delete expense"); return; }
+    router.refresh();
   }
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
@@ -105,7 +107,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
 
   async function onSubmit(data: FormData) {
     const supabase = createClient();
-    await supabase.from("expenses").insert({
+    const { error } = await supabase.from("expenses").insert({
       business_id:  businessId,
       category:     data.category,
       title:        data.title,
@@ -114,6 +116,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
       expense_date: data.expense_date,
       recorded_by:  userId,
     });
+    if (error) { toast.error("Failed to record expense"); return; }
     reset({ expense_date: new Date().toISOString().split("T")[0], category: "other" });
     setShowForm(false);
     router.refresh();

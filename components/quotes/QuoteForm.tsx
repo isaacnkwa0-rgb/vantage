@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Customer {
   id: string;
@@ -145,7 +146,8 @@ export function QuoteForm({ business, customers, editingQuote, userId, backHref,
     let quoteId = editingQuote?.id;
 
     if (isEdit && quoteId) {
-      await supabase.from("quotes").update(payload).eq("id", quoteId);
+      const { error: updErr } = await supabase.from("quotes").update(payload).eq("id", quoteId);
+      if (updErr) { setError(updErr.message); setSaving(false); return; }
       await supabase.from("quote_items").delete().eq("quote_id", quoteId);
     } else {
       const { data: numData } = await supabase
@@ -168,15 +170,18 @@ export function QuoteForm({ business, customers, editingQuote, userId, backHref,
     }
 
     const validItems = items.filter((i) => i.description.trim());
-    await supabase.from("quote_items").insert(
-      validItems.map((i) => ({
-        quote_id:    quoteId,
-        description: i.description,
-        quantity:    i.quantity,
-        unit_price:  i.unit_price,
-        line_total:  i.quantity * i.unit_price,
-      }))
-    );
+    if (validItems.length > 0) {
+      const { error: itemErr } = await supabase.from("quote_items").insert(
+        validItems.map((i) => ({
+          quote_id:    quoteId,
+          description: i.description,
+          quantity:    i.quantity,
+          unit_price:  i.unit_price,
+          line_total:  i.quantity * i.unit_price,
+        }))
+      );
+      if (itemErr) toast.error("Quote saved but line items may not have saved");
+    }
 
     setSaving(false);
     router.push(backHref);

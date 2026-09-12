@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, Truck, Search, Phone, Mail, MapPin, Trash2, Edit2, X, Loader2, User } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface Supplier {
   id: string;
@@ -57,6 +59,7 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
   const [form, setForm]           = useState(EMPTY_FORM);
   const [saving, setSaving]       = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId]   = useState<string | null>(null);
 
   const filtered = suppliers.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -121,16 +124,28 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
     setSaving(false);
   }
 
-  async function deleteSupplier(id: string) {
-    if (!confirm("Remove this supplier?")) return;
-    setDeletingId(id);
+  async function deleteSupplier() {
+    if (!confirmId) return;
+    setDeletingId(confirmId);
     const supabase = createClient();
-    await supabase.from("suppliers").update({ is_active: false }).eq("id", id);
-    setSuppliers((prev) => prev.filter((s) => s.id !== id));
+    const { error } = await supabase.from("suppliers").update({ is_active: false }).eq("id", confirmId);
     setDeletingId(null);
+    setConfirmId(null);
+    if (error) { toast.error("Failed to remove supplier"); return; }
+    setSuppliers((prev) => prev.filter((s) => s.id !== confirmId));
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={!!confirmId}
+      title="Remove supplier?"
+      message="This supplier will be removed from your records."
+      confirmLabel="Remove"
+      loading={!!deletingId}
+      onConfirm={deleteSupplier}
+      onCancel={() => setConfirmId(null)}
+    />
     <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
 
       {/* Search + New */}
@@ -314,7 +329,7 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
                     <Edit2 className="w-3 h-3" /> Edit
                   </button>
                   <button
-                    onClick={() => deleteSupplier(s.id)}
+                    onClick={() => setConfirmId(s.id)}
                     disabled={deletingId === s.id}
                     className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
                   >
@@ -328,5 +343,6 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
         </>
       )}
     </div>
+    </>
   );
 }

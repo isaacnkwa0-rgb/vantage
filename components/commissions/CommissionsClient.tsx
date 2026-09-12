@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Percent, TrendingUp, Users, DollarSign } from "lucide-react";
+import { Percent, TrendingUp, Users, DollarSign, BarChart3 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 
 interface Member {
@@ -109,6 +109,15 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
       </div>
 
       {/* Table */}
+      {rows.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <BarChart3 className="w-7 h-7 text-slate-300" />
+          </div>
+          <p className="text-[15px] font-bold text-slate-800">No staff members yet</p>
+          <p className="text-[13px] text-slate-400 mt-1 max-w-xs">Add staff in Settings → Staff & Roles to track commissions</p>
+        </div>
+      ) : (
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3 bg-slate-50 border-b border-slate-100">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">
@@ -167,6 +176,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
           )}
         </table>
       </div>
+      )}
 
       <p className="text-xs text-slate-400 text-center">
         Commission rates are configured in Settings → Staff & Roles

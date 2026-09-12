@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Zap, Star, Loader2, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
 import { PLAN_PRICING, type PlanTier } from "@/lib/plans";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Props {
   business: { id: string; name: string; subscription_tier: string };
@@ -38,10 +39,10 @@ export function BillingTab({ business, userEmail }: Props) {
       if (data.authorizationUrl) {
         window.location.href = data.authorizationUrl;
       } else {
-        alert(data.error ?? "Failed to start checkout");
+        toast.error(data.error ?? "Failed to start checkout");
       }
     } catch {
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
     setLoading(null);
   }

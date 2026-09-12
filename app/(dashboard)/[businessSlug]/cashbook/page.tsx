@@ -37,7 +37,7 @@ export default async function CashbookPage({ params, searchParams }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Cashbook" />
+      <TopBar title="Cashbook" bg="bg-[#fafefb]" border={false} centered />
       <CashbookClient
         entries={(entries ?? []) as any}
         currency={business.currency}

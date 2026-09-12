@@ -38,7 +38,7 @@ export default async function PurchaseOrdersPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Purchase Orders" />
+      <TopBar title="Purchase Orders" bg="bg-[#fafefb]" border={false} centered />
       <PurchaseOrdersClient
         orders={(posRes.data ?? []) as any}
         suppliers={(suppliersRes.data ?? []) as any}

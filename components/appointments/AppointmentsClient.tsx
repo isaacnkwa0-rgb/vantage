@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Calendar, Plus, ChevronLeft, ChevronRight, Clock, User, X, Check, Phone } from "lucide-react";
+import { CalendarDays, Plus, ChevronLeft, ChevronRight, ChevronDown, Clock, X, Check, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Appointment {
@@ -37,42 +37,68 @@ interface Props {
   weekStart: string;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  scheduled: "bg-blue-100 text-blue-700",
-  confirmed: "bg-green-100 text-green-700",
-  completed: "bg-slate-100 text-slate-600",
-  cancelled: "bg-red-100 text-red-500",
-  no_show: "bg-amber-100 text-amber-700",
+const STATUS_CONFIG: Record<string, { label: string; pill: string }> = {
+  scheduled:  { label: "Scheduled",  pill: "bg-blue-100 text-blue-700" },
+  confirmed:  { label: "Confirmed",  pill: "bg-green-100 text-green-700" },
+  completed:  { label: "Completed",  pill: "bg-slate-100 text-slate-600" },
+  cancelled:  { label: "Cancelled",  pill: "bg-red-100 text-red-500" },
+  no_show:    { label: "No Show",    pill: "bg-amber-100 text-amber-700" },
 };
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const AVATAR_PALETTES = [
+  "bg-violet-100 text-violet-600",
+  "bg-blue-100 text-blue-600",
+  "bg-amber-100 text-amber-700",
+  "bg-pink-100 text-pink-600",
+  "bg-teal-100 text-teal-600",
+  "bg-indigo-100 text-indigo-600",
+];
+
+function avatarColor(name: string) {
+  return AVATAR_PALETTES[name.charCodeAt(0) % AVATAR_PALETTES.length];
+}
 
 function addDays(dateStr: string, n: number): string {
-  const d = new Date(dateStr + "T00:00:00");
-  d.setDate(d.getDate() + n);
-  return d.toISOString().split("T")[0];
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d + n));
+  return date.toISOString().split("T")[0];
+}
+
+function parseDay(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
 }
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+function apptDay(a: Appointment) {
+  return a.start_time.split("T")[0];
+}
+
 export function AppointmentsClient({ appointments: initialAppts, members, customers, businessId, weekStart: initialWeekStart }: Props) {
   const supabase = createClient();
   const router = useRouter();
 
+  const today = new Date().toISOString().split("T")[0];
   const [appts, setAppts] = useState<Appointment[]>(initialAppts);
   const [weekStart, setWeekStart] = useState(initialWeekStart);
+  const [selectedDay, setSelectedDay] = useState(today);
   const [showCreate, setShowCreate] = useState(false);
+  const [showDayPicker, setShowDayPicker] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     customer_name: "",
     customer_phone: "",
     service_name: "",
     staff_id: "",
-    date: new Date().toISOString().split("T")[0],
+    date: today,
     start_time: "09:00",
     end_time: "10:00",
     notes: "",
@@ -83,17 +109,15 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
   function prevWeek() {
     const newStart = addDays(weekStart, -7);
     setWeekStart(newStart);
+    setSelectedDay(newStart);
     router.push(`?week=${newStart}`, { scroll: false });
   }
 
   function nextWeek() {
     const newStart = addDays(weekStart, 7);
     setWeekStart(newStart);
+    setSelectedDay(newStart);
     router.push(`?week=${newStart}`, { scroll: false });
-  }
-
-  function apptDay(a: Appointment) {
-    return a.start_time.split("T")[0];
   }
 
   function selectCustomer(customerId: string) {
@@ -123,8 +147,9 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
       .single();
     if (!error && data) {
       setAppts((prev) => [...prev, data as Appointment].sort((a, b) => a.start_time.localeCompare(b.start_time)));
+      setSelectedDay(form.date);
       setShowCreate(false);
-      setForm({ customer_name: "", customer_phone: "", service_name: "", staff_id: "", date: new Date().toISOString().split("T")[0], start_time: "09:00", end_time: "10:00", notes: "" });
+      setForm({ customer_name: "", customer_phone: "", service_name: "", staff_id: "", date: today, start_time: "09:00", end_time: "10:00", notes: "" });
     }
     setSaving(false);
   }
@@ -134,185 +159,348 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
     setAppts((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
   }
 
-  const dayAppts = (day: string) => appts.filter((a) => apptDay(a) === day);
-  const today = new Date().toISOString().split("T")[0];
+  const dayAppts = weekDays.reduce<Record<string, Appointment[]>>((acc, d) => {
+    acc[d] = appts.filter((a) => apptDay(a) === d);
+    return acc;
+  }, {});
+
+  const selectedAppts = dayAppts[selectedDay] ?? [];
+
+  const weekLabel = (() => {
+    const s = parseDay(weekStart);
+    const e = parseDay(addDays(weekStart, 6));
+    return `${MONTHS_SHORT[s.getUTCMonth()]} ${s.getUTCDate()} – ${MONTHS_SHORT[e.getUTCMonth()]} ${e.getUTCDate()}, ${e.getUTCFullYear()}`;
+  })();
 
   return (
-    <div className="flex-1 p-5 space-y-4">
-      {/* Week nav */}
-      <div className="flex items-center justify-between">
+    <div className="flex-1 flex flex-col bg-[#f8faf9] overflow-hidden">
+
+      {/* Week nav header */}
+      <div className="bg-white px-4 py-3 flex items-center justify-between flex-shrink-0 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <button onClick={prevWeek} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+          <button
+            onClick={prevWeek}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 active:bg-slate-100 transition-colors"
+          >
             <ChevronLeft className="w-4 h-4 text-slate-500" />
           </button>
-          <span className="text-sm font-semibold text-[#0F172A]">
-            {new Date(weekStart + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" })} –{" "}
-            {new Date(addDays(weekStart, 6) + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-          </span>
-          <button onClick={nextWeek} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+          <span className="text-[13px] font-semibold text-slate-700">{weekLabel}</span>
+          <button
+            onClick={nextWeek}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 active:bg-slate-100 transition-colors"
+          >
             <ChevronRight className="w-4 h-4 text-slate-500" />
           </button>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"
+          className="h-11 flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
         >
-          <Plus className="w-4 h-4" />
-          Book Appointment
+          <Plus className="w-4 h-4" /> New
         </button>
       </div>
 
-      {/* Week calendar */}
-      <div className="grid grid-cols-7 gap-2">
-        {weekDays.map((day, i) => {
-          const dayApptList = dayAppts(day);
-          const isToday = day === today;
-          return (
-            <div key={day} className={cn("bg-white rounded-xl border shadow-sm min-h-[120px] p-2", isToday ? "border-green-400 ring-1 ring-green-300" : "border-slate-200")}>
-              <div className="text-center mb-2">
-                <p className="text-xs font-semibold text-slate-500">{DAYS[i]}</p>
-                <p className={cn("text-sm font-bold", isToday ? "text-green-600" : "text-[#0F172A]")}>
-                  {new Date(day + "T00:00:00").getDate()}
-                </p>
-              </div>
-              <div className="space-y-1">
-                {dayApptList.slice(0, 3).map((a) => (
-                  <button
-                    key={a.id}
-                    onClick={() => setSelectedDay(a.id === selectedDay ? null : a.id)}
-                    className={cn(
-                      "w-full text-left px-2 py-1 rounded-lg text-xs font-medium truncate transition",
-                      STATUS_STYLES[a.status]
-                    )}
-                  >
-                    {formatTime(a.start_time)} {a.customer_name}
-                  </button>
-                ))}
-                {dayApptList.length > 3 && (
-                  <p className="text-xs text-slate-400 text-center">+{dayApptList.length - 3} more</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
+      {/* Day dropdown trigger */}
+      <div className="px-4 py-2 bg-white border-b border-slate-100 flex-shrink-0">
+        <button
+          onClick={() => setShowDayPicker(true)}
+          className="w-full flex items-center justify-between px-4 h-11 bg-slate-50 rounded-xl border border-slate-200 active:bg-slate-100 transition-colors"
+        >
+          <span className="text-[14px] font-semibold text-slate-800">
+            {(() => { const d = parseDay(selectedDay); return `${DAYS_SHORT[d.getUTCDay()]}, ${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`; })()}
+            {selectedDay === today && <span className="ml-2 text-[11px] font-semibold text-green-600">Today</span>}
+          </span>
+          <div className="flex items-center gap-2">
+            {(dayAppts[selectedDay]?.length ?? 0) > 0 && (
+              <span className="text-[11px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                {dayAppts[selectedDay].length}
+              </span>
+            )}
+            <ChevronDown className="w-4 h-4 text-slate-400" />
+          </div>
+        </button>
       </div>
 
-      {/* Appointment list for the week */}
-      {appts.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-5 py-3 bg-slate-50 border-b border-slate-100">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">This Week's Appointments</p>
+      {/* Day picker bottom sheet */}
+      {showDayPicker && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-end"
+          onClick={() => setShowDayPicker(false)}
+        >
+          <div
+            className="w-full bg-white rounded-t-2xl px-5 pt-5 pb-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[16px] font-bold text-slate-900">Select Day</h3>
+              <button onClick={() => setShowDayPicker(false)} className="p-1.5 rounded-xl text-slate-400 active:bg-slate-100 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-1">
+              {weekDays.map((day) => {
+                const isSelected = day === selectedDay;
+                const isToday = day === today;
+                const count = dayAppts[day]?.length ?? 0;
+                const d = parseDay(day);
+                return (
+                  <button
+                    key={day}
+                    onClick={() => { setSelectedDay(day); setShowDayPicker(false); }}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors",
+                      isSelected ? "bg-green-50" : "active:bg-slate-50"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold flex-shrink-0",
+                        isSelected ? "bg-green-600 text-white" : isToday ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"
+                      )}>
+                        {d.getUTCDate()}
+                      </div>
+                      <div className="text-left">
+                        <p className={cn("text-[14px] font-semibold", isSelected ? "text-green-700" : "text-slate-800")}>
+                          {DAYS_SHORT[d.getUTCDay()]}
+                          {isToday && <span className="ml-2 text-[11px] font-medium text-green-500">Today</span>}
+                        </p>
+                        <p className="text-[12px] text-slate-400">
+                          {MONTHS_LONG[d.getUTCMonth()]} {d.getUTCDate()}
+                        </p>
+                      </div>
+                    </div>
+                    {count > 0 ? (
+                      <span className={cn("text-[11px] font-bold px-2.5 py-1 rounded-full", isSelected ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600")}>
+                        {count} appt{count !== 1 ? "s" : ""}
+                      </span>
+                    ) : (
+                      isSelected && <Check className="w-4 h-4 text-green-600" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="divide-y divide-slate-50">
-            {appts.map((a) => (
-              <div key={a.id} className="px-5 py-3 flex items-center gap-4 hover:bg-slate-50 transition group">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-[#0F172A]">{a.customer_name}</p>
-                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[a.status])}>{a.status}</span>
+        </div>
+      )}
+
+      {/* Appointments list */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+
+        {selectedAppts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 pt-16 text-center">
+            <div className="w-14 h-14 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm">
+              <CalendarDays className="w-6 h-6 text-slate-300" />
+            </div>
+            <p className="text-[14px] font-semibold text-slate-700">No appointments</p>
+            <p className="text-[13px] text-slate-400">
+              {selectedDay === today ? "Nothing booked for today" : (() => { const d = parseDay(selectedDay); return `Nothing booked for ${DAYS_SHORT[d.getUTCDay()]}, ${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`; })()}
+            </p>
+            <button
+              onClick={() => { setForm((f) => ({ ...f, date: selectedDay })); setShowCreate(true); }}
+              className="mt-1 px-5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            >
+              Add Appointment
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400 px-1">
+              {(() => { const d = parseDay(selectedDay); return `${DAYS_SHORT[d.getUTCDay()]}, ${MONTHS_LONG[d.getUTCMonth()]} ${d.getUTCDate()}`; })()}
+              {"  ·  "}{selectedAppts.length} appointment{selectedAppts.length !== 1 ? "s" : ""}
+            </p>
+            {selectedAppts.map((a) => {
+              const cfg = STATUS_CONFIG[a.status];
+              const initials = a.customer_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+              return (
+                <div key={a.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  {/* Main row */}
+                  <div className="flex items-start gap-3 px-4 py-4">
+                    {/* Avatar */}
+                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold flex-shrink-0", avatarColor(a.customer_name))}>
+                      {initials}
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-[14px] font-bold text-slate-900">{a.customer_name}</p>
+                        <span className={cn("px-2 py-0.5 rounded-full text-[11px] font-semibold", cfg.pill)}>{cfg.label}</span>
+                      </div>
+                      <p className="text-[13px] text-slate-600 mt-0.5">{a.service_name}</p>
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                        <span className="flex items-center gap-1 text-[12px] text-slate-400">
+                          <Clock className="w-3.5 h-3.5" />
+                          {formatTime(a.start_time)} – {formatTime(a.end_time)}
+                        </span>
+                        {a.customer_phone && (
+                          <span className="flex items-center gap-1 text-[12px] text-slate-400">
+                            <Phone className="w-3.5 h-3.5" />
+                            {a.customer_phone}
+                          </span>
+                        )}
+                      </div>
+                      {a.notes && (
+                        <p className="text-[12px] text-slate-400 mt-1 italic">"{a.notes}"</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-400">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTime(a.start_time)} – {formatTime(a.end_time)}</span>
-                    <span>{a.service_name}</span>
-                    {a.customer_phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{a.customer_phone}</span>}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-                  {a.status === "scheduled" && (
-                    <button onClick={() => updateStatus(a.id, "confirmed")} title="Confirm" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition">
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+
+                  {/* Actions */}
                   {(a.status === "scheduled" || a.status === "confirmed") && (
-                    <>
-                      <button onClick={() => updateStatus(a.id, "completed")} title="Complete" className="px-2 py-1 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-semibold transition">Done</button>
-                      <button onClick={() => updateStatus(a.id, "cancelled")} title="Cancel" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition">
-                        <X className="w-3.5 h-3.5" />
+                    <div className="flex border-t border-slate-100">
+                      {a.status === "scheduled" && (
+                        <button
+                          onClick={() => updateStatus(a.id, "confirmed")}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-green-600 active:bg-green-50 transition-colors border-r border-slate-100"
+                        >
+                          <Check className="w-4 h-4" />
+                          Confirm
+                        </button>
+                      )}
+                      <button
+                        onClick={() => updateStatus(a.id, "completed")}
+                        className="flex-1 flex items-center justify-center py-3 text-[13px] font-semibold text-slate-600 active:bg-slate-50 transition-colors border-r border-slate-100"
+                      >
+                        Done
                       </button>
-                    </>
+                      <button
+                        onClick={() => updateStatus(a.id, "cancelled")}
+                        className="flex-1 flex items-center justify-center py-3 text-[13px] font-semibold text-red-500 active:bg-red-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+              );
+            })}
+          </>
+        )}
+      </div>
 
-      {appts.length === 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center text-center gap-3">
-          <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-            <Calendar className="w-6 h-6 text-slate-400" />
-          </div>
-          <p className="text-sm font-semibold text-[#0F172A]">No appointments this week</p>
-          <p className="text-xs text-slate-400">Book an appointment to get started</p>
-        </div>
-      )}
-
-      {/* Create modal */}
+      {/* Create bottom sheet */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">Book Appointment</h3>
-              <button onClick={() => setShowCreate(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
-                <X className="w-4 h-4" />
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-end"
+          onClick={() => setShowCreate(false)}
+        >
+          <div
+            className="w-full bg-white rounded-t-2xl px-5 pt-5 pb-10 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-bold text-slate-900">Add Appointment</h3>
+              <button onClick={() => setShowCreate(false)} className="p-1.5 rounded-xl text-slate-400 active:bg-slate-100 transition-colors">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {customers.length > 0 && (
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Existing Customer (optional)</label>
-                  <select onChange={(e) => selectCustomer(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">— Walk-in / New —</option>
+                  <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Existing Customer</label>
+                  <select
+                    onChange={(e) => selectCustomer(e.target.value)}
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Walk-in / New customer</option>
                     {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
               )}
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Customer Name *</label>
-                <input value={form.customer_name} onChange={(e) => setForm({ ...form, customer_name: e.target.value })} placeholder="Full name" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Customer Name *</label>
+                <input
+                  value={form.customer_name}
+                  onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
+                  placeholder="Full name"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Phone</label>
-                <input value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} placeholder="+234..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Phone</label>
+                <input
+                  value={form.customer_phone}
+                  onChange={(e) => setForm({ ...form, customer_phone: e.target.value })}
+                  placeholder="+234..."
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Service *</label>
-                <input value={form.service_name} onChange={(e) => setForm({ ...form, service_name: e.target.value })} placeholder="e.g. Haircut, Massage, Consultation" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Service *</label>
+                <input
+                  value={form.service_name}
+                  onChange={(e) => setForm({ ...form, service_name: e.target.value })}
+                  placeholder="e.g. Haircut, Consultation"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
               </div>
               {members.length > 0 && (
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Assigned Staff</label>
-                  <select value={form.staff_id} onChange={(e) => setForm({ ...form, staff_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">— Any —</option>
+                  <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Assigned Staff</label>
+                  <select
+                    value={form.staff_id}
+                    onChange={(e) => setForm({ ...form, staff_id: e.target.value })}
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Any staff</option>
                     {members.map((m) => <option key={m.user_id} value={m.user_id}>{m.profiles?.full_name ?? m.user_id}</option>)}
                   </select>
                 </div>
               )}
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Date</label>
+                <input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Start Time</label>
-                  <input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Start Time</label>
+                  <input
+                    type="time"
+                    value={form.start_time}
+                    onChange={(e) => setForm({ ...form, start_time: e.target.value })}
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">End Time</label>
-                  <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">End Time</label>
+                  <input
+                    type="time"
+                    value={form.end_time}
+                    onChange={(e) => setForm({ ...form, end_time: e.target.value })}
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
-                <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} placeholder="Optional notes..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Notes</label>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  rows={2}
+                  placeholder="Optional notes..."
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                />
               </div>
             </div>
 
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={createAppt} disabled={saving || !form.customer_name.trim() || !form.service_name.trim()} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowCreate(false)}
+                className="flex-1 py-3.5 border border-slate-200 text-slate-600 rounded-xl text-[14px] font-semibold active:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createAppt}
+                disabled={saving || !form.customer_name.trim() || !form.service_name.trim()}
+                className="flex-1 py-3.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50"
+              >
                 {saving ? "Booking..." : "Book"}
               </button>
             </div>

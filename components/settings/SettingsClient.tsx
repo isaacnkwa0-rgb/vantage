@@ -9,6 +9,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { Users, Building2, Loader2, UserMinus, Mail, Upload, MapPin, Plus, Pencil, ToggleLeft, ToggleRight, Tag, Trash2, Star, CreditCard, Printer, Percent, Globe, Copy, ExternalLink, Share2, Check } from "lucide-react";
 import { BillingTab } from "@/components/subscription/BillingTab";
+import { toast } from "sonner";
 
 interface Business {
   id: string;
@@ -387,9 +388,10 @@ export function SettingsClient({ business, members, locations: initialLocations,
     }).eq("id", business.id);
     setSavingBranding(false);
     if (error) {
-      alert(`Failed to save: ${error.message}`);
+      toast.error(`Failed to save: ${error.message}`);
       return;
     }
+    toast.success("Branding saved");
     router.refresh();
   }
 

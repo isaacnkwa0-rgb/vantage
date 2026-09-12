@@ -37,7 +37,7 @@ export default async function PricingPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Wholesale / Pricing Tiers" />
+      <TopBar title="Wholesale / Pricing Tiers" bg="bg-[#fafefb]" border={false} centered />
       <PricingClient
         tiers={(tiersRes.data ?? []) as any}
         customers={(customersRes.data ?? []) as any}

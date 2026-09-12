@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Plus, Users, Play, CheckCircle, FileText, X, Pencil, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Users, Play, CheckCircle, FileText, X, Pencil, Trash2, ChevronDown, ChevronRight, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface StaffMember {
   id: string;
@@ -50,10 +51,31 @@ interface Props {
   userId: string;
 }
 
-const SALARY_LABELS = { monthly: "Monthly", weekly: "Weekly", daily: "Daily", hourly: "Hourly" };
-const STATUS_STYLES = { draft: "bg-slate-100 text-slate-500", approved: "bg-amber-100 text-amber-700", paid: "bg-green-100 text-green-700" };
+const SALARY_LABELS = { monthly: "/ month", weekly: "/ week", daily: "/ day", hourly: "/ hour" };
+
+const STATUS_CONFIG: Record<string, { label: string; pill: string }> = {
+  draft:    { label: "Draft",    pill: "bg-slate-100 text-slate-500" },
+  approved: { label: "Approved", pill: "bg-amber-100 text-amber-700" },
+  paid:     { label: "Paid",     pill: "bg-green-100 text-green-700" },
+};
+
+const AVATAR_PALETTES = [
+  "bg-violet-100 text-violet-600",
+  "bg-blue-100 text-blue-600",
+  "bg-amber-100 text-amber-700",
+  "bg-pink-100 text-pink-600",
+  "bg-teal-100 text-teal-600",
+  "bg-indigo-100 text-indigo-600",
+];
+function avatarColor(name: string) {
+  return AVATAR_PALETTES[name.charCodeAt(0) % AVATAR_PALETTES.length];
+}
+
 interface StaffForm { name: string; role: string; email: string; phone: string; salary_type: StaffMember["salary_type"]; salary_amount: number; bank_name: string; account_number: string; joined_at: string; }
 const EMPTY_STAFF: StaffForm = { name: "", role: "", email: "", phone: "", salary_type: "monthly", salary_amount: 0, bank_name: "", account_number: "", joined_at: new Date().toISOString().split("T")[0] };
+
+const INPUT = "w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500";
+const LABEL = "block text-[12px] font-semibold text-slate-500 mb-1.5";
 
 export function PayrollClient({ staff: initial, runs: initialRuns, currency, businessId, userId }: Props) {
   const supabase = createClient();
@@ -67,38 +89,34 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
   const [form, setForm] = useState<StaffForm>({ ...EMPTY_STAFF });
   const [saving, setSaving] = useState(false);
   const [expandedRun, setExpandedRun] = useState<string | null>(null);
-  const [runForm, setRunForm] = useState({
-    period_label: "",
-    period_start: new Date().toISOString().split("T")[0],
-    period_end: new Date().toISOString().split("T")[0],
-    notes: "",
-  });
+  const [runForm, setRunForm] = useState({ period_label: "", period_start: new Date().toISOString().split("T")[0], period_end: new Date().toISOString().split("T")[0], notes: "" });
   const [runEntries, setRunEntries] = useState<{ staffId: string; name: string; gross: string; deductions: string }[]>([]);
+
+  const totalMonthlyPayroll = staff.filter((s) => s.salary_type === "monthly").reduce((sum, s) => sum + s.salary_amount, 0);
 
   async function saveStaff() {
     if (!form.name.trim()) return;
     setSaving(true);
     if (editingId) {
-      await supabase.from("staff").update({ ...form, salary_amount: Number(form.salary_amount) }).eq("id", editingId);
-      setStaff((p) => p.map((s) => s.id === editingId ? { ...s, ...form, salary_amount: Number(form.salary_amount) } : s));
+      const { error } = await supabase.from("staff").update({ ...form, salary_amount: Number(form.salary_amount) }).eq("id", editingId);
+      if (!error) setStaff((p) => p.map((s) => s.id === editingId ? { ...s, ...form, salary_amount: Number(form.salary_amount) } : s));
+      else { toast.error("Failed to update staff member"); setSaving(false); return; }
     } else {
-      const { data } = await supabase.from("staff").insert({ business_id: businessId, ...form, salary_amount: Number(form.salary_amount) }).select().single();
+      const { data, error } = await supabase.from("staff").insert({ business_id: businessId, ...form, salary_amount: Number(form.salary_amount) }).select().single();
+      if (error) { toast.error("Failed to add staff member"); setSaving(false); return; }
       if (data) setStaff((p) => [...p, data as StaffMember]);
     }
-    setShowAddStaff(false);
-    setEditingId(null);
-    setForm({ ...EMPTY_STAFF });
-    setSaving(false);
+    setShowAddStaff(false); setEditingId(null); setForm({ ...EMPTY_STAFF }); setSaving(false);
   }
 
   function openEdit(s: StaffMember) {
     setForm({ name: s.name, role: s.role ?? "", email: s.email ?? "", phone: s.phone ?? "", salary_type: s.salary_type, salary_amount: s.salary_amount, bank_name: s.bank_name ?? "", account_number: s.account_number ?? "", joined_at: s.joined_at });
-    setEditingId(s.id);
-    setShowAddStaff(true);
+    setEditingId(s.id); setShowAddStaff(true);
   }
 
   async function removeStaff(id: string) {
-    await supabase.from("staff").update({ is_active: false }).eq("id", id);
+    const { error } = await supabase.from("staff").update({ is_active: false }).eq("id", id);
+    if (error) { toast.error("Failed to remove staff member"); return; }
     setStaff((p) => p.filter((s) => s.id !== id));
   }
 
@@ -117,233 +135,288 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
     const entries = runEntries.map((e) => ({ gross: parseFloat(e.gross) || 0, deductions: parseFloat(e.deductions) || 0, net: (parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0), staffId: e.staffId, name: e.name }));
     const totalGross = entries.reduce((sum, e) => sum + e.gross, 0);
     const totalDed = entries.reduce((sum, e) => sum + e.deductions, 0);
-    const totalNet = totalGross - totalDed;
-
-    const { data: run } = await supabase.from("payroll_runs").insert({ business_id: businessId, period_label: runForm.period_label, period_start: runForm.period_start, period_end: runForm.period_end, total_gross: totalGross, total_deductions: totalDed, total_net: totalNet, notes: runForm.notes || null, created_by: userId }).select().single();
-    if (!run) { setSaving(false); return; }
-
-    const entryRows = entries.map((e) => ({ run_id: run.id, business_id: businessId, staff_id: e.staffId || null, staff_name: e.name, gross_pay: e.gross, deductions: e.deductions, net_pay: e.net }));
-    const { data: insertedEntries } = await supabase.from("payroll_entries").insert(entryRows).select();
+    const { data: run, error: runErr } = await supabase.from("payroll_runs").insert({ business_id: businessId, period_label: runForm.period_label, period_start: runForm.period_start, period_end: runForm.period_end, total_gross: totalGross, total_deductions: totalDed, total_net: totalGross - totalDed, notes: runForm.notes || null, created_by: userId }).select().single();
+    if (runErr || !run) { toast.error("Failed to create payroll run"); setSaving(false); return; }
+    const { data: insertedEntries } = await supabase.from("payroll_entries").insert(entries.map((e) => ({ run_id: run.id, business_id: businessId, staff_id: e.staffId || null, staff_name: e.name, gross_pay: e.gross, deductions: e.deductions, net_pay: e.net }))).select();
     setRuns((p) => [{ ...run, payroll_entries: (insertedEntries ?? []) as PayrollEntry[] } as PayrollRun, ...p]);
-    setShowRunModal(false);
-    setTab("runs");
-    setSaving(false);
+    setShowRunModal(false); setTab("runs"); setSaving(false);
   }
 
   async function updateRunStatus(id: string, status: PayrollRun["status"]) {
-    await supabase.from("payroll_runs").update({ status }).eq("id", id);
+    const { error } = await supabase.from("payroll_runs").update({ status }).eq("id", id);
+    if (error) { toast.error("Failed to update payroll status"); return; }
     setRuns((p) => p.map((r) => r.id === id ? { ...r, status } : r));
   }
 
-  const totalMonthlyPayroll = staff.filter((s) => s.salary_type === "monthly").reduce((sum, s) => sum + s.salary_amount, 0);
-
   return (
-    <div className="flex-1 p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-bold text-[#0F172A]">Staff Payroll</h2>
-          {totalMonthlyPayroll > 0 && <p className="text-xs text-slate-400 mt-0.5">Monthly payroll: {fmt(totalMonthlyPayroll)}</p>}
+    <div className="flex-1 flex flex-col bg-[#f8faf9] overflow-hidden">
+
+      {/* Monthly summary card */}
+      {totalMonthlyPayroll > 0 && (
+        <div className="px-4 pt-3 pb-1 bg-[#fafefb] flex-shrink-0">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+            <div className="w-11 h-11 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+              <Wallet className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[12px] text-slate-400 font-medium">Monthly Payroll</p>
+              <p className="text-[22px] font-extrabold text-slate-900 leading-tight">{fmt(totalMonthlyPayroll)}</p>
+            </div>
+            <p className="text-[12px] text-slate-400">{staff.length} staff</p>
+          </div>
+        </div>
+      )}
+
+      {/* Tabs + actions bar */}
+      <div className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between flex-shrink-0">
+        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+          {([["staff", "Staff"], ["runs", "Runs"]] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={cn("px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-colors", tab === key ? "bg-white text-slate-900 shadow-sm" : "text-slate-500")}
+            >
+              {label}
+              {key === "runs" && runs.length > 0 && (
+                <span className="ml-1.5 text-[11px] text-slate-400">({runs.length})</span>
+              )}
+            </button>
+          ))}
         </div>
         <div className="flex items-center gap-2">
           {tab === "staff" && (
-            <button onClick={() => { setForm({ ...EMPTY_STAFF }); setEditingId(null); setShowAddStaff(true); }} className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
-              <Plus className="w-4 h-4" /> Add Staff
+            <button
+              onClick={() => { setForm({ ...EMPTY_STAFF }); setEditingId(null); setShowAddStaff(true); }}
+              className="h-11 flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            >
+              <Plus className="w-4 h-4" /> New
             </button>
           )}
           {staff.length > 0 && (
-            <button onClick={openRunModal} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
-              <Play className="w-4 h-4" /> Run Payroll
+            <button
+              onClick={openRunModal}
+              className="h-11 flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            >
+              <Play className="w-3.5 h-3.5" /> Run
             </button>
           )}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
-        {([["staff", "Staff Members"], ["runs", "Payroll Runs"]] as const).map(([key, label]) => (
-          <button key={key} onClick={() => setTab(key)} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition", tab === key ? "bg-white text-[#0F172A] shadow-sm" : "text-slate-500 hover:text-slate-700")}>
-            {label}
-            {key === "runs" && runs.length > 0 && <span className="ml-1.5 text-xs text-slate-400">({runs.length})</span>}
-          </button>
-        ))}
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+
+        {/* Staff tab */}
+        {tab === "staff" && (
+          staff.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 pt-16 text-center">
+              <div className="w-14 h-14 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm">
+                <Users className="w-6 h-6 text-slate-300" />
+              </div>
+              <p className="text-[14px] font-semibold text-slate-700">No staff members yet</p>
+              <p className="text-[13px] text-slate-400">Add staff to start running payroll</p>
+              <button
+                onClick={() => { setForm({ ...EMPTY_STAFF }); setShowAddStaff(true); }}
+                className="mt-1 px-5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+              >
+                Add Staff Member
+              </button>
+            </div>
+          ) : (
+            staff.map((s) => {
+              const initials = s.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+              return (
+                <div key={s.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="flex items-start gap-3 px-4 py-4">
+                    <div className={cn("w-11 h-11 rounded-full flex items-center justify-center text-[14px] font-bold flex-shrink-0", avatarColor(s.name))}>
+                      {initials}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-bold text-slate-900">{s.name}</p>
+                      {s.role && <p className="text-[12px] text-slate-500 mt-0.5">{s.role}</p>}
+                      <div className="flex items-baseline gap-1 mt-2">
+                        <span className="text-[16px] font-extrabold text-slate-900">{fmt(s.salary_amount)}</span>
+                        <span className="text-[12px] text-slate-400">{SALARY_LABELS[s.salary_type]}</span>
+                      </div>
+                      {(s.bank_name || s.account_number) && (
+                        <p className="text-[12px] text-slate-400 mt-1">
+                          {s.bank_name}{s.bank_name && s.account_number ? " · " : ""}{s.account_number}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex border-t border-slate-100">
+                    <button
+                      onClick={() => openEdit(s)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-slate-600 active:bg-slate-50 transition-colors border-r border-slate-100"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </button>
+                    <button
+                      onClick={() => removeStaff(s.id)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-red-500 active:bg-red-50 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Remove
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )
+        )}
+
+        {/* Runs tab */}
+        {tab === "runs" && (
+          runs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 pt-16 text-center">
+              <div className="w-14 h-14 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm">
+                <FileText className="w-6 h-6 text-slate-300" />
+              </div>
+              <p className="text-[14px] font-semibold text-slate-700">No payroll runs yet</p>
+              <p className="text-[13px] text-slate-400">Run payroll to create your first period</p>
+              {staff.length > 0 && (
+                <button
+                  onClick={openRunModal}
+                  className="mt-1 px-5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+                >
+                  Run Payroll
+                </button>
+              )}
+            </div>
+          ) : (
+            runs.map((run) => {
+              const cfg = STATUS_CONFIG[run.status];
+              const isOpen = expandedRun === run.id;
+              return (
+                <div key={run.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  {/* Header row */}
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-4 active:bg-slate-50 transition-colors text-left"
+                    onClick={() => setExpandedRun(isOpen ? null : run.id)}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-[14px] font-bold text-slate-900">{run.period_label}</p>
+                        <span className={cn("px-2 py-0.5 rounded-full text-[11px] font-semibold", cfg.pill)}>{cfg.label}</span>
+                      </div>
+                      <p className="text-[12px] text-slate-400 mt-0.5">{run.payroll_entries.length} staff · {run.period_start} → {run.period_end}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-[15px] font-extrabold text-slate-900">{fmt(run.total_net)}</p>
+                      <p className="text-[11px] text-slate-400">net pay</p>
+                    </div>
+                    <ChevronDown className={cn("w-4 h-4 text-slate-400 flex-shrink-0 transition-transform", isOpen && "rotate-180")} />
+                  </button>
+
+                  {/* Expanded entries */}
+                  {isOpen && (
+                    <>
+                      <div className="border-t border-slate-100 divide-y divide-slate-50">
+                        {run.payroll_entries.map((e) => (
+                          <div key={e.id} className="flex items-center px-4 py-3 gap-3">
+                            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0", avatarColor(e.staff_name))}>
+                              {e.staff_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
+                            </div>
+                            <p className="flex-1 text-[13px] font-medium text-slate-800 truncate">{e.staff_name}</p>
+                            <div className="text-right">
+                              <p className="text-[13px] font-bold text-slate-900">{fmt(e.net_pay)}</p>
+                              {e.deductions > 0 && <p className="text-[11px] text-red-400">−{fmt(e.deductions)}</p>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Status actions */}
+                      {run.status !== "paid" && (
+                        <div className="flex border-t border-slate-100">
+                          {run.status === "draft" && (
+                            <button
+                              onClick={() => updateRunStatus(run.id, "approved")}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-amber-700 active:bg-amber-50 transition-colors border-r border-slate-100"
+                            >
+                              <CheckCircle className="w-4 h-4" /> Approve
+                            </button>
+                          )}
+                          {run.status === "approved" && (
+                            <button
+                              onClick={() => updateRunStatus(run.id, "paid")}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-green-700 active:bg-green-50 transition-colors border-r border-slate-100"
+                            >
+                              <CheckCircle className="w-4 h-4" /> Mark as Paid
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })
+          )
+        )}
       </div>
 
-      {/* Staff tab */}
-      {tab === "staff" && (
-        staff.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center gap-3 text-center">
-            <Users className="w-10 h-10 text-slate-300" />
-            <p className="text-sm font-semibold text-[#0F172A]">No staff members yet</p>
-            <p className="text-xs text-slate-400">Add staff to start running payroll</p>
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide bg-slate-50">
-                  <th className="text-left px-5 py-3">Name / Role</th>
-                  <th className="text-left px-5 py-3">Salary</th>
-                  <th className="text-left px-5 py-3">Bank</th>
-                  <th className="text-left px-5 py-3">Joined</th>
-                  <th className="px-5 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {staff.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50 transition group">
-                    <td className="px-5 py-3">
-                      <p className="text-sm font-medium text-[#0F172A]">{s.name}</p>
-                      {s.role && <p className="text-xs text-slate-400">{s.role}</p>}
-                    </td>
-                    <td className="px-5 py-3">
-                      <p className="text-sm font-bold text-[#0F172A]">{fmt(s.salary_amount)}</p>
-                      <p className="text-xs text-slate-400">{SALARY_LABELS[s.salary_type]}</p>
-                    </td>
-                    <td className="px-5 py-3 text-xs text-slate-500">
-                      {s.bank_name ? <><p>{s.bank_name}</p>{s.account_number && <p className="font-mono">{s.account_number}</p>}</> : <span className="text-slate-300">—</span>}
-                    </td>
-                    <td className="px-5 py-3 text-xs text-slate-500">{s.joined_at}</td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition justify-end">
-                        <button onClick={() => openEdit(s)} className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition"><Pencil className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => removeStaff(s.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"><Trash2 className="w-3.5 h-3.5" /></button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      )}
-
-      {/* Runs tab */}
-      {tab === "runs" && (
-        runs.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center gap-3 text-center">
-            <FileText className="w-10 h-10 text-slate-300" />
-            <p className="text-sm font-semibold text-[#0F172A]">No payroll runs yet</p>
-            <p className="text-xs text-slate-400">Click "Run Payroll" to create your first payroll period</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {runs.map((run) => (
-              <div key={run.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-slate-50 transition" onClick={() => setExpandedRun(expandedRun === run.id ? null : run.id)}>
-                  <div className="flex items-center gap-3">
-                    {expandedRun === run.id ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-                    <div>
-                      <p className="text-sm font-semibold text-[#0F172A]">{run.period_label}</p>
-                      <p className="text-xs text-slate-400">{run.period_start} → {run.period_end} · {run.payroll_entries.length} staff</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-semibold capitalize", STATUS_STYLES[run.status])}>{run.status}</span>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-[#0F172A]">{fmt(run.total_net)}</p>
-                      <p className="text-xs text-slate-400">Net · Gross {fmt(run.total_gross)}</p>
-                    </div>
-                    {run.status === "draft" && (
-                      <button onClick={(e) => { e.stopPropagation(); updateRunStatus(run.id, "approved"); }} className="flex items-center gap-1 px-2.5 py-1 text-xs text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-50 transition">
-                        <CheckCircle className="w-3 h-3" /> Approve
-                      </button>
-                    )}
-                    {run.status === "approved" && (
-                      <button onClick={(e) => { e.stopPropagation(); updateRunStatus(run.id, "paid"); }} className="flex items-center gap-1 px-2.5 py-1 text-xs text-green-700 border border-green-200 rounded-lg hover:bg-green-50 transition">
-                        <CheckCircle className="w-3 h-3" /> Mark Paid
-                      </button>
-                    )}
-                  </div>
-                </div>
-                {expandedRun === run.id && (
-                  <div className="border-t border-slate-100">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                          <th className="text-left px-5 py-2">Staff</th>
-                          <th className="text-right px-5 py-2">Gross</th>
-                          <th className="text-right px-5 py-2">Deductions</th>
-                          <th className="text-right px-5 py-2">Net</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50">
-                        {run.payroll_entries.map((e) => (
-                          <tr key={e.id} className="hover:bg-slate-50">
-                            <td className="px-5 py-2 text-sm text-[#0F172A]">{e.staff_name}</td>
-                            <td className="px-5 py-2 text-right text-sm text-slate-600">{fmt(e.gross_pay)}</td>
-                            <td className="px-5 py-2 text-right text-sm text-red-500">{e.deductions > 0 ? `−${fmt(e.deductions)}` : "—"}</td>
-                            <td className="px-5 py-2 text-right text-sm font-bold text-[#0F172A]">{fmt(e.net_pay)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )
-      )}
-
-      {/* Add/Edit Staff modal */}
+      {/* Add/Edit Staff bottom sheet */}
       {showAddStaff && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">{editingId ? "Edit Staff Member" : "Add Staff Member"}</h3>
-              <button onClick={() => setShowAddStaff(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"><X className="w-4 h-4" /></button>
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={() => setShowAddStaff(false)}>
+          <div className="w-full bg-white rounded-t-2xl px-5 pt-5 pb-10 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-bold text-slate-900">{editingId ? "Edit Staff" : "Add Staff Member"}</h3>
+              <button onClick={() => setShowAddStaff(false)} className="p-1.5 rounded-xl text-slate-400 active:bg-slate-100 transition-colors"><X className="w-5 h-5" /></button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
-                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Full name" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Name *</label>
+                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Full name" className={INPUT} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Role / Position</label>
-                  <input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="e.g. Cashier" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Role</label>
+                  <input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="e.g. Cashier" className={INPUT} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
-                  <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="staff@email.com" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Phone</label>
+                  <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+234..." className={INPUT} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Phone</label>
-                  <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+234 800 000 0000" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Email</label>
+                  <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="staff@email.com" className={INPUT} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Salary Amount</label>
-                  <input type="number" min="0" value={form.salary_amount} onChange={(e) => setForm({ ...form, salary_amount: parseFloat(e.target.value) || 0 })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Salary Amount</label>
+                  <input type="number" min="0" value={form.salary_amount} onChange={(e) => setForm({ ...form, salary_amount: parseFloat(e.target.value) || 0 })} className={INPUT} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Salary Type</label>
-                  <select value={form.salary_type} onChange={(e) => setForm({ ...form, salary_type: e.target.value as StaffMember["salary_type"] })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    {Object.entries(SALARY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                  <label className={LABEL}>Salary Type</label>
+                  <select value={form.salary_type} onChange={(e) => setForm({ ...form, salary_type: e.target.value as StaffMember["salary_type"] })} className={INPUT}>
+                    <option value="monthly">Monthly</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="daily">Daily</option>
+                    <option value="hourly">Hourly</option>
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Bank Name</label>
-                  <input value={form.bank_name} onChange={(e) => setForm({ ...form, bank_name: e.target.value })} placeholder="e.g. Zenith Bank" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Bank Name</label>
+                  <input value={form.bank_name} onChange={(e) => setForm({ ...form, bank_name: e.target.value })} placeholder="e.g. Zenith Bank" className={INPUT} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Account Number</label>
-                  <input value={form.account_number} onChange={(e) => setForm({ ...form, account_number: e.target.value })} placeholder="0123456789" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Account Number</label>
+                  <input value={form.account_number} onChange={(e) => setForm({ ...form, account_number: e.target.value })} placeholder="0123456789" className={INPUT} />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Date Joined</label>
-                <input type="date" value={form.joined_at} onChange={(e) => setForm({ ...form, joined_at: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <label className={LABEL}>Date Joined</label>
+                <input type="date" value={form.joined_at} onChange={(e) => setForm({ ...form, joined_at: e.target.value })} className={INPUT} />
               </div>
             </div>
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowAddStaff(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={saveStaff} disabled={saving || !form.name.trim()} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowAddStaff(false)} className="flex-1 py-3.5 border border-slate-200 text-slate-600 rounded-xl text-[14px] font-semibold active:bg-slate-50 transition-colors">Cancel</button>
+              <button onClick={saveStaff} disabled={saving || !form.name.trim()} className="flex-1 py-3.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50">
                 {saving ? "Saving..." : editingId ? "Update" : "Add Staff"}
               </button>
             </div>
@@ -351,75 +424,75 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
         </div>
       )}
 
-      {/* Run Payroll modal */}
+      {/* Run Payroll bottom sheet */}
       {showRunModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">Run Payroll</h3>
-              <button onClick={() => setShowRunModal(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"><X className="w-4 h-4" /></button>
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={() => setShowRunModal(false)}>
+          <div className="w-full bg-white rounded-t-2xl px-5 pt-5 pb-10 max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-bold text-slate-900">Run Payroll</h3>
+              <button onClick={() => setShowRunModal(false)} className="p-1.5 rounded-xl text-slate-400 active:bg-slate-100 transition-colors"><X className="w-5 h-5" /></button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Period Label *</label>
-                <input value={runForm.period_label} onChange={(e) => setRunForm({ ...runForm, period_label: e.target.value })} placeholder="e.g. August 2026" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <label className={LABEL}>Period Label *</label>
+                <input value={runForm.period_label} onChange={(e) => setRunForm({ ...runForm, period_label: e.target.value })} placeholder="e.g. September 2026" className={INPUT} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Period Start</label>
-                  <input type="date" value={runForm.period_start} onChange={(e) => setRunForm({ ...runForm, period_start: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>Start Date</label>
+                  <input type="date" value={runForm.period_start} onChange={(e) => setRunForm({ ...runForm, period_start: e.target.value })} className={INPUT} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Period End</label>
-                  <input type="date" value={runForm.period_end} onChange={(e) => setRunForm({ ...runForm, period_end: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <label className={LABEL}>End Date</label>
+                  <input type="date" value={runForm.period_end} onChange={(e) => setRunForm({ ...runForm, period_end: e.target.value })} className={INPUT} />
                 </div>
               </div>
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                      <th className="text-left px-4 py-2">Staff</th>
-                      <th className="text-right px-4 py-2">Gross Pay</th>
-                      <th className="text-right px-4 py-2">Deductions</th>
-                      <th className="text-right px-4 py-2">Net</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {runEntries.map((e, i) => {
-                      const net = (parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0);
-                      return (
-                        <tr key={e.staffId}>
-                          <td className="px-4 py-2 text-sm text-[#0F172A]">{e.name}</td>
-                          <td className="px-2 py-1">
-                            <input type="number" min="0" value={e.gross} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, gross: ev.target.value } : r))} className="w-24 px-2 py-1 border border-slate-200 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-green-500" />
-                          </td>
-                          <td className="px-2 py-1">
-                            <input type="number" min="0" value={e.deductions} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, deductions: ev.target.value } : r))} className="w-20 px-2 py-1 border border-slate-200 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-green-500" />
-                          </td>
-                          <td className="px-4 py-2 text-right text-sm font-bold text-[#0F172A]">{fmt(net)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-slate-50 font-bold text-sm">
-                      <td className="px-4 py-2 text-slate-600">Total</td>
-                      <td className="px-4 py-2 text-right">{fmt(runEntries.reduce((s, e) => s + (parseFloat(e.gross) || 0), 0))}</td>
-                      <td className="px-4 py-2 text-right text-red-500">{fmt(runEntries.reduce((s, e) => s + (parseFloat(e.deductions) || 0), 0))}</td>
-                      <td className="px-4 py-2 text-right text-green-600">{fmt(runEntries.reduce((s, e) => s + ((parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0)), 0))}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
+
+              {/* Staff entries */}
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
-                <textarea value={runForm.notes} onChange={(e) => setRunForm({ ...runForm, notes: e.target.value })} rows={2} placeholder="Optional notes..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+                <label className={LABEL}>Staff Pay</label>
+                <div className="space-y-3">
+                  {runEntries.map((e, i) => {
+                    const net = (parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0);
+                    return (
+                      <div key={e.staffId} className="bg-slate-50 rounded-xl px-4 py-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[13px] font-semibold text-slate-800">{e.name}</p>
+                          <p className="text-[13px] font-bold text-green-700">{fmt(net)} net</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <p className="text-[11px] text-slate-400 mb-1">Gross Pay</p>
+                            <input type="number" min="0" value={e.gross} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, gross: ev.target.value } : r))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-slate-400 mb-1">Deductions</p>
+                            <input type="number" min="0" value={e.deductions} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, deductions: ev.target.value } : r))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Totals summary */}
+              <div className="bg-green-50 rounded-xl px-4 py-3 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-green-800">Total Net Pay</p>
+                <p className="text-[16px] font-extrabold text-green-700">
+                  {fmt(runEntries.reduce((s, e) => s + ((parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0)), 0))}
+                </p>
+              </div>
+
+              <div>
+                <label className={LABEL}>Notes</label>
+                <textarea value={runForm.notes} onChange={(e) => setRunForm({ ...runForm, notes: e.target.value })} rows={2} placeholder="Optional notes..." className={cn(INPUT, "resize-none")} />
               </div>
             </div>
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowRunModal(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={createRun} disabled={saving || !runForm.period_label.trim()} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
-                {saving ? "Creating..." : "Create Payroll Run"}
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowRunModal(false)} className="flex-1 py-3.5 border border-slate-200 text-slate-600 rounded-xl text-[14px] font-semibold active:bg-slate-50 transition-colors">Cancel</button>
+              <button onClick={createRun} disabled={saving || !runForm.period_label.trim()} className="flex-1 py-3.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50">
+                {saving ? "Creating..." : "Create Run"}
               </button>
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
 
@@ -218,10 +219,10 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
         setCart([]);
         setBundleCart([]);
       } else {
-        alert(data.error ?? "Something went wrong. Please try again.");
+        toast.error(data.error ?? "Something went wrong. Please try again.");
       }
     } catch {
-      alert("Network error. Please check your connection and try again.");
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setProcessing(false);
     }

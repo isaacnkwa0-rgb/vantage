@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const jakarta = Outfit({
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${jakarta.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         {children}
+        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   );

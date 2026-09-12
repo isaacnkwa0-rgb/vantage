@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Customer {
   id: string;
@@ -148,7 +149,8 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
     let invoiceId = editingInvoice?.id;
 
     if (isEdit && invoiceId) {
-      await supabase.from("invoices").update(payload).eq("id", invoiceId);
+      const { error: updErr } = await supabase.from("invoices").update(payload).eq("id", invoiceId);
+      if (updErr) { setError(updErr.message); setSaving(false); return; }
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
     } else {
       const { data: numData } = await supabase
@@ -171,15 +173,18 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
     }
 
     const validItems = items.filter((i) => i.description.trim());
-    await supabase.from("invoice_items").insert(
-      validItems.map((i) => ({
-        invoice_id: invoiceId,
-        description: i.description,
-        quantity: i.quantity,
-        unit_price: i.unit_price,
-        line_total: i.quantity * i.unit_price,
-      }))
-    );
+    if (validItems.length > 0) {
+      const { error: itemErr } = await supabase.from("invoice_items").insert(
+        validItems.map((i) => ({
+          invoice_id: invoiceId,
+          description: i.description,
+          quantity: i.quantity,
+          unit_price: i.unit_price,
+          line_total: i.quantity * i.unit_price,
+        }))
+      );
+      if (itemErr) toast.error("Invoice saved but line items may not have saved");
+    }
 
     if (saveStatus === "sent" && clientEmail && invoiceId) {
       await fetch("/api/invoices/send", {

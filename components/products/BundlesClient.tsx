@@ -5,6 +5,8 @@ import { Plus, Package, Trash2, Pencil, Loader2, ToggleLeft, ToggleRight, X, Sea
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils/currency";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface Product {
   id: string;
@@ -79,6 +81,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId]   = useState<string | null>(null);
 
   const filtered = bundles.filter((b) =>
     b.name.toLowerCase().includes(search.toLowerCase())
@@ -177,16 +180,28 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
     setTogglingId(null);
   }
 
-  async function deleteBundle(id: string) {
-    if (!confirm("Delete this bundle? This cannot be undone.")) return;
-    setDeletingId(id);
+  async function deleteBundle() {
+    if (!confirmId) return;
+    setDeletingId(confirmId);
     const supabase = createClient();
-    await supabase.from("product_bundles").delete().eq("id", id);
-    setBundles((prev) => prev.filter((b) => b.id !== id));
+    const { error } = await supabase.from("product_bundles").delete().eq("id", confirmId);
     setDeletingId(null);
+    setConfirmId(null);
+    if (error) { toast.error("Failed to delete bundle"); return; }
+    setBundles((prev) => prev.filter((b) => b.id !== confirmId));
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={!!confirmId}
+      title="Delete bundle?"
+      message="This bundle will be permanently deleted. This cannot be undone."
+      confirmLabel="Delete"
+      loading={!!deletingId}
+      onConfirm={deleteBundle}
+      onCancel={() => setConfirmId(null)}
+    />
     <div className="flex-1 flex flex-col min-h-0 bg-white overflow-x-hidden">
 
       {/* Search + New */}
@@ -421,7 +436,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                       {b.is_active ? "Deactivate" : "Activate"}
                     </button>
                     <button
-                      onClick={() => deleteBundle(b.id)}
+                      onClick={() => setConfirmId(b.id)}
                       disabled={deletingId === b.id}
                       className="ml-auto flex items-center gap-1.5 text-[12px] font-semibold text-red-500 px-3 py-1.5 rounded-[8px] transition active:bg-red-50 disabled:opacity-50"
                     >
@@ -437,5 +452,6 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
       </div>
 
     </div>
+    </>
   );
 }

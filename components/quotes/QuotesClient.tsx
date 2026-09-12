@@ -6,6 +6,7 @@ import {
   X, Loader2, ArrowRightLeft, Send,
   SlidersHorizontal, Check,
 } from "lucide-react";
+import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -120,8 +121,9 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
   async function updateStatus(q: Quote, status: string) {
     setUpdatingStatus(q.id + status);
     const supabase = createClient();
-    await supabase.from("quotes").update({ status }).eq("id", q.id);
+    const { error } = await supabase.from("quotes").update({ status }).eq("id", q.id);
     setUpdatingStatus(null);
+    if (error) { toast.error("Failed to update quote status"); return; }
     router.refresh();
   }
 
@@ -160,7 +162,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
       .select("id")
       .single();
 
-    if (invErr || !inv) { setConverting(null); return; }
+    if (invErr || !inv) { setConverting(null); toast.error("Failed to convert quote to invoice"); return; }
 
     if (items && items.length > 0) {
       await supabase.from("invoice_items").insert(

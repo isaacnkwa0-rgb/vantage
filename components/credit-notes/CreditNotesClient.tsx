@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Plus, FileX, Search, X, Check, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface CreditNote {
   id: string;
@@ -110,7 +111,8 @@ export function CreditNotesClient({ creditNotes: initialNotes, customers, invoic
   }
 
   async function updateStatus(id: string, status: CreditNote["status"]) {
-    await supabase.from("credit_notes").update({ status }).eq("id", id);
+    const { error } = await supabase.from("credit_notes").update({ status }).eq("id", id);
+    if (error) { toast.error("Failed to update status"); return; }
     setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, status } : n)));
   }
 

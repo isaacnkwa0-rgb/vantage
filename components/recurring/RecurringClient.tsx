@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
-import { Plus, RefreshCw, Pause, Play, Trash2, X } from "lucide-react";
+import { Plus, RefreshCw, Pause, Play, Trash2, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Schedule {
   id: string;
@@ -84,18 +85,20 @@ export function RecurringClient({ schedules: initial, customers, currency, busin
 
   async function toggleStatus(id: string, current: string) {
     const status = current === "active" ? "paused" : "active";
-    await supabase.from("recurring_invoices").update({ status }).eq("id", id);
+    const { error } = await supabase.from("recurring_invoices").update({ status }).eq("id", id);
+    if (error) { toast.error("Failed to update schedule"); return; }
     setSchedules((p) => p.map((s) => (s.id === id ? { ...s, status: status as Schedule["status"] } : s)));
   }
 
   async function cancel(id: string) {
-    await supabase.from("recurring_invoices").update({ status: "cancelled" }).eq("id", id);
+    const { error } = await supabase.from("recurring_invoices").update({ status: "cancelled" }).eq("id", id);
+    if (error) { toast.error("Failed to cancel schedule"); return; }
     setSchedules((p) => p.map((s) => (s.id === id ? { ...s, status: "cancelled" } : s)));
   }
 
   async function issueNow(schedule: Schedule) {
-    const today = new Date().toISOString().split("T")[0];
-    await supabase.from("recurring_invoices").update({ last_issued_at: new Date().toISOString(), next_issue_date: advanceDate(schedule.next_issue_date, schedule.frequency) }).eq("id", schedule.id);
+    const { error } = await supabase.from("recurring_invoices").update({ last_issued_at: new Date().toISOString(), next_issue_date: advanceDate(schedule.next_issue_date, schedule.frequency) }).eq("id", schedule.id);
+    if (error) { toast.error("Failed to issue invoice"); return; }
     setSchedules((p) => p.map((s) => s.id === schedule.id ? { ...s, last_issued_at: new Date().toISOString() } : s));
   }
 

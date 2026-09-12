@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Gift, Plus, Search, Copy, CheckCheck, X, Loader2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface GiftCard {
   id: string;
@@ -79,6 +81,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
   const [copiedId, setCopiedId]   = useState<string | null>(null);
   const [saving, setSaving]       = useState(false);
   const [voidingId, setVoidingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     code:           generateCode(),
@@ -133,13 +136,15 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
     setSaving(false);
   }
 
-  async function voidCard(id: string) {
-    if (!confirm("Void this gift card? It can no longer be used.")) return;
-    setVoidingId(id);
+  async function voidCard() {
+    if (!confirmId) return;
+    setVoidingId(confirmId);
     const supabase = createClient();
-    await supabase.from("gift_cards").update({ status: "voided" }).eq("id", id);
-    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, status: "voided" as const } : c)));
+    const { error } = await supabase.from("gift_cards").update({ status: "voided" }).eq("id", confirmId);
     setVoidingId(null);
+    setConfirmId(null);
+    if (error) { toast.error("Failed to void gift card"); return; }
+    setCards((prev) => prev.map((c) => (c.id === confirmId ? { ...c, status: "voided" as const } : c)));
   }
 
   const activeCards   = cards.filter((c) => c.status === "active");
@@ -147,6 +152,16 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
   const redeemedCount = cards.filter((c) => c.status === "redeemed").length;
 
   return (
+    <>
+    <ConfirmDialog
+      open={!!confirmId}
+      title="Void gift card?"
+      message="This gift card will be voided and can no longer be used by the recipient."
+      confirmLabel="Void Card"
+      loading={!!voidingId}
+      onConfirm={voidCard}
+      onCancel={() => setConfirmId(null)}
+    />
     <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
 
       {/* Search + New */}
@@ -361,7 +376,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
                     </button>
                     {card.status === "active" && (
                       <button
-                        onClick={() => voidCard(card.id)}
+                        onClick={() => setConfirmId(card.id)}
                         disabled={isVoiding}
                         className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
                       >
@@ -377,5 +392,6 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
         </>
       )}
     </div>
+    </>
   );
 }

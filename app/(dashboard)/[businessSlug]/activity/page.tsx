@@ -16,7 +16,7 @@ export default async function ActivityPage({ params }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id")
+    .select("id, currency")
     .eq("slug", businessSlug)
     .single();
   if (!business) redirect("/onboarding");
@@ -30,8 +30,8 @@ export default async function ActivityPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Activity Log" />
-      <ActivityClient logs={(logs ?? []) as any} />
+      <TopBar title="Activity Log" bg="bg-[#fafefb]" border={false} centered />
+      <ActivityClient logs={(logs ?? []) as any} currency={business.currency} />
     </div>
   );
 }

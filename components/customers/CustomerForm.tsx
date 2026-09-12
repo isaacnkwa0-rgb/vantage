@@ -7,6 +7,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { logAudit } from "@/lib/utils/audit";
 import { X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -74,12 +75,13 @@ async function onSubmit(data: FormData) {
     }
 
     // Sync tag assignments: delete existing, insert selected
-    await supabase.from("customer_tag_assignments").delete().eq("customer_id", customerId);
-    if (selectedTagIds.length > 0) {
+    const { error: tagErr } = await supabase.from("customer_tag_assignments").delete().eq("customer_id", customerId);
+    if (!tagErr && selectedTagIds.length > 0) {
       await supabase.from("customer_tag_assignments").insert(
         selectedTagIds.map((tag_id) => ({ customer_id: customerId, tag_id }))
       );
     }
+    if (tagErr) toast.error("Tags may not have saved — please re-check");
 
     onClose();
   }

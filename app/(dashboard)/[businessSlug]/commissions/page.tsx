@@ -48,7 +48,7 @@ export default async function CommissionsPage({ params, searchParams }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Staff Commissions" />
+      <TopBar title="Staff Commissions" bg="bg-[#fafefb]" border={false} centered />
       <CommissionsClient
         members={(membersRes.data ?? []) as any}
         rules={(rulesRes.data ?? []) as any}

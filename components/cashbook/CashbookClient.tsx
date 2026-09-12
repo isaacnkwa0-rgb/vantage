@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Plus, ArrowUpCircle, ArrowDownCircle, Trash2, BookOpen, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Entry {
   id: string;
@@ -87,9 +88,10 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
 
   async function deleteEntry(id: string) {
     setDeletingId(id);
-    await supabase.from("cashbook_entries").delete().eq("id", id);
-    setEntries((prev) => prev.filter((e) => e.id !== id));
+    const { error } = await supabase.from("cashbook_entries").delete().eq("id", id);
     setDeletingId(null);
+    if (error) { toast.error("Failed to delete entry"); return; }
+    setEntries((prev) => prev.filter((e) => e.id !== id));
   }
 
   function exportCSV() {
@@ -125,8 +127,8 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
           <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">
             <Download className="w-4 h-4" /> Export
           </button>
-          <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
-            <Plus className="w-4 h-4" /> Add Entry
+          <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-2 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95">
+            <Plus className="w-4 h-4" /> New Entry
           </button>
         </div>
       </div>

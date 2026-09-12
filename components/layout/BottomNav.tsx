@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Home, ShoppingCart, Box, Package, Package2, Users, CircleEllipsis, Crown, Award,
   LayoutDashboard, ClipboardList,
-  Vault, ActivitySquare, Megaphone, BadgePercent, Receipt,
+  ActivitySquare, Megaphone, Receipt,
   BarChart3, TrendingUp, Settings, FileText, FilePen, Ticket, Target, Truck,
   CalendarDays, Globe, Gift, Share2,
   RefreshCw, Barcode, Thermometer, BellRing, Landmark, Wallet,
@@ -81,15 +81,13 @@ const NAV_SECTIONS: NavSection[] = [
     label: "INSIGHTS",
     items: [
       { label: "Reports", icon: BarChart3, href: "reports" },
-      { label: "Targets", icon: Target, href: "targets" },
-      { label: "Commissions", icon: BadgePercent, href: "commissions" },
+      { label: "Milestones & Targets", icon: Target, href: "targets" },
     ],
   },
   {
     id: "operations",
     label: "OPERATIONS",
     items: [
-      { label: "Cash Shifts", icon: Vault, href: "shifts" },
       { label: "Appointments", icon: CalendarDays, href: "appointments" },
       { label: "Payroll", icon: Wallet, href: "payroll" },
     ],
@@ -329,12 +327,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                     />
 
                     {/* Label */}
-                    <span
-                      className={cn(
-                        "flex-1 text-[14px] font-medium",
-                        isActive ? "text-green-700" : "text-slate-700"
-                      )}
-                    >
+                    <span className="flex-1 text-[14px] font-medium text-slate-700">
                       {label}
                     </span>
 

@@ -45,7 +45,7 @@ export default async function ProductsPage({ params }: Props) {
   return (
     <div className="flex flex-col flex-1 overflow-auto">
       <div className="hidden lg:block">
-        <TopBar title={isService ? "Services" : "Products"} />
+        <TopBar title={isService ? "Services" : "Products"} bg="bg-[#fafefb]" border={false} centered />
       </div>
       <ProductsClient
         products={(products ?? []) as any}

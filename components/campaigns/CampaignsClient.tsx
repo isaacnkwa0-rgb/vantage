@@ -8,6 +8,8 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface Tag { id: string; name: string; color: string; }
 
@@ -99,6 +101,8 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
   const [sending, setSending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sendResult, setSendResult] = useState<{ sent: number; failed: number } | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filtered = campaigns.filter((c) =>
     c.channel === channelTab &&
@@ -153,16 +157,30 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
     router.refresh();
   }
 
-  async function deleteCampaign(id: string) {
-    if (!confirm("Delete this campaign?")) return;
+  async function deleteCampaign() {
+    if (!confirmId) return;
+    setDeleting(true);
     const supabase = createClient();
-    await supabase.from("campaigns").delete().eq("id", id);
-    setCampaigns((prev) => prev.filter((c) => c.id !== id));
+    const { error } = await supabase.from("campaigns").delete().eq("id", confirmId);
+    setDeleting(false);
+    setConfirmId(null);
+    if (error) { toast.error("Failed to delete campaign"); return; }
+    setCampaigns((prev) => prev.filter((c) => c.id !== confirmId));
   }
 
   const reach = channelTab === "email" ? emailReachCount : phoneReachCount;
 
   return (
+    <>
+    <ConfirmDialog
+      open={!!confirmId}
+      title="Delete campaign?"
+      message="This campaign will be permanently deleted and cannot be recovered."
+      confirmLabel="Delete"
+      loading={deleting}
+      onConfirm={deleteCampaign}
+      onCancel={() => setConfirmId(null)}
+    />
     <div className="flex-1 flex flex-col min-h-0 bg-white overflow-x-hidden">
 
       {/* Channel tabs */}
@@ -430,7 +448,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
                           )}
                           {campaign.status !== "sending" && (
                             <button
-                              onClick={() => deleteCampaign(campaign.id)}
+                              onClick={() => setConfirmId(campaign.id)}
                               className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 px-3 py-1.5 rounded-lg transition active:bg-red-50"
                             >
                               <Trash2 className="w-3 h-3" />
@@ -448,6 +466,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
         </>
       )}
     </div>
+    </>
   );
 }
 

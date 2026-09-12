@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { X, Printer, Share2, CheckCircle2, MessageCircle, Eye } from "lucide-react";
 import { generateReceiptHTML } from "@/lib/utils/receipt";
 import { formatCurrency } from "@/lib/utils/currency";
+import { toast } from "sonner";
 
 interface Props {
   sale: {
@@ -76,7 +77,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
       await navigator.share({ title: `Receipt ${sale.sale_number}`, text });
     } else {
       await navigator.clipboard.writeText(text);
-      alert("Receipt copied to clipboard!");
+      toast.success("Receipt copied to clipboard");
     }
   }
 

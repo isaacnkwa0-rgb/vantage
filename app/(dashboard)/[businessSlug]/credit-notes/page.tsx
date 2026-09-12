@@ -43,7 +43,7 @@ export default async function CreditNotesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Credit Notes" />
+      <TopBar title="Credit Notes" bg="bg-[#fafefb]" border={false} centered />
       <CreditNotesClient
         creditNotes={(cnsRes.data ?? []) as any}
         customers={(customersRes.data ?? []) as any}

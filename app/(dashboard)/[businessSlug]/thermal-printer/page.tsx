@@ -30,7 +30,7 @@ export default async function ThermalPrinterPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Thermal Printer" />
+      <TopBar title="Thermal Printer" bg="bg-[#fafefb]" border={false} centered />
       <ThermalPrinterClient
         business={business as any}
         recentSales={(recentSales ?? []) as any}

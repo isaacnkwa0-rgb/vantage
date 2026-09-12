@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Search, Users, AlertCircle, Loader2, Tag, Phone, Mail, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils/currency";
 import { CustomerForm } from "./CustomerForm";
 import { createClient } from "@/lib/supabase/client";
@@ -114,11 +115,12 @@ export function CustomersClient({
     setRecordingPayment(true);
     const supabase = createClient();
     const newBalance = Math.max(0, (recordingPaymentFor.credit_balance ?? 0) - amount);
-    await supabase.from("customers").update({ credit_balance: newBalance }).eq("id", recordingPaymentFor.id);
+    const { error } = await supabase.from("customers").update({ credit_balance: newBalance }).eq("id", recordingPaymentFor.id);
+    setRecordingPayment(false);
+    if (error) { toast.error("Failed to record payment"); return; }
     setRecordingPaymentFor(null);
     setPaymentAmount("");
     setPaymentNote("");
-    setRecordingPayment(false);
     router.refresh();
   }
 

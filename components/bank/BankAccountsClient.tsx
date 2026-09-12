@@ -4,6 +4,8 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Plus, CreditCard, Star, Trash2, X, Loader2, Copy, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface BankAccount {
   id: string;
@@ -59,6 +61,7 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
   const [saving, setSaving]               = useState(false);
   const [deletingId, setDeletingId]       = useState<string | null>(null);
   const [copiedId, setCopiedId]           = useState<string | null>(null);
+  const [confirmId, setConfirmId]         = useState<string | null>(null);
 
   async function addAccount() {
     if (!form.account_name.trim() || !form.bank_name.trim()) return;
@@ -83,13 +86,15 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
     setAccounts((p) => p.map((a) => ({ ...a, is_primary: a.id === id })));
   }
 
-  async function deleteAccount(id: string) {
-    if (!confirm("Remove this account?")) return;
-    setDeletingId(id);
+  async function deleteAccount() {
+    if (!confirmId) return;
+    setDeletingId(confirmId);
     const supabase = createClient();
-    await supabase.from("bank_accounts").update({ is_active: false }).eq("id", id);
-    setAccounts((p) => p.filter((a) => a.id !== id));
+    const { error } = await supabase.from("bank_accounts").update({ is_active: false }).eq("id", confirmId);
     setDeletingId(null);
+    setConfirmId(null);
+    if (error) { toast.error("Failed to remove account"); return; }
+    setAccounts((p) => p.filter((a) => a.id !== confirmId));
   }
 
   function copyNumber(id: string, number: string) {
@@ -99,6 +104,16 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={!!confirmId}
+      title="Remove account?"
+      message="This payment account will be removed from your checkout options."
+      confirmLabel="Remove"
+      loading={!!deletingId}
+      onConfirm={deleteAccount}
+      onCancel={() => setConfirmId(null)}
+    />
     <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6 space-y-4">
 
       {/* Info banner */}
@@ -224,7 +239,7 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
                     </button>
                   )}
                   <button
-                    onClick={() => deleteAccount(account.id)}
+                    onClick={() => setConfirmId(account.id)}
                     disabled={deletingId === account.id}
                     className="flex items-center gap-1.5 text-[13px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
                   >
@@ -238,5 +253,6 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
         </>
       )}
     </div>
+    </>
   );
 }
