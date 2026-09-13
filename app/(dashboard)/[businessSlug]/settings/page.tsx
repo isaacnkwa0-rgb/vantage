@@ -45,7 +45,7 @@ export default async function SettingsPage({ params, searchParams }: Props) {
   }
 
   // Tab selected → back-arrow header + settings form
-  const [{ data: members }, { data: locations }, { data: categories }] = await Promise.all([
+  const [{ data: members }, { data: locations }, { data: categories }, { data: products }] = await Promise.all([
     supabase
       .from("business_members")
       .select("id, role, is_active, joined_at, location_id, profiles(id, full_name, email, avatar_url)")
@@ -61,6 +61,13 @@ export default async function SettingsPage({ params, searchParams }: Props) {
       .from("categories")
       .select("id, name, color")
       .eq("business_id", business.id)
+      .order("name"),
+    supabase
+      .from("products")
+      .select("id, name, image_url")
+      .eq("business_id", business.id)
+      .eq("is_active", true)
+      .not("image_url", "is", null)
       .order("name"),
   ]);
 
@@ -83,6 +90,7 @@ export default async function SettingsPage({ params, searchParams }: Props) {
         members={(members ?? []) as any}
         locations={(locations ?? []) as any}
         categories={(categories ?? []) as any}
+        products={(products ?? []) as any}
         currentUserId={user.id}
         userEmail={user.email ?? ""}
         hideNav

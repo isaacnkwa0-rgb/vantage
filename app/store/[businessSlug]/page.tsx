@@ -32,7 +32,7 @@ export default async function StorePage({ params, searchParams }: Props) {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, slug, description, logo_url, currency, phone, email, address, city, social_whatsapp, social_instagram, store_shipping_enabled, store_shipping_fee, store_free_shipping_above, store_delivery_note, fb_pixel_id, ga_measurement_id, invoice_accent_color, store_maintenance_mode")
+    .select("id, name, slug, description, logo_url, currency, phone, email, address, city, social_whatsapp, social_instagram, store_shipping_enabled, store_shipping_fee, store_free_shipping_above, store_delivery_note, fb_pixel_id, ga_measurement_id, invoice_accent_color, store_maintenance_mode, store_banner_url, store_welcome_text, store_all_items_image_url")
     .eq("slug", businessSlug)
     .eq("is_active", true)
     .single();
@@ -41,7 +41,7 @@ export default async function StorePage({ params, searchParams }: Props) {
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, description, image_url, selling_price, stock_quantity, track_inventory, category_id")
+    .select("id, name, description, image_url, selling_price, stock_quantity, track_inventory, category_id, sku")
     .eq("business_id", business.id)
     .eq("is_active", true)
     .gt("selling_price", 0)
@@ -108,6 +108,11 @@ export default async function StorePage({ params, searchParams }: Props) {
     );
   }
 
+  const productsWithImages = (products ?? []).filter(p => p.image_url);
+  const randomAllItemsImage = productsWithImages.length > 0
+    ? productsWithImages[Math.floor(Math.random() * productsWithImages.length)].image_url
+    : null;
+
   return (
     <>
       {/* Facebook Pixel */}
@@ -143,6 +148,7 @@ export default async function StorePage({ params, searchParams }: Props) {
         orderNumber={order}
         paymentStatus={status}
         bundles={(bundles ?? []) as any}
+        randomAllItemsImage={randomAllItemsImage}
       />
     </>
   );

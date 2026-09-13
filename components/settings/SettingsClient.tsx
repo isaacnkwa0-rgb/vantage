@@ -46,6 +46,9 @@ interface Business {
   fb_pixel_id: string | null;
   ga_measurement_id: string | null;
   custom_domain?: string | null;
+  store_banner_url?: string | null;
+  store_welcome_text?: string | null;
+  store_all_items_image_url?: string | null;
 }
 
 interface Member {
@@ -91,11 +94,18 @@ const PRESET_COLORS = [
   "#F97316", "#6366F1", "#14B8A6", "#64748B",
 ];
 
+interface Product {
+  id: string;
+  name: string;
+  image_url: string | null;
+}
+
 interface Props {
   business: Business;
   members: Member[];
   locations: Location[];
   categories: Category[];
+  products: Product[];
   currentUserId: string;
   userEmail: string;
   hideNav?: boolean;
@@ -114,7 +124,7 @@ type BizForm = z.infer<typeof bizSchema>;
 
 const CURRENCIES = ["NGN", "USD", "GHS", "KES", "ZAR", "GBP", "EUR", "XOF", "XAF"];
 
-export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, currentUserId, userEmail, hideNav }: Props) {
+export function SettingsClient({ business, members, locations: initialLocations, categories: initialCategories, products, currentUserId, userEmail, hideNav }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as any) ?? "business";
@@ -136,6 +146,10 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logo_url);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
+  const [bannerUrl, setBannerUrl] = useState<string | null>(business.store_banner_url ?? null);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [welcomeText, setWelcomeText] = useState(business.store_welcome_text ?? "");
+  const [allItemsImageUrl, setAllItemsImageUrl] = useState<string | null>(business.store_all_items_image_url ?? null);
   const [taxEnabled, setTaxEnabled] = useState(business.tax_enabled ?? false);
   const [taxRate, setTaxRate] = useState((business.tax_rate ?? 0).toString());
   const [taxName, setTaxName] = useState(business.tax_name ?? "VAT");
@@ -184,6 +198,22 @@ export function SettingsClient({ business, members, locations: initialLocations,
       currency: business.currency,
     },
   });
+
+  async function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBanner(true);
+    const supabase = createClient();
+    const ext = file.name.split(".").pop();
+    const path = `banners/${business.id}/${Date.now()}.${ext}`;
+    const { data, error } = await supabase.storage.from("product-images").upload(path, file, { upsert: true });
+    if (!error && data) {
+      const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+      setBannerUrl(urlData.publicUrl);
+      await supabase.from("businesses").update({ store_banner_url: urlData.publicUrl }).eq("id", business.id);
+    }
+    setUploadingBanner(false);
+  }
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -419,6 +449,9 @@ export function SettingsClient({ business, members, locations: initialLocations,
       store_delivery_note: deliveryNote.trim() || null,
       fb_pixel_id: fbPixelId.trim() || null,
       ga_measurement_id: gaMeasurementId.trim() || null,
+      store_banner_url: bannerUrl || null,
+      store_welcome_text: welcomeText.trim() || null,
+      store_all_items_image_url: allItemsImageUrl || null,
     }).eq("id", business.id);
     setSavingShipping(false);
   }
@@ -1124,6 +1157,103 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 <Share2 className="w-3.5 h-3.5" />
                 Share
               </button>
+            </div>
+          </div>
+
+          {/* ── Store Hero ── */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div>
+              <h3 className="font-semibold text-[#0F172A]">Store Hero</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Hero banner image and welcome text shown at the top of your storefront.</p>
+            </div>
+
+            {/* Banner image */}
+            <div>
+              <p className="text-xs font-medium text-slate-600 mb-2">Banner Image</p>
+              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center mb-2">
+                {bannerUrl ? (
+                  <Image src={bannerUrl} alt="Store banner" fill className="object-cover" sizes="600px" />
+                ) : (
+                  <p className="text-xs text-slate-400">No banner uploaded</p>
+                )}
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1a9c38] border border-[#1a9c38] px-3 py-1.5 rounded-lg hover:bg-green-50 transition">
+                {uploadingBanner ? "Uploading..." : bannerUrl ? "Change banner" : "Upload banner"}
+                <input type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} disabled={uploadingBanner} />
+              </label>
+              {bannerUrl && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setBannerUrl(null);
+                    const sb = createClient();
+                    await sb.from("businesses").update({ store_banner_url: null }).eq("id", business.id);
+                  }}
+                  className="ml-2 text-xs text-red-500 hover:underline"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            {/* Welcome text */}
+            <div>
+              <p className="text-xs font-medium text-slate-600 mb-1.5">Welcome Text</p>
+              <input
+                type="text"
+                value={welcomeText}
+                onChange={(e) => setWelcomeText(e.target.value)}
+                placeholder="e.g. Welcome to our store! 🎉"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">Shown as the headline on your store hero section.</p>
+            </div>
+
+            {/* All Items card image picker */}
+            <div>
+              <p className="text-xs font-medium text-slate-600 mb-1.5">All Items Card Image</p>
+              <p className="text-[11px] text-slate-400 mb-3">Pick a product image to display on the All Items card in your store.</p>
+              {products.filter(p => p.image_url).length === 0 ? (
+                <p className="text-xs text-slate-400 italic">No product images uploaded yet.</p>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  {products.filter(p => p.image_url).map(p => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={async () => {
+                        setAllItemsImageUrl(p.image_url);
+                        const sb = createClient();
+                        await sb.from("businesses").update({ store_all_items_image_url: p.image_url }).eq("id", business.id);
+                        toast.success("All Items image updated");
+                      }}
+                      className="relative aspect-square rounded-lg overflow-hidden border-2 transition"
+                      style={{ borderColor: allItemsImageUrl === p.image_url ? "#1a9c38" : "transparent" }}
+                      title={p.name}
+                    >
+                      <Image src={p.image_url!} alt={p.name} fill className="object-cover" sizes="80px" />
+                      {allItemsImageUrl === p.image_url && (
+                        <div className="absolute inset-0 bg-green-600/20 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-white drop-shadow" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {allItemsImageUrl && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setAllItemsImageUrl(null);
+                    const sb = createClient();
+                    await sb.from("businesses").update({ store_all_items_image_url: null }).eq("id", business.id);
+                  }}
+                  className="mt-2 text-xs text-red-500 hover:underline"
+                >
+                  Remove selection
+                </button>
+              )}
             </div>
           </div>
 
