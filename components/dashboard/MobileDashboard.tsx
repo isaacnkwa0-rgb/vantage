@@ -12,7 +12,7 @@ const PROMO_SLIDES = [
   {
     bg: "#1a9c38",
     title: "Record Sales Anywhere",
-    body: "Use the Vantage POS to record in-store and online sales with ease.",
+    body: "Use the Stokka POS to record in-store and online sales with ease.",
     cta: "Get started",
     href: "pos",
     emoji: "🛒",
@@ -661,7 +661,7 @@ export function MobileDashboard({
           <div className="px-4 pt-4 pb-3">
             <p className="text-[15px] font-bold text-slate-900 mb-0.5">Refer &amp; Earn</p>
             <p className="text-[12px] text-slate-400 leading-snug">
-              Help other business owners discover Vantage &amp; earn rewards!
+              Help other business owners discover Stokka &amp; earn rewards!
             </p>
           </div>
           <div className="px-4 pb-4 space-y-3">
@@ -669,7 +669,7 @@ export function MobileDashboard({
               href={`/${slug}/referrals`}
               className="w-full h-10 bg-[#1a9c38] rounded-[8px] flex items-center justify-center"
             >
-              <span className="text-[13px] font-bold text-white">Join the Vantage Referral Community</span>
+              <span className="text-[13px] font-bold text-white">Join the Stokka Referral Community</span>
             </Link>
             {referralCode && (
               <div className="flex items-center justify-between bg-slate-50 rounded-[8px] px-3 py-2.5">

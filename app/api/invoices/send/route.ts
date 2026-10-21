@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   );
 
   const { error: emailError } = await resend.emails.send({
-    from: process.env.INVITATION_FROM_EMAIL ?? "noreply@vantage.app",
+    from: process.env.INVITATION_FROM_EMAIL ?? "noreply@stokka.shop",
     to: invoice.client_email,
     subject: `Invoice ${invoice.invoice_number} from ${business.name}`,
     html,

@@ -86,7 +86,7 @@ export default function PricingPage() {
           <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-md shadow-green-200">
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <span className="text-lg font-extrabold tracking-tight text-green-700">VANTAGE</span>
+          <span className="text-lg font-extrabold tracking-tight text-green-700">Stokka</span>
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition">

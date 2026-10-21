@@ -36,7 +36,7 @@ function downloadTemplate() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "vantage-product-import-template.csv";
+  a.download = "stokka-product-import-template.csv";
   a.click();
   URL.revokeObjectURL(url);
 }

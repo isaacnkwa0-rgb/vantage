@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
   await svc.from("campaigns").update({ status: "sending" }).eq("id", campaignId);
 
-  const fromEmail = process.env.INVITATION_FROM_EMAIL ?? "noreply@vantage.app";
+  const fromEmail = process.env.INVITATION_FROM_EMAIL ?? "noreply@stokka.shop";
   const bizName = (campaign.businesses as any)?.name ?? "Your Business";
   let sent = 0;
   let failed = 0;
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
             <h2 style="color:#0f172a">${campaign.subject ?? `Message from ${bizName}`}</h2>
             <div style="white-space:pre-wrap;color:#374151;line-height:1.6">${campaign.message.replace(/\n/g, "<br>")}</div>
             <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-            <p style="color:#9ca3af;font-size:12px">This message was sent by ${bizName} via VANTAGE.</p>
+            <p style="color:#9ca3af;font-size:12px">This message was sent by ${bizName} via Stokka.</p>
           </div>`,
         })
       )

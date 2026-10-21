@@ -260,9 +260,9 @@ export function Sidebar({ slug }: { slug: string }) {
         >
           {/* Expanded: logo + name */}
           <div className={cn("flex items-center gap-2.5 min-w-0", sidebarCollapsed && "lg:hidden")}>
-            <Image src="/vantage-icon.svg" alt="VANTAGE" width={32} height={32} className="flex-shrink-0 rounded-lg" />
+            <Image src="/vantage-icon.svg" alt="Stokka" width={32} height={32} className="flex-shrink-0 rounded-lg" />
             <div className="min-w-0">
-              <p className="text-[13px] font-extrabold tracking-tight text-white leading-tight">VANTAGE</p>
+              <p className="text-[13px] font-extrabold tracking-tight text-white leading-tight">Stokka</p>
               <p className="text-[11px] text-slate-500 truncate leading-tight">
                 {activeBusiness?.name ?? "Loading..."}
               </p>
@@ -276,7 +276,7 @@ export function Sidebar({ slug }: { slug: string }) {
               aria-label="Expand sidebar"
               className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg hover:opacity-80 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0C1526]"
             >
-              <Image src="/vantage-icon.svg" alt="VANTAGE" width={36} height={36} className="rounded-lg" />
+              <Image src="/vantage-icon.svg" alt="Stokka" width={36} height={36} className="rounded-lg" />
             </button>
           )}
 

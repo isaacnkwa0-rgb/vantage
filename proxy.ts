@@ -4,18 +4,18 @@ import { updateSession } from "@/lib/supabase/middleware";
 const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/auth/callback", "/api/auth/callback", "/verify", "/invite", "/pricing", "/pay", "/portal", "/store", "/by-domain", "/api/store", "/api/instagram/callback"];
 const AUTH_PATHS = ["/login", "/register"];
 
-// Set STORE_DOMAIN to your platform domain, e.g. "getvantage.app"
-// Branded subdomains (zikkygadgets.getvantage.app) will then route automatically.
+// Set STORE_DOMAIN to your platform domain, e.g. "stokka.shop"
+// Branded subdomains (zikkygadgets.stokka.shop) will then route automatically.
 const STORE_DOMAIN = process.env.STORE_DOMAIN ?? "";
 
 // The main app hostname (used to distinguish custom domains from the app itself).
-// Set APP_HOSTNAME to e.g. "vantage-mu-ten.vercel.app" or your future app domain.
+// Set APP_HOSTNAME to e.g. "app.stokka.shop" or your Vercel deployment domain.
 const APP_HOSTNAME = process.env.APP_HOSTNAME ?? "";
 
 export async function proxy(request: NextRequest) {
   const hostname = request.headers.get("host") ?? "";
 
-  // ── Branded subdomain: zikkygadgets.getvantage.app ──────────────────────
+  // ── Branded subdomain: zikkygadgets.stokka.shop ─────────────────────────
   // When STORE_DOMAIN is configured, any subdomain of it serves that store.
   if (STORE_DOMAIN && hostname.endsWith(`.${STORE_DOMAIN}`)) {
     const slug = hostname.slice(0, hostname.length - STORE_DOMAIN.length - 1);

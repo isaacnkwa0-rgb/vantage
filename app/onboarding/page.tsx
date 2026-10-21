@@ -222,7 +222,7 @@ export default function OnboardingPage() {
                 placeholder="Store URL"
                 className="flex-1 min-w-0 px-4 h-full text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
               />
-              {storeUrl && <span className="pr-3 text-[14px] text-slate-400 select-none whitespace-nowrap shrink-0">.getvantage.app</span>}
+              {storeUrl && <span className="pr-3 text-[14px] text-slate-400 select-none whitespace-nowrap shrink-0">.stokka.shop</span>}
             </div>
           </div>
 

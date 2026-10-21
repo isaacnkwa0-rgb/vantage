@@ -1,6 +1,6 @@
 {
-  "name": "VANTAGE Business",
-  "short_name": "VANTAGE",
+  "name": "Stokka Business",
+  "short_name": "Stokka",
   "description": "The all-in-one business management platform",
   "start_url": "/",
   "display": "standalone",

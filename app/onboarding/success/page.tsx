@@ -167,7 +167,7 @@ function SuccessPage() {
         </h1>
 
         <p className="fade-up-2 text-slate-500 text-[14px] leading-relaxed mb-10">
-          Your 14-day free trial has started. Start managing your business smarter with Vantage.
+          Your 14-day free trial has started. Start managing your business smarter with Stokka.
         </p>
 
         <button

@@ -752,7 +752,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
 
           <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-100 pt-5">
             <p>© {new Date().getFullYear()} {business.name}. All rights reserved.</p>
-            <p>Powered by <span className="font-semibold" style={{ color: brand }}>VANTAGE</span></p>
+            <p>Powered by <span className="font-semibold" style={{ color: brand }}>Stokka</span></p>
           </div>
         </footer>
       </main>

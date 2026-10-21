@@ -125,7 +125,7 @@ function PlanPage() {
             Choose your Plan
           </h1>
           <p className="text-slate-500 text-[14px] mt-1.5 leading-relaxed">
-            Join thousands of businesses managing smarter with Vantage. Start free, upgrade anytime.
+            Join thousands of businesses managing smarter with Stokka. Start free, upgrade anytime.
           </p>
         </div>
 

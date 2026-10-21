@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   if (!campaignId) return NextResponse.json({ error: "Missing campaignId" }, { status: 400 });
 
   const termiiKey = process.env.TERMII_API_KEY;
-  const termiiSender = process.env.TERMII_SENDER_ID ?? "VANTAGE";
+  const termiiSender = process.env.TERMII_SENDER_ID ?? "STOKKA";
   if (!termiiKey) return NextResponse.json({ error: "SMS not configured — add TERMII_API_KEY to environment variables" }, { status: 503 });
 
   const svc = createServiceClient();

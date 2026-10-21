@@ -168,7 +168,7 @@ export default function LoginPage() {
         <Link href="/terms/merchant" className="text-[#1a9c38]">Merchant Terms of Use</Link>{" "}
         &amp;{" "}
         <Link href="/privacy" className="text-[#1a9c38]">General Privacy Policy</Link>{" "}
-        of Vantage
+        of Stokka
       </p>
     </div>
   );

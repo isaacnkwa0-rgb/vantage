@@ -80,7 +80,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
             <div className="w-7 h-7 bg-green-600 rounded-lg flex items-center justify-center shadow-md shadow-green-200">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <p className="text-lg font-extrabold tracking-tight text-green-700">VANTAGE</p>
+            <p className="text-lg font-extrabold tracking-tight text-green-700">Stokka</p>
           </div>
           <p className="text-sm text-slate-500">Secure payment powered by Paystack</p>
         </div>
@@ -200,7 +200,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
                 {loading ? "Redirecting to Paystack..." : `Pay ${fmt(amountDue)}`}
               </button>
               <p className="text-xs text-center text-slate-400">
-                Secured by Paystack · Your payment info is never stored by VANTAGE
+                Secured by Paystack · Your payment info is never stored by Stokka
               </p>
             </div>
           )}
@@ -215,7 +215,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
         </div>
 
         <p className="text-center text-xs text-slate-400">
-          Powered by <span className="font-semibold text-green-700">VANTAGE</span>
+          Powered by <span className="font-semibold text-green-700">Stokka</span>
         </p>
       </div>
     </div>

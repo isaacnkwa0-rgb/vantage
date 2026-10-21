@@ -199,7 +199,7 @@ export function BillingTab({ business, userEmail }: Props) {
         <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 text-sm text-slate-600 flex items-center justify-between gap-3">
           <p>Need to cancel or manage your subscription?</p>
           <a
-            href="mailto:support@vantage.app"
+            href="mailto:support@stokka.shop"
             className="flex items-center gap-1 text-green-600 font-semibold hover:underline whitespace-nowrap"
           >
             Contact support <ExternalLink className="w-3.5 h-3.5" />

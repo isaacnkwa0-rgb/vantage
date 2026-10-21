@@ -2,7 +2,7 @@ import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.getvantage.app",
-  appName: "VANTAGE",
+  appName: "Stokka",
   webDir: "out",
   server: {
     // Set CAPACITOR_SERVER_URL in your environment before running cap sync.

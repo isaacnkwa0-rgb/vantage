@@ -18,8 +18,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | VANTAGE",
-    default: "VANTAGE — Business Management",
+    template: "%s | Stokka",
+    default: "Stokka — Business Management",
   },
   description:
     "The all-in-one business management platform for modern businesses. POS, inventory, customers, expenses, and analytics in one place.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "VANTAGE",
+    title: "Stokka",
   },
 };
 

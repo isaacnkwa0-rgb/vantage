@@ -1116,7 +1116,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
             </p>
             <div className="flex items-center gap-2 bg-white border border-green-200 rounded-lg px-3 py-2 mb-3">
               <span className="flex-1 text-sm text-slate-700 truncate font-mono select-all">
-                {typeof window !== "undefined" ? window.location.origin : "https://vantage-mu-ten.vercel.app"}/store/{business.slug}
+                {typeof window !== "undefined" ? window.location.origin : "https://stokka.shop"}/store/{business.slug}
               </span>
             </div>
             <div className="flex gap-2">

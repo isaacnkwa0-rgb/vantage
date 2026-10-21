@@ -66,6 +66,6 @@ export const useOfflineStore = create<OfflineState>()(
           pendingSales: state.pendingSales.filter((s) => s.localId !== localId),
         })),
     }),
-    { name: "vantage-offline-queue" }
+    { name: "stokka-offline-queue" }
   )
 );

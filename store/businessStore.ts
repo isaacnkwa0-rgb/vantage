@@ -33,7 +33,7 @@ export const useBusinessStore = create<BusinessState>()(
         set({ activeBusiness: null, userRole: null, userBusinesses: [], selectedLocationId: null }),
     }),
     {
-      name: "vantage-business",
+      name: "stokka-business",
       partialize: (state) => ({
         activeBusiness: state.activeBusiness,
         userRole: state.userRole,

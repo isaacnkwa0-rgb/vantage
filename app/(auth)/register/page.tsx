@@ -316,7 +316,7 @@ function RegisterPageInner() {
           <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">
             Start doing business like a Pro today.
           </h2>
-          <p className="text-slate-400 text-[14px] mb-6">Manage your business smarter with Vantage</p>
+          <p className="text-slate-400 text-[14px] mb-6">Manage your business smarter with Stokka</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             {/* Name row */}
@@ -393,7 +393,7 @@ function RegisterPageInner() {
                 className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent appearance-none bg-white text-slate-400"
                 defaultValue=""
               >
-                <option value="" disabled>How did you hear about Vantage?</option>
+                <option value="" disabled>How did you hear about Stokka?</option>
                 {REFERRAL_OPTIONS.map((opt) => (
                   <option key={opt} value={opt} className="text-slate-800">{opt}</option>
                 ))}
@@ -410,7 +410,7 @@ function RegisterPageInner() {
                 className="mt-0.5 w-5 h-5 rounded accent-[#1a9c38] cursor-pointer flex-shrink-0"
               />
               <span className="text-[13px] text-slate-500 leading-snug">
-                I&apos;ll like to receive marketing communication and tips from Vantage
+                I&apos;ll like to receive marketing communication and tips from Stokka
               </span>
             </label>
 
@@ -429,7 +429,7 @@ function RegisterPageInner() {
 
           {/* Terms */}
           <p className="text-center text-[12px] text-slate-400 mt-5 leading-relaxed px-2">
-            By continuing, I agree to Vantage&apos;s{" "}
+            By continuing, I agree to Stokka&apos;s{" "}
             <Link href="/terms" className="text-[#1a9c38]">Terms of Use</Link>
             {" "}&amp;{" "}
             <Link href="/privacy" className="text-[#1a9c38]">Privacy Policy</Link>
@@ -460,7 +460,7 @@ function RegisterPageInner() {
           <h2 className="text-[22px] font-bold text-slate-900 leading-snug">
             Start doing business like a Pro today.
           </h2>
-          <p className="text-slate-400 text-[14px] mt-2">Manage your business smarter with Vantage</p>
+          <p className="text-slate-400 text-[14px] mt-2">Manage your business smarter with Stokka</p>
         </div>
 
         {/* Auth buttons */}

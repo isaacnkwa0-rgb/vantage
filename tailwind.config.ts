@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // VANTAGE Design System — Business Green
+        // Stokka Design System — Business Green
         sidebar: {
           DEFAULT: "#14532d",
           foreground: "#bbf7d0",

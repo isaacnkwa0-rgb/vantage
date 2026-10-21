@@ -196,7 +196,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
             <Award className="w-6 h-6 text-green-600 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-slate-900">Upgrade to Starter</p>
-              <p className="text-xs text-slate-500 mt-0.5">Unlock the full benefits of VANTAGE</p>
+              <p className="text-xs text-slate-500 mt-0.5">Unlock the full benefits of Stokka</p>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" aria-hidden="true" />
           </Link>
