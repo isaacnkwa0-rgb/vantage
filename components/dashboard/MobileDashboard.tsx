@@ -217,18 +217,18 @@ export function MobileDashboard({
   const storeVisits  = period === "today" ? todayStoreVisits : period === "week" ? weekStoreVisits  : monthStoreVisits;
 
   const STATS = [
-    { display: String(txCount),       label: isService ? "Services" : "Orders",         bg: "bg-slate-50"  },
-    { display: String(itemsSold),     label: "Items sold",                               bg: "bg-[#E8F5EC]" },
-    { display: String(periodNewCx),   label: isService ? "New clients" : "New customers", bg: "bg-[#FEF9EC]" },
-    { display: String(storeVisits),   label: "Store visits",                             bg: "bg-[#FEF0F0]" },
+    { display: String(txCount),       label: isService ? "Services" : "Orders",           bg: "bg-primary-soft" },
+    { display: String(itemsSold),     label: "Items sold",                                 bg: "bg-[#E8F5EC]"    },
+    { display: String(periodNewCx),   label: isService ? "New clients" : "New customers",  bg: "bg-amber-50"     },
+    { display: String(storeVisits),   label: "Store visits",                               bg: "bg-blue-50"      },
   ];
 
   return (
     <div className="flex-1 overflow-auto bg-white">
       <div className="pb-10">
 
-        {/* ── Hero section (grey background, Bumpa-style) ──── */}
-        <div className="bg-[#f6f6f6] px-4 pt-9 pb-7 rounded-b-[32px]">
+        {/* ── Hero section (cream background, Catlog-style warmth) ──── */}
+        <div className="bg-[#FFF6EC] px-4 pt-9 pb-7 rounded-b-[32px]">
           {/* Header row */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -309,13 +309,25 @@ export function MobileDashboard({
               )}
             </Link>
           </div>
+
+          {/* ── Feature pills (Bumpa/Catlog-style horizontal chips) ── */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar mt-3 -mb-1 pb-1">
+            {(isService
+              ? ["Record Service", "Invoices", "Clients", "Expenses", "Analytics"]
+              : ["POS Sales", "Invoices", "Inventory", "Expenses", "Customers", "Analytics"]
+            ).map((tag) => (
+              <span key={tag} className="flex-shrink-0 bg-white border border-[#EADFD2] text-[11px] font-medium text-slate-600 px-3 py-1 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* ── Location picker ───────────────────────────────── */}
         <div className="mx-4 mt-4 mb-3">
           <button
             onClick={() => setShowLocationPicker(true)}
-            className="w-full flex items-center gap-2.5 text-[13px] font-semibold text-slate-700 bg-white border border-slate-200 px-4 py-3 rounded-[8px]"
+            className="w-full flex items-center gap-2.5 text-[13px] font-semibold text-slate-700 bg-white border border-[#EADFD2] px-4 py-3 rounded-[8px]"
           >
             <MapPin className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
             <span className="flex-1 text-left">{selectedLocationName}</span>
@@ -369,8 +381,11 @@ export function MobileDashboard({
           </div>
         )}
 
-        {/* ── Revenue card (Bumpa wallet style) ───────────── */}
-        <div className="mx-4 mb-3 rounded-[14px] px-4 pt-4 pb-[34px] relative overflow-hidden border-l-4 border-primary" style={{ backgroundColor: "#f6f6f6" }}>
+        {/* ── Revenue card — Catlog-accent-bar style ───────────── */}
+        <div className="mx-4 mb-3 rounded-[14px] bg-white border border-[#EADFD2] overflow-hidden shadow-sm">
+          {/* Ember gradient top accent — Catlog-inspired */}
+          <div className="h-[3px] bg-gradient-to-r from-[#F2542D] via-[#FBBCAA] to-[#FDE3D9]" />
+        <div className="px-4 pt-4 pb-5 relative">
 
           {/* Label row — label left, eye right */}
           <div className="flex items-center justify-between mb-3">
@@ -413,6 +428,7 @@ export function MobileDashboard({
               {revenueGrowthPct >= 0 ? "+" : ""}{revenueGrowthPct.toFixed(1)}% vs last month
             </div>
           )}
+        </div>
         </div>
 
         {/* ── Period picker (Bumpa Total Sales style) ───────── */}
@@ -508,30 +524,36 @@ export function MobileDashboard({
         {/* ── Business Report banner ────────────────────────── */}
         <Link
           href={`/${slug}/reports`}
-          className="mx-4 mb-3 flex items-center justify-between bg-[#f6f6f6] rounded-[32px] px-4 h-12"
+          className="mx-4 mb-3 flex items-center justify-between bg-gradient-to-r from-primary-soft to-[#FFF6EC] rounded-[32px] px-4 h-12 border border-[#FBBCAA]"
         >
-          <p className="text-[13px] font-medium text-slate-500">Your business report is ready.</p>
+          <p className="text-[13px] font-semibold text-slate-700">Your business report is ready.</p>
           <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0 ml-3">
             <Download className="w-4 h-4 text-white" aria-hidden="true" />
           </div>
         </Link>
 
         {/* ── Quick Actions ─────────────────────────────────── */}
-        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-slate-200 px-3 pt-5 pb-6">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-4">Quick Actions</p>
+        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-[#EADFD2] px-3 pt-5 pb-6">
+          <p className="text-[13px] font-bold text-slate-800 mb-4">Quick Actions</p>
           <div className="grid grid-cols-4 gap-1.5">
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
               return (
                 <Link key={action.href} href={`/${slug}/${action.href}`} className="flex flex-col items-center">
-                  <div className="w-full h-[96px] rounded-[10px] border border-slate-200 flex flex-col items-center justify-center gap-2.5">
+                  <div className={cn(
+                    "w-full h-[96px] rounded-[10px] flex flex-col items-center justify-center gap-2.5",
+                    action.href === "pos"                               ? "bg-primary-soft" :
+                    action.href === "products" || action.href === "customers" ? "bg-blue-50"   :
+                    action.href === "invoices"                          ? "bg-purple-50"    :
+                    "bg-amber-50"
+                  )}>
                     <Icon aria-hidden="true" className={cn("w-[26px] h-[26px]",
-                      action.href === "pos"      ? "text-primary"   :
-                      action.href === "products" ? "text-blue-500"    :
-                      action.href === "invoices" ? "text-violet-500"  :
-                      "text-orange-400"
+                      action.href === "pos"                               ? "text-primary"    :
+                      action.href === "products" || action.href === "customers" ? "text-blue-500" :
+                      action.href === "invoices"                          ? "text-violet-500" :
+                      "text-amber-500"
                     )} />
-                    <span className="text-[11px] font-normal text-slate-500 text-center leading-tight">
+                    <span className="text-[11px] font-semibold text-slate-600 text-center leading-tight">
                       {action.label}
                     </span>
                   </div>
@@ -656,31 +678,33 @@ export function MobileDashboard({
           </div>
         </div>
 
-        {/* ── Refer & Earn ─────────────────────────────────── */}
-        <div className="mx-4 mb-3 bg-white rounded-[16px] border border-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.06)] overflow-hidden">
-          <div className="px-4 pt-4 pb-3">
-            <p className="text-[15px] font-bold text-slate-900 mb-0.5">Refer &amp; Earn</p>
-            <p className="text-[12px] text-slate-400 leading-snug">
+        {/* ── Refer & Earn — Bumpa-style full-width CTA card ── */}
+        <div className="mx-4 mb-3 rounded-[16px] overflow-hidden border border-[#EADFD2]">
+          {/* Ember CTA banner */}
+          <div className="bg-primary px-4 pt-5 pb-5">
+            <p className="text-[16px] font-bold text-white mb-1">Refer &amp; Earn</p>
+            <p className="text-[12px] leading-snug mb-4" style={{ color: "rgba(255,255,255,0.75)" }}>
               Help other business owners discover Stokka &amp; earn rewards!
             </p>
-          </div>
-          <div className="px-4 pb-4 space-y-3">
             <Link
               href={`/${slug}/referrals`}
-              className="w-full h-10 bg-primary rounded-[8px] flex items-center justify-center"
+              className="inline-flex items-center gap-2 bg-white rounded-[8px] px-4 h-9"
             >
-              <span className="text-[13px] font-bold text-white">Join the Stokka Referral Community</span>
+              <span className="text-[13px] font-bold text-primary">Join the Community</span>
+              <ChevronRight className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
             </Link>
-            {referralCode && (
-              <div className="flex items-center justify-between bg-slate-50 rounded-[8px] px-3 py-2.5">
+          </div>
+          {referralCode && (
+            <div className="px-4 pb-4 pt-3 bg-white">
+              <div className="flex items-center justify-between bg-[#FFF6EC] rounded-[8px] px-3 py-2.5 border border-[#EADFD2]">
                 <div>
-                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-0.5">Referral Code</p>
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-0.5">Your Referral Code</p>
                   <p className="text-[15px] font-bold text-slate-900 tracking-widest">{referralCode}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={copyReferralCode}
-                    className="p-1.5 rounded-[6px] bg-white border border-slate-200"
+                    className="p-1.5 rounded-[6px] bg-white border border-[#EADFD2]"
                     aria-label="Copy referral code"
                   >
                     {codeCopied
@@ -692,8 +716,8 @@ export function MobileDashboard({
                   </Link>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
       </div>
