@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Manrope, Bricolage_Grotesque } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const jakarta = Outfit({
+const body = Manrope({
   subsets: ["latin"],
-  variable: "--font-jakarta",
+  variable: "--font-body",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  variable: "--font-display",
   display: "swap",
+  weight: ["500", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -25,8 +26,8 @@ export const metadata: Metadata = {
     "The all-in-one business management platform for modern businesses. POS, inventory, customers, expenses, and analytics in one place.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/vantage-icon.svg",
-    apple: "/vantage-icon.svg",
+    icon: "/stokka-icon.svg",
+    apple: "/stokka-icon.svg",
   },
   appleWebApp: {
     capable: true,
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0F172A",
+  themeColor: "#F2542D",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -46,7 +47,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${jakarta.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+      <body className={`${body.variable} ${display.variable} font-sans antialiased`}>
         {children}
         <Toaster position="top-center" richColors closeButton />
       </body>

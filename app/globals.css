@@ -2,38 +2,160 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 247 249 252;
-    --foreground: 15 23 42;
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-    --primary: 22 163 74;
-    --primary-foreground: 255 255 255;
-    --secondary: 241 245 249;
-    --secondary-foreground: 15 23 42;
-    --muted: 241 245 249;
-    --muted-foreground: 100 116 139;
-    --accent: 241 245 249;
-    --accent-foreground: 15 23 42;
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-    --border: 226 232 240;
-    --input: 226 232 240;
-    --ring: 22 163 74;
-    --radius: 0.5rem;
+:root {
+  /* Brand palette */
+  --ember:        #F2542D;
+  --ember-deep:   #B8320F;
+  --ink:          #16130F;
+  --cream:        #FFF6EC;
+  --sun:          #FFC93C;
 
-    /* Sidebar */
-    --sidebar-bg: 15 23 42;
-    --sidebar-border: 30 41 59;
-    --sidebar-text: 148 163 184;
-    --sidebar-text-active: 255 255 255;
-    --sidebar-accent: 22 163 74;
-    --sidebar-width: 256px;
-    --sidebar-collapsed-width: 68px;
+  /* Semantic tokens — light mode */
+  --color-bg:           #FFF6EC;
+  --color-surface:      #FFFFFF;
+  --color-border:       #EADFD2;
+  --color-text:         #16130F;
+  --color-muted:        #6B625A;
+  --color-link:         #B8320F;
+  --color-primary:      #F2542D;
+  --color-primary-soft: #FDE3D9;
+  --color-on-primary:   #16130F;
+  --color-highlight:    #FFC93C;
+  --color-on-highlight: #16130F;
+  --color-success:      #1E8E5A;
+  --color-warning:      #FFC93C;
+  --color-danger:       #C62828;
+
+  /* Sidebar tokens — desktop sidebar is always dark */
+  --sidebar-bg:        #16130F;
+  --sidebar-fg:        #CFC4B6;
+  --sidebar-fg-active: #FFF6EC;
+  --sidebar-border:    #2A231D;
+  --sidebar-accent:    #F2542D;
+
+  /* Legacy var names kept for gradual migration */
+  --background: 255 246 236;
+  --foreground: 22 19 15;
+  --primary: 242 84 45;
+  --primary-foreground: 22 19 15;
+  --secondary: 253 227 217;
+  --muted: 253 227 217;
+  --muted-foreground: 107 98 90;
+  --destructive: 198 40 40;
+  --destructive-foreground: 255 255 255;
+  --border: 234 223 210;
+  --ring: 242 84 45;
+  --radius: 14px;
+}
+
+/* System dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg:           #16130F;
+    --color-surface:      #221D18;
+    --color-border:       #3A322B;
+    --color-text:         #FFF6EC;
+    --color-muted:        #CFC4B6;
+    --color-link:         #F2542D;
+    --color-primary:      #F2542D;
+    --color-primary-soft: #2A231D;
+    --color-on-primary:   #16130F;
+    --color-highlight:    #FFC93C;
+    --color-on-highlight: #16130F;
+    --color-success:      #1E8E5A;
+    --color-warning:      #FFC93C;
+    --color-danger:       #C62828;
+
+    --sidebar-bg:        #16130F;
+    --sidebar-fg:        #CFC4B6;
+    --sidebar-fg-active: #FFF6EC;
+    --sidebar-border:    #2A231D;
+    --sidebar-accent:    #F2542D;
+
+    --background: 22 19 15;
+    --foreground: 255 246 236;
+    --primary: 242 84 45;
+    --primary-foreground: 22 19 15;
+    --secondary: 42 35 29;
+    --muted: 42 35 29;
+    --muted-foreground: 207 196 182;
+    --destructive: 198 40 40;
+    --destructive-foreground: 255 255 255;
+    --border: 58 50 43;
+    --ring: 242 84 45;
   }
+}
+
+/* Manual dark mode override */
+[data-theme="dark"] {
+  --color-bg:           #16130F;
+  --color-surface:      #221D18;
+  --color-border:       #3A322B;
+  --color-text:         #FFF6EC;
+  --color-muted:        #CFC4B6;
+  --color-link:         #F2542D;
+  --color-primary:      #F2542D;
+  --color-primary-soft: #2A231D;
+  --color-on-primary:   #16130F;
+  --color-highlight:    #FFC93C;
+  --color-on-highlight: #16130F;
+  --color-success:      #1E8E5A;
+  --color-warning:      #FFC93C;
+  --color-danger:       #C62828;
+
+  --sidebar-bg:        #16130F;
+  --sidebar-fg:        #CFC4B6;
+  --sidebar-fg-active: #FFF6EC;
+  --sidebar-border:    #2A231D;
+  --sidebar-accent:    #F2542D;
+
+  --background: 22 19 15;
+  --foreground: 255 246 236;
+  --primary: 242 84 45;
+  --primary-foreground: 22 19 15;
+  --secondary: 42 35 29;
+  --muted: 42 35 29;
+  --muted-foreground: 207 196 182;
+  --destructive: 198 40 40;
+  --destructive-foreground: 255 255 255;
+  --border: 58 50 43;
+  --ring: 242 84 45;
+}
+
+/* Manual light mode override */
+[data-theme="light"] {
+  --color-bg:           #FFF6EC;
+  --color-surface:      #FFFFFF;
+  --color-border:       #EADFD2;
+  --color-text:         #16130F;
+  --color-muted:        #6B625A;
+  --color-link:         #B8320F;
+  --color-primary:      #F2542D;
+  --color-primary-soft: #FDE3D9;
+  --color-on-primary:   #16130F;
+  --color-highlight:    #FFC93C;
+  --color-on-highlight: #16130F;
+  --color-success:      #1E8E5A;
+  --color-warning:      #FFC93C;
+  --color-danger:       #C62828;
+
+  --sidebar-bg:        #16130F;
+  --sidebar-fg:        #CFC4B6;
+  --sidebar-fg-active: #FFF6EC;
+  --sidebar-border:    #2A231D;
+  --sidebar-accent:    #F2542D;
+
+  --background: 255 246 236;
+  --foreground: 22 19 15;
+  --primary: 242 84 45;
+  --primary-foreground: 22 19 15;
+  --secondary: 253 227 217;
+  --muted: 253 227 217;
+  --muted-foreground: 107 98 90;
+  --destructive: 198 40 40;
+  --destructive-foreground: 255 255 255;
+  --border: 234 223 210;
+  --ring: 242 84 45;
 }
 
 @layer base {
@@ -45,19 +167,16 @@
     text-size-adjust: 100%;
   }
   body {
-    background-color: rgb(var(--background));
-    color: rgb(var(--foreground));
+    background-color: var(--color-bg);
+    color: var(--color-text);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* ── Numeric / financial figures ── */
-.font-numeric {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
-  font-variant-numeric: tabular-nums;
-}
+/* ── Tabular figures ── */
+.tabular-nums { font-variant-numeric: tabular-nums; }
 
 /* ── Skeleton loader ── */
 @keyframes shimmer {
@@ -67,9 +186,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    #f1f5f9 25%,
-    #e2e8f0 50%,
-    #f1f5f9 75%
+    #F3E6D6 25%,
+    #EADFD2 50%,
+    #F3E6D6 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
@@ -99,15 +218,15 @@
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-thumb { background: #EADFD2; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #6B625A; }
 
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
 /* ── Focus ring ── */
 :focus-visible {
-  outline: 2px solid #1a9c38;
+  outline: 2px solid #F2542D;
   outline-offset: 2px;
 }
 
@@ -116,8 +235,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px white inset !important;
-  -webkit-text-fill-color: rgb(15 23 42) !important;
+  -webkit-box-shadow: 0 0 0 30px #FFF6EC inset !important;
+  -webkit-text-fill-color: #16130F !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -126,15 +245,16 @@ input:-webkit-autofill:active {
   @apply flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 w-full;
 }
 .nav-item-active {
-  background: rgba(26, 156, 56, 0.15);
-  color: #1a9c38;
+  background: rgba(242, 84, 45, 0.15);
+  color: #F2542D;
+  border-color: #EADFD2;
 }
 .nav-item-inactive {
-  color: rgb(var(--sidebar-text));
+  color: var(--sidebar-fg);
 }
 .nav-item-inactive:hover {
   background: rgba(255,255,255,0.06);
-  color: #e2e8f0;
+  color: var(--sidebar-fg-active);
 }
 
 /* ── Command palette overlay ── */
@@ -152,6 +272,6 @@ input:-webkit-autofill:active {
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .skeleton { animation: none; background: #f1f5f9; will-change: auto; }
+  .skeleton { animation: none; background: #F3E6D6; will-change: auto; }
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

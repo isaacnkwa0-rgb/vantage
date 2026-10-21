@@ -4,12 +4,12 @@
   "description": "The all-in-one business management platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F172A",
-  "theme_color": "#0F172A",
+  "background_color": "#FFF6EC",
+  "theme_color": "#F2542D",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/vantage-icon.svg",
+      "src": "/stokka-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -21,7 +21,7 @@
       "name": "Point of Sale",
       "short_name": "POS",
       "url": "/",
-      "icons": [{ "src": "/vantage-icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/stokka-icon.svg", "sizes": "any" }]
     }
   ]
 }

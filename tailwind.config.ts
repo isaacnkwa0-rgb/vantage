@@ -10,36 +10,50 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Stokka Design System — Business Green
+        // Semantic tokens — map to CSS variables
+        bg:        "var(--color-bg)",
+        surface:   "var(--color-surface)",
+        border:    "var(--color-border)",
+        "text-base":   "var(--color-text)",
+        "text-muted":  "var(--color-muted)",
+        link:      "var(--color-link)",
+        primary:   "var(--color-primary)",
+        "primary-soft": "var(--color-primary-soft)",
+        "on-primary":   "var(--color-on-primary)",
+        highlight: "var(--color-highlight)",
+        "on-highlight": "var(--color-on-highlight)",
+        success:   "var(--color-success)",
+        warning:   "var(--color-warning)",
+        danger:    "var(--color-danger)",
+        // Raw palette (for when you need a fixed value)
+        ember:     "#F2542D",
+        "ember-deep": "#B8320F",
+        ink:       "#16130F",
+        cream:     "#FFF6EC",
+        sun:       "#FFC93C",
+        // Sidebar specific
         sidebar: {
-          DEFAULT: "#14532d",
-          foreground: "#bbf7d0",
-          "foreground-active": "#FFFFFF",
-          border: "#166534",
-          accent: "#166534",
+          DEFAULT:            "var(--sidebar-bg)",
+          foreground:         "var(--sidebar-fg)",
+          "foreground-active":"var(--sidebar-fg-active)",
+          border:             "var(--sidebar-border)",
+          accent:             "var(--sidebar-accent)",
         },
-        brand: {
-          DEFAULT: "#1a9c38",
-          hover: "#158030",
-          foreground: "#FFFFFF",
-        },
-        profit: "#10B981",
-        loss: "#EF4444",
-        warning: "#F59E0B",
-        background: "#F8FAFC",
-        surface: "#FFFFFF",
-        border: "#E2E8F0",
-        "text-primary": "#0F172A",
-        "text-secondary": "#64748B",
-      },
-      fontFamily: {
-        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
-        mono: ["var(--font-jetbrains-mono)", "JetBrains Mono", "monospace"],
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        none: "0",
+        sm:   "8px",
+        DEFAULT: "14px",
+        md:   "14px",
+        lg:   "18px",
+        xl:   "24px",
+        "2xl": "24px",
+        full: "9999px",
+      },
+      fontFamily: {
+        sans:    ["var(--font-body)", "Manrope", "Arial", "sans-serif"],
+        display: ["var(--font-display)", "Bricolage Grotesque", "Arial", "sans-serif"],
+        mono:    ["Manrope", "Arial", "sans-serif"],  // no more JetBrains Mono
       },
       keyframes: {
         "scan-line": {
