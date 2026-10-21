@@ -50,43 +50,6 @@
   --radius: 14px;
 }
 
-/* System dark mode */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-bg:           #16130F;
-    --color-surface:      #221D18;
-    --color-border:       #3A322B;
-    --color-text:         #FFF6EC;
-    --color-muted:        #CFC4B6;
-    --color-link:         #F2542D;
-    --color-primary:      #F2542D;
-    --color-primary-soft: #2A231D;
-    --color-on-primary:   #16130F;
-    --color-highlight:    #FFC93C;
-    --color-on-highlight: #16130F;
-    --color-success:      #1E8E5A;
-    --color-warning:      #FFC93C;
-    --color-danger:       #C62828;
-
-    --sidebar-bg:        #16130F;
-    --sidebar-fg:        #CFC4B6;
-    --sidebar-fg-active: #FFF6EC;
-    --sidebar-border:    #2A231D;
-    --sidebar-accent:    #F2542D;
-
-    --background: 22 19 15;
-    --foreground: 255 246 236;
-    --primary: 242 84 45;
-    --primary-foreground: 22 19 15;
-    --secondary: 42 35 29;
-    --muted: 42 35 29;
-    --muted-foreground: 207 196 182;
-    --destructive: 198 40 40;
-    --destructive-foreground: 255 255 255;
-    --border: 58 50 43;
-    --ring: 242 84 45;
-  }
-}
 
 /* Manual dark mode override */
 [data-theme="dark"] {
