@@ -235,8 +235,20 @@ input:-webkit-autofill:active {
   }
 }
 
+/* ── Feature pill marquee ── */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 24s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .skeleton { animation: none; background: #F3E6D6; will-change: auto; }
+  .marquee-track { animation: none; }
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
