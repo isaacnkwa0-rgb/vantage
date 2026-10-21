@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, CheckCircle2, ShoppingCart, Package, TrendingUp, Mail, ChevronDown, X, ChevronLeft } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
 const schema = z.object({
@@ -505,8 +506,12 @@ function RegisterPageInner() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      {/* Logo */}
+      <div className="flex justify-center pt-12 pb-0">
+        <Logo variant="full" size={36} />
+      </div>
       {/* Dot indicators */}
-      <div className="flex justify-center gap-2 pt-14 pb-4">
+      <div className="flex justify-center gap-2 pt-4 pb-4">
         {SLIDES.map((_, i) => (
           <button
             key={i}

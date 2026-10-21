@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, AlertCircle, Loader2, Zap, FileText } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 import { formatCurrency } from "@/lib/utils/currency";
 
 interface InvoiceItem {
@@ -77,10 +78,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-7 h-7 bg-green-600 rounded-lg flex items-center justify-center shadow-md shadow-green-200">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
-            <p className="text-lg font-extrabold tracking-tight text-green-700">Stokka</p>
+            <Logo variant="full" size={28} />
           </div>
           <p className="text-sm text-slate-500">Secure payment powered by Paystack</p>
         </div>

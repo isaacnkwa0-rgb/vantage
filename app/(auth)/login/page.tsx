@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ChevronLeft } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 function GoogleIcon() {
   return (
@@ -87,6 +88,7 @@ export default function LoginPage() {
 
       {/* Heading */}
       <div className="mt-8 mb-8">
+        <Logo variant="full" size={36} className="mb-4" />
         <h1 className="text-[22px] font-bold text-slate-900 leading-tight mb-1">Welcome back</h1>
         <p className="text-slate-500 text-[14px]">Login and start managing your business like a pro</p>
       </div>

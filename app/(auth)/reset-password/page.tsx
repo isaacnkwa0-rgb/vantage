@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, CheckCircle2, Lock } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 const schema = z
   .object({
@@ -52,6 +53,8 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 px-5 pt-16 pb-10">
+        <Logo variant="full" size={36} className="mb-6" />
+
         <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
           <Lock className="w-6 h-6 text-[#1a9c38]" />
         </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Logo } from "@/components/ui/Logo";
 
 const COLORS = ["#1a9c38", "#0f6624", "#34d058", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#dcfce7", "#052e16", "#14532d", "#166534"];
 
@@ -157,6 +158,10 @@ function SuccessPage() {
           .fade-up-2 { animation: fade-up 0.5s ease-out 0.7s both; }
           .fade-up-3 { animation: fade-up 0.5s ease-out 0.9s both; }
         `}</style>
+
+        <div className="fade-up-1 mb-4">
+          <Logo variant="full" size={36} />
+        </div>
 
         <div className="popper-anim float-loop mb-6 text-[80px] leading-none select-none">
           🎉

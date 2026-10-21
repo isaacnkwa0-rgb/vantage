@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, X, Zap, Star, Building2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
 
 const FEATURES = [
   { label: "Products / Services", free: "Up to 50", starter: "Unlimited", pro: "Unlimited" },
@@ -82,11 +83,8 @@ export default function PricingPage() {
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Nav */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-md shadow-green-200">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-lg font-extrabold tracking-tight text-green-700">Stokka</span>
+        <Link href="/">
+          <Logo variant="full" size={36} />
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition">

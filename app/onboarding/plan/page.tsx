@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
 
 const BILLING_PERIODS = [
   { key: "monthly", label: "Monthly", discount: null },
@@ -121,6 +122,9 @@ function PlanPage() {
 
         {/* Title */}
         <div className="text-center mb-6 mt-2">
+          <div className="flex justify-center mb-4">
+            <Logo variant="full" size={36} />
+          </div>
           <h1 className="text-[22px] font-bold text-slate-900 leading-tight">
             Choose your Plan
           </h1>
