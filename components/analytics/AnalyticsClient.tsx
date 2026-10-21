@@ -14,7 +14,7 @@ interface Props {
   currency: string;
 }
 
-const COLORS = ["#F2542D", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#F97316", "#84CC16"];
+const COLORS = ["#F2542D", "#FFC93C", "#8B5CF6", "#06B6D4", "#EF4444", "#F97316", "#B8320F", "#3A322B"];
 
 export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props) {
   const fmt = (n: number) => formatCurrency(n, currency);
@@ -69,7 +69,7 @@ export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props)
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-emerald-600">{fmt(totalRevenue)}</p>
+          <p className="text-xl font-bold text-primary">{fmt(totalRevenue)}</p>
           <p className="text-xs text-slate-500">30-day Revenue</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
@@ -77,7 +77,7 @@ export function AnalyticsClient({ sales, saleItems, expenses, currency }: Props)
           <p className="text-xs text-slate-500">30-day Expenses</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className={`text-xl font-bold ${totalRevenue - totalExpenses >= 0 ? "text-green-600" : "text-red-600"}`}>
+          <p className={`text-xl font-bold ${totalRevenue - totalExpenses >= 0 ? "text-success" : "text-danger"}`}>
             {fmt(totalRevenue - totalExpenses)}
           </p>
           <p className="text-xs text-slate-500">Net Profit</p>
