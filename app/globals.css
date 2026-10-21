@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
+
   /* Brand palette */
   --ember:        #F2542D;
   --ember-deep:   #B8320F;
