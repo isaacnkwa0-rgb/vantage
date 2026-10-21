@@ -146,7 +146,7 @@ export function PricingClient({ tiers: initialTiers, customers, currency, busine
           <h2 className="text-base font-bold text-[#0F172A]">Pricing Tiers</h2>
           <p className="text-xs text-slate-400 mt-0.5">Offer wholesale or group discounts to specific customers</p>
         </div>
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
+        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition shadow-sm">
           <Plus className="w-4 h-4" />
           New Tier
         </button>
@@ -201,7 +201,7 @@ export function PricingClient({ tiers: initialTiers, customers, currency, busine
                   <p className="text-xs font-semibold text-slate-500 flex items-center gap-1">
                     <Users className="w-3 h-3" /> {tier.customer_price_tiers.length} customers
                   </p>
-                  <button onClick={() => setAssignTierId(tier.id)} className="text-xs text-green-600 hover:text-green-700 font-semibold">
+                  <button onClick={() => setAssignTierId(tier.id)} className="text-xs text-primary hover:text-primary font-semibold">
                     + Assign
                   </button>
                 </div>
@@ -240,34 +240,34 @@ export function PricingClient({ tiers: initialTiers, customers, currency, busine
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Tier Name *</label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Wholesale, VIP, Bulk" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Wholesale, VIP, Bulk" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
-                <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Optional description" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Optional description" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Discount Type</label>
-                  <select value={form.discount_type} onChange={(e) => setForm({ ...form, discount_type: e.target.value as "percentage" | "fixed" })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <select value={form.discount_type} onChange={(e) => setForm({ ...form, discount_type: e.target.value as "percentage" | "fixed" })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                     <option value="percentage">Percentage (%)</option>
                     <option value="fixed">Fixed Amount</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Discount Value *</label>
-                  <input type="number" min="0" value={form.discount_value} onChange={(e) => setForm({ ...form, discount_value: e.target.value })} placeholder="0" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <input type="number" min="0" value={form.discount_value} onChange={(e) => setForm({ ...form, discount_value: e.target.value })} placeholder="0" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Minimum Order Amount (optional)</label>
-                <input type="number" min="0" value={form.min_order_amount} onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })} placeholder="Leave blank for no minimum" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input type="number" min="0" value={form.min_order_amount} onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })} placeholder="Leave blank for no minimum" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
             </div>
 
             <div className="flex gap-2 pt-1">
               <button onClick={closeCreate} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={save} disabled={saving || !form.name.trim() || !form.discount_value} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+              <button onClick={save} disabled={saving || !form.name.trim() || !form.discount_value} className="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50">
                 {saving ? "Saving..." : editingId ? "Update" : "Create Tier"}
               </button>
             </div>
@@ -285,7 +285,7 @@ export function PricingClient({ tiers: initialTiers, customers, currency, busine
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <select value={assigningCustomer} onChange={(e) => setAssigningCustomer(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            <select value={assigningCustomer} onChange={(e) => setAssigningCustomer(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
               <option value="">— Select customer —</option>
               {customers
                 .filter((c) => !assignTier.customer_price_tiers.some((x) => x.customer_id === c.id))
@@ -293,7 +293,7 @@ export function PricingClient({ tiers: initialTiers, customers, currency, busine
             </select>
             <div className="flex gap-2">
               <button onClick={() => { setAssignTierId(null); setAssigningCustomer(""); }} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={assignCustomer} disabled={assigning || !assigningCustomer} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+              <button onClick={assignCustomer} disabled={assigning || !assigningCustomer} className="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50">
                 {assigning ? "Assigning..." : "Assign"}
               </button>
             </div>

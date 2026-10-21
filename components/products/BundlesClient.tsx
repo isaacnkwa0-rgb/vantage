@@ -50,7 +50,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -213,13 +213,13 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search"
-              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
             />
           </div>
           {!showForm && (
             <button
               onClick={openCreate}
-              className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+              className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
             >
               <Plus className="w-4 h-4" />
               New
@@ -275,7 +275,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                 const p = parseFloat(form.price) || 0;
                 const savings = sum - p;
                 return sum > 0 ? (
-                  <p className={`text-[12px] px-0.5 ${savings > 0 ? "text-emerald-600" : "text-slate-400"}`}>
+                  <p className={`text-[12px] px-0.5 ${savings > 0 ? "text-success" : "text-slate-400"}`}>
                     Individual total: {fmt(sum)}{savings > 0 ? ` · Save ${fmt(savings)}` : ""}
                   </p>
                 ) : null;
@@ -287,7 +287,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
               action={
                 <button
                   onClick={addFormItem}
-                  className="flex items-center gap-1 text-[12px] text-[#1a9c38] font-semibold flex-shrink-0"
+                  className="flex items-center gap-1 text-[12px] text-primary font-semibold flex-shrink-0"
                 >
                   <Plus className="w-3 h-3" /> Add
                 </button>
@@ -345,7 +345,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               {editingId ? "Save Changes" : "Create Bundle"}
@@ -386,7 +386,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                         <p className="font-semibold text-[14px] text-[#0F172A] truncate">{b.name}</p>
                         <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
                           b.is_active
-                            ? "bg-emerald-50 text-emerald-700"
+                            ? "bg-primary-soft text-primary"
                             : "bg-slate-100 text-slate-500"
                         }`}>
                           {b.is_active ? "Active" : "Inactive"}
@@ -407,7 +407,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                     <div className="flex-shrink-0 text-right">
                       <p className="font-bold text-[14px] text-violet-700">{fmt(b.price)}</p>
                       {savings > 0 && (
-                        <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">Save {fmt(savings)}</p>
+                        <p className="text-[10px] text-success font-semibold mt-0.5">Save {fmt(savings)}</p>
                       )}
                     </div>
                   </div>
@@ -429,7 +429,7 @@ export function BundlesClient({ bundles: initialBundles, products, businessId, c
                       {togglingId === b.id ? (
                         <Loader2 className="w-3 h-3 animate-spin" />
                       ) : b.is_active ? (
-                        <ToggleRight className="w-3.5 h-3.5 text-emerald-500" />
+                        <ToggleRight className="w-3.5 h-3.5 text-success" />
                       ) : (
                         <ToggleLeft className="w-3.5 h-3.5 text-slate-400" />
                       )}

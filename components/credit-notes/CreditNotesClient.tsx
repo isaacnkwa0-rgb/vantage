@@ -33,7 +33,7 @@ interface Props {
 
 const STATUS_STYLES: Record<string, string> = {
   open: "bg-blue-100 text-blue-700",
-  applied: "bg-green-100 text-green-700",
+  applied: "bg-primary-soft text-primary",
   voided: "bg-slate-100 text-slate-500",
 };
 
@@ -122,9 +122,9 @@ export function CreditNotesClient({ creditNotes: initialNotes, customers, invoic
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search credit notes..." className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search credit notes..." className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
-        <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
+        <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition shadow-sm">
           <Plus className="w-4 h-4" /> New Credit Note
         </button>
       </div>
@@ -177,7 +177,7 @@ export function CreditNotesClient({ creditNotes: initialNotes, customers, invoic
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition justify-end">
                       {n.status === "open" && (
                         <>
-                          <button onClick={() => updateStatus(n.id, "applied")} title="Mark Applied" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition">
+                          <button onClick={() => updateStatus(n.id, "applied")} title="Mark Applied" className="p-1.5 text-primary hover:bg-primary-soft rounded-lg transition">
                             <Check className="w-3.5 h-3.5" />
                           </button>
                           <button onClick={() => updateStatus(n.id, "voided")} title="Void" className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
@@ -208,38 +208,38 @@ export function CreditNotesClient({ creditNotes: initialNotes, customers, invoic
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Customer</label>
-                <select value={form.customer_id} onChange={(e) => setForm({ ...form, customer_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select value={form.customer_id} onChange={(e) => setForm({ ...form, customer_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="">— None —</option>
                   {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Linked Invoice</label>
-                <select value={form.invoice_id} onChange={(e) => setForm({ ...form, invoice_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select value={form.invoice_id} onChange={(e) => setForm({ ...form, invoice_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="">— None —</option>
                   {invoices.map((i) => <option key={i.id} value={i.id}>{i.invoice_number}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Reason *</label>
-                <select value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="">— Select reason —</option>
                   {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Credit Amount *</label>
-                <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
-                <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} placeholder="Optional details..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+                <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} placeholder="Optional details..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
               </div>
             </div>
 
             <div className="flex gap-2 pt-1">
               <button onClick={closeCreate} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={create} disabled={saving || !form.reason || !form.amount} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+              <button onClick={create} disabled={saving || !form.reason || !form.amount} className="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50">
                 {saving ? "Saving..." : "Issue Credit Note"}
               </button>
             </div>

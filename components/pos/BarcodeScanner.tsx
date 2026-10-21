@@ -88,12 +88,12 @@ export function BarcodeScanner({ onScan, onClose }: Props) {
           <div className="relative z-10 flex flex-col items-center gap-4">
             <div className="w-64 h-40 relative">
               {/* Corner brackets */}
-              <span className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400 rounded-tl-lg" />
-              <span className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400 rounded-tr-lg" />
-              <span className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400 rounded-bl-lg" />
-              <span className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400 rounded-br-lg" />
+              <span className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-lg" />
+              <span className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-lg" />
+              <span className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-lg" />
+              <span className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-lg" />
               {/* Scan line animation */}
-              <div className="absolute inset-x-0 top-0 h-0.5 bg-green-400/80 animate-scan-line shadow-[0_0_8px_2px_rgba(74,222,128,0.6)]" />
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-primary/80 animate-scan-line shadow-[0_0_8px_2px_rgba(74,222,128,0.6)]" />
             </div>
             <p className="text-white/80 text-sm font-medium bg-black/50 px-4 py-2 rounded-full">
               Point camera at barcode
@@ -104,7 +104,7 @@ export function BarcodeScanner({ onScan, onClose }: Props) {
         {/* Starting state */}
         {status === "starting" && (
           <div className="z-10 flex flex-col items-center gap-3 text-white">
-            <Loader2 className="w-8 h-8 animate-spin text-green-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
             <p className="text-sm text-white/70">Starting camera…</p>
           </div>
         )}

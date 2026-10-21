@@ -93,13 +93,13 @@ function VerifyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-sm">
 
           {/* Icon */}
-          <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-            <Mail className="w-7 h-7 text-[#1a9c38]" />
+          <div className="w-14 h-14 bg-primary-soft rounded-2xl flex items-center justify-center mb-6 mx-auto">
+            <Mail className="w-7 h-7 text-primary" />
           </div>
 
           <h1 className="text-[22px] font-bold text-slate-900 leading-snug mb-2 text-center">
@@ -131,7 +131,7 @@ function VerifyPage() {
                     onChange={(e) => handleDigit(i, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(i, e)}
                     disabled={isVerifying}
-                    className="w-12 h-12 text-center text-[20px] font-bold border border-slate-300 rounded-[4px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent disabled:opacity-50"
+                    className="w-12 h-12 text-center text-[20px] font-bold border border-slate-300 rounded-[4px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
                   />
                 ))}
               </div>
@@ -145,7 +145,7 @@ function VerifyPage() {
                 {cooldown > 0 ? (
                   <span>Resend in {cooldown}s</span>
                 ) : (
-                  <button onClick={sendOtp} className="text-[#1a9c38] font-semibold">
+                  <button onClick={sendOtp} className="text-primary font-semibold">
                     Resend code
                   </button>
                 )}
@@ -154,7 +154,7 @@ function VerifyPage() {
               <button
                 onClick={() => verify(code)}
                 disabled={isVerifying || code.some((d) => !d)}
-                className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {isVerifying && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isVerifying ? "Verifying..." : "Continue"}

@@ -88,7 +88,7 @@ export function ServicePOSClient({ services, customers, business, userId }: Prop
       <div className="lg:hidden flex items-center gap-3 px-4 h-14 bg-white border-b border-slate-200 flex-shrink-0">
         <button
           onClick={toggleSidebar}
-          className="p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition"
+          className="p-2 text-slate-500 hover:text-primary hover:bg-primary-soft rounded-lg transition"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -100,7 +100,7 @@ export function ServicePOSClient({ services, customers, business, userId }: Prop
         <button
           onClick={() => setMobilePanel("services")}
           className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold border-b-2 transition ${
-            mobilePanel === "services" ? "border-green-600 text-green-600" : "border-transparent text-slate-500"
+            mobilePanel === "services" ? "border-primary text-primary" : "border-transparent text-slate-500"
           }`}
         >
           <Scissors className="w-4 h-4" />
@@ -109,13 +109,13 @@ export function ServicePOSClient({ services, customers, business, userId }: Prop
         <button
           onClick={() => setMobilePanel("session")}
           className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold border-b-2 transition relative ${
-            mobilePanel === "session" ? "border-green-600 text-green-600" : "border-transparent text-slate-500"
+            mobilePanel === "session" ? "border-primary text-primary" : "border-transparent text-slate-500"
           }`}
         >
           <ShoppingCart className="w-4 h-4" />
           Session
           {cartCount > 0 && (
-            <span className="absolute top-2 right-[calc(50%-28px)] min-w-[18px] h-[18px] bg-green-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+            <span className="absolute top-2 right-[calc(50%-28px)] min-w-[18px] h-[18px] bg-primary text-on-primary text-[10px] font-bold rounded-full flex items-center justify-center px-1">
               {cartCount}
             </span>
           )}

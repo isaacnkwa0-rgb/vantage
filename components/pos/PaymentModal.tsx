@@ -322,8 +322,8 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
                   onClick={() => setPaymentMethod(m.value)}
                   className={`flex flex-col items-center gap-1.5 p-3 border-2 rounded-xl text-xs font-medium transition ${
                     paymentMethod === m.value
-                      ? "border-green-600 bg-green-600 text-white shadow-md shadow-green-200"
-                      : "border-slate-200 text-slate-600 hover:border-green-300 hover:text-green-600"
+                      ? "border-primary bg-primary text-on-primary shadow-md shadow-ember/20"
+                      : "border-slate-200 text-slate-600 hover:border-green-300 hover:text-primary"
                   }`}
                 >
                   <m.icon className="w-5 h-5" />
@@ -352,10 +352,10 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
                 min={tot}
                 value={amountPaid}
                 onChange={(e) => setAmountPaid(e.target.value)}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary text-center"
               />
               {change > 0 && (
-                <div className="mt-2 bg-emerald-50 text-emerald-700 text-sm font-semibold px-3 py-2 rounded-lg text-center">
+                <div className="mt-2 bg-primary-soft text-primary text-sm font-semibold px-3 py-2 rounded-lg text-center">
                   Change: <span className="">{fmt(change)}</span>
                 </div>
               )}
@@ -372,7 +372,7 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
                 placeholder="e.g. TXN123456"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           )}
@@ -384,7 +384,7 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
           <button
             onClick={handleCharge}
             disabled={loading}
-            className="w-full bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold py-4 rounded-xl transition text-base flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-green-300/50"
+            className="w-full bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-green-800 text-white font-bold py-4 rounded-xl transition text-base flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-ember/20"
           >
             {loading && <Loader2 className="w-5 h-5 animate-spin" />}
             {loading ? "Processing..." : `Confirm Payment ${fmt(tot)}`}

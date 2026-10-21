@@ -70,8 +70,8 @@ export function DashboardStats({
 
         {/* Month Revenue */}
         <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-start gap-4 overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 to-green-400" />
-          <div className="w-11 h-11 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-green-200">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ember to-green-400" />
+          <div className="w-11 h-11 bg-gradient-to-br from-ember to-ember-deep rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-ember/20">
             <Calendar className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
@@ -100,7 +100,7 @@ export function DashboardStats({
         {/* Today's tx count */}
         <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center shadow-sm shadow-green-200">
+            <div className="w-7 h-7 bg-gradient-to-br from-green-400 to-ember rounded-lg flex items-center justify-center shadow-sm shadow-ember/20">
               <TxIcon className="w-3.5 h-3.5 text-white" />
             </div>
             <p className="text-xs text-slate-500 font-medium">{todayTxLabel}</p>

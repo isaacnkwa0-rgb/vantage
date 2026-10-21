@@ -161,7 +161,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
   const [receiptFooter, setReceiptFooter] = useState(business.receipt_footer ?? "");
   const [receiptTagline, setReceiptTagline] = useState(business.receipt_tagline ?? "");
   const [receiptShowLogo, setReceiptShowLogo] = useState(business.receipt_show_logo ?? true);
-  const [invoiceAccentColor, setInvoiceAccentColor] = useState(business.invoice_accent_color ?? "#1a9c38");
+  const [invoiceAccentColor, setInvoiceAccentColor] = useState(business.invoice_accent_color ?? "#F2542D");
   const [invoiceFooterNotes, setInvoiceFooterNotes] = useState(business.invoice_footer_notes ?? "");
   const [socialInstagram, setSocialInstagram] = useState(business.social_instagram ?? "");
   const [socialTwitter, setSocialTwitter] = useState(business.social_twitter ?? "");
@@ -410,7 +410,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
       receipt_footer: receiptFooter || null,
       receipt_tagline: receiptTagline || null,
       receipt_show_logo: receiptShowLogo,
-      invoice_accent_color: invoiceAccentColor || "#1a9c38",
+      invoice_accent_color: invoiceAccentColor || "#F2542D",
       invoice_footer_notes: invoiceFooterNotes || null,
       social_instagram: socialInstagram || null,
       social_twitter: socialTwitter || null,
@@ -501,7 +501,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 )}
               </div>
               <div>
-                <label className="cursor-pointer inline-flex items-center gap-2 text-sm text-green-500 hover:underline font-medium">
+                <label className="cursor-pointer inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium">
                   {uploadingLogo ? "Uploading..." : logoUrl ? "Change logo" : "Upload logo"}
                   <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={uploadingLogo} />
                 </label>
@@ -517,40 +517,40 @@ export function SettingsClient({ business, members, locations: initialLocations,
 
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Business Name *</label>
-              <input {...register("name")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              <input {...register("name")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-[#0F172A] mb-1">Email</label>
-                <input {...register("email")} type="email" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input {...register("email")} type="email" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#0F172A] mb-1">Phone</label>
-                <input {...register("phone")} type="tel" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input {...register("phone")} type="tel" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Address</label>
-              <input {...register("address")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              <input {...register("address")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-[#0F172A] mb-1">City</label>
-                <input {...register("city")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input {...register("city")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#0F172A] mb-1">Country *</label>
-                <input {...register("country")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input {...register("country")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Currency *</label>
-              <select {...register("currency")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              <select {...register("currency")} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary">
                 {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -566,7 +566,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <button
                 type="button"
                 onClick={() => setTaxEnabled((v) => !v)}
-                className={`relative w-11 h-6 rounded-full transition-colors ${taxEnabled ? "bg-green-600" : "bg-slate-200"}`}
+                className={`relative w-11 h-6 rounded-full transition-colors ${taxEnabled ? "bg-primary" : "bg-slate-200"}`}
               >
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${taxEnabled ? "translate-x-5" : "translate-x-0"}`} />
               </button>
@@ -579,7 +579,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={taxName}
                     onChange={(e) => setTaxName(e.target.value)}
                     placeholder="e.g. VAT, GST, Sales Tax"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -592,7 +592,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={taxRate}
                     onChange={(e) => setTaxRate(e.target.value)}
                     placeholder="e.g. 7.5"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -663,7 +663,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   {business.subscription_tier === "free" ? "Free forever" : "Active subscription"}
                 </p>
               </div>
-              <span className="px-3 py-1 bg-green-500 rounded-full text-xs font-semibold capitalize">
+              <span className="px-3 py-1 bg-primary rounded-full text-xs font-semibold capitalize">
                 {business.subscription_tier}
               </span>
             </div>
@@ -672,7 +672,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-green-300/40"
+            className="flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-6 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-ember/20"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             {saving ? "Saving..." : "Save changes"}
@@ -692,7 +692,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
                   placeholder="e.g. Electronics, Clothing, Food..."
-                  className="flex-1 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   onKeyDown={(e) => e.key === "Enter" && addCategory()}
                 />
                 {/* Preview chip */}
@@ -728,7 +728,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <button
                 onClick={addCategory}
                 disabled={addingCat || !newCatName.trim()}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-green-200"
+                className="flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-4 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-ember/20"
               >
                 {addingCat ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 {addingCat ? "Adding..." : "Add Category"}
@@ -791,7 +791,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   value={newLoc.name}
                   onChange={(e) => setNewLoc({ ...newLoc, name: e.target.value })}
                   placeholder="e.g. Main Store, Ikeja Branch"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -801,7 +801,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={newLoc.address}
                     onChange={(e) => setNewLoc({ ...newLoc, address: e.target.value })}
                     placeholder="Optional"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -810,14 +810,14 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={newLoc.phone}
                     onChange={(e) => setNewLoc({ ...newLoc, phone: e.target.value })}
                     placeholder="Optional"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
               <button
                 onClick={addLocation}
                 disabled={addingLoc || !newLoc.name.trim()}
-                className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-60"
+                className="flex items-center gap-2 bg-primary hover:bg-primary text-on-primary px-4 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-60"
               >
                 {addingLoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 {addingLoc ? "Adding..." : "Add Location"}
@@ -842,26 +842,26 @@ export function SettingsClient({ business, members, locations: initialLocations,
                         <input
                           value={editLoc.name}
                           onChange={(e) => setEditLoc({ ...editLoc, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                         <div className="grid grid-cols-2 gap-2">
                           <input
                             value={editLoc.address}
                             onChange={(e) => setEditLoc({ ...editLoc, address: e.target.value })}
                             placeholder="Address"
-                            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           />
                           <input
                             value={editLoc.phone}
                             onChange={(e) => setEditLoc({ ...editLoc, phone: e.target.value })}
                             placeholder="Phone"
-                            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           />
                         </div>
                         <div className="flex gap-2">
                           <button
                             onClick={() => saveEditLoc(loc.id)}
-                            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-semibold transition"
+                            className="px-3 py-1.5 bg-primary hover:bg-primary text-on-primary rounded-lg text-xs font-semibold transition"
                           >
                             Save
                           </button>
@@ -875,8 +875,8 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       </div>
                     ) : (
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-4 h-4 text-green-500" />
+                        <div className="w-8 h-8 bg-primary-soft rounded-lg flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-4 h-4 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className={`text-sm font-medium truncate ${loc.is_active ? "text-[#0F172A]" : "text-slate-400 line-through"}`}>
@@ -898,7 +898,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                           </button>
                           <button
                             onClick={() => toggleLocationActive(loc)}
-                            className={`p-1.5 rounded-lg transition ${loc.is_active ? "text-emerald-500 hover:bg-emerald-50" : "text-slate-400 hover:bg-slate-100"}`}
+                            className={`p-1.5 rounded-lg transition ${loc.is_active ? "text-success hover:bg-primary-soft" : "text-slate-400 hover:bg-slate-100"}`}
                             title={loc.is_active ? "Deactivate" : "Activate"}
                           >
                             {loc.is_active
@@ -940,7 +940,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <button
                 type="button"
                 onClick={() => setReceiptShowLogo((v) => !v)}
-                className={`relative w-11 h-6 rounded-full transition-colors ${receiptShowLogo ? "bg-green-600" : "bg-slate-200"}`}
+                className={`relative w-11 h-6 rounded-full transition-colors ${receiptShowLogo ? "bg-primary" : "bg-slate-200"}`}
               >
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${receiptShowLogo ? "translate-x-5" : "translate-x-0"}`} />
               </button>
@@ -952,7 +952,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 value={receiptTagline}
                 onChange={(e) => setReceiptTagline(e.target.value)}
                 placeholder="e.g. Quality you can trust"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <p className="text-[10px] text-slate-400 mt-1">Shown below your business name on receipts</p>
             </div>
@@ -964,7 +964,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 onChange={(e) => setReceiptFooter(e.target.value)}
                 placeholder="e.g. Thank you for shopping with us! No refunds after 7 days."
                 rows={3}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
               <p className="text-[10px] text-slate-400 mt-1">Printed at the bottom of every receipt</p>
             </div>
@@ -984,7 +984,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer p-0.5"
                 />
                 <div className="flex flex-wrap gap-2">
-                  {["#1a9c38", "#2563eb", "#7c3aed", "#dc2626", "#d97706", "#0891b2", "#0f172a", "#db2777"].map((c) => (
+                  {["#F2542D", "#2563eb", "#7c3aed", "#dc2626", "#d97706", "#0891b2", "#0f172a", "#db2777"].map((c) => (
                     <button
                       key={c}
                       type="button"
@@ -1010,7 +1010,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 onChange={(e) => setInvoiceFooterNotes(e.target.value)}
                 placeholder="e.g. Payment is due within 30 days. Late payments attract a 5% surcharge."
                 rows={3}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
               <p className="text-[10px] text-slate-400 mt-1">Shown at the bottom of every invoice (terms, return policy, etc.)</p>
             </div>
@@ -1023,7 +1023,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
 
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Instagram</label>
-              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-green-500">
+              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary">
                 <span className="px-3 py-2.5 bg-slate-50 text-slate-400 text-sm border-r border-slate-200">@</span>
                 <input
                   value={socialInstagram}
@@ -1036,7 +1036,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
 
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">X / Twitter</label>
-              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-green-500">
+              <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary">
                 <span className="px-3 py-2.5 bg-slate-50 text-slate-400 text-sm border-r border-slate-200">@</span>
                 <input
                   value={socialTwitter}
@@ -1053,7 +1053,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 value={socialWhatsapp}
                 onChange={(e) => setSocialWhatsapp(e.target.value)}
                 placeholder="e.g. +2348012345678"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -1061,7 +1061,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
           <button
             onClick={saveBranding}
             disabled={savingBranding}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-green-300/40"
+            className="flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-6 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-ember/20"
           >
             {savingBranding && <Loader2 className="w-4 h-4 animate-spin" />}
             {savingBranding ? "Saving..." : "Save changes"}
@@ -1106,15 +1106,15 @@ export function SettingsClient({ business, members, locations: initialLocations,
           </div>
 
           {/* ── Shareable store link card ── */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-primary rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
-              <Globe className="w-4 h-4 text-green-600" />
-              <p className="text-sm font-semibold text-green-800">Your Store Link</p>
+              <Globe className="w-4 h-4 text-primary" />
+              <p className="text-sm font-semibold text-primary">Your Store Link</p>
             </div>
-            <p className="text-xs text-green-700 mb-3">
+            <p className="text-xs text-primary mb-3">
               Share this link on WhatsApp, Instagram, or anywhere — customers can browse your products and place orders directly.
             </p>
-            <div className="flex items-center gap-2 bg-white border border-green-200 rounded-lg px-3 py-2 mb-3">
+            <div className="flex items-center gap-2 bg-white border border-primary rounded-lg px-3 py-2 mb-3">
               <span className="flex-1 text-sm text-slate-700 truncate font-mono select-all">
                 {typeof window !== "undefined" ? window.location.origin : "https://stokka.shop"}/store/{business.slug}
               </span>
@@ -1127,7 +1127,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   setStoreLinkCopied(true);
                   setTimeout(() => setStoreLinkCopied(false), 2000);
                 }}
-                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+                className="flex items-center gap-1.5 bg-primary hover:bg-ember-deep text-on-primary text-xs font-semibold px-3 py-2 rounded-lg transition"
               >
                 {storeLinkCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 {storeLinkCopied ? "Copied!" : "Copy Link"}
@@ -1136,7 +1136,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 href={`/store/${business.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 border border-green-300 text-green-700 hover:bg-green-100 text-xs font-semibold px-3 py-2 rounded-lg transition"
+                className="flex items-center gap-1.5 border border-green-300 text-primary hover:bg-primary-soft text-xs font-semibold px-3 py-2 rounded-lg transition"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 Visit Store
@@ -1152,7 +1152,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     setTimeout(() => setStoreLinkCopied(false), 2000);
                   }
                 }}
-                className="flex items-center gap-1.5 border border-green-300 text-green-700 hover:bg-green-100 text-xs font-semibold px-3 py-2 rounded-lg transition"
+                className="flex items-center gap-1.5 border border-green-300 text-primary hover:bg-primary-soft text-xs font-semibold px-3 py-2 rounded-lg transition"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 Share
@@ -1177,7 +1177,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   <p className="text-xs text-slate-400">No banner uploaded</p>
                 )}
               </div>
-              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1a9c38] border border-[#1a9c38] px-3 py-1.5 rounded-lg hover:bg-green-50 transition">
+              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary-soft transition">
                 {uploadingBanner ? "Uploading..." : bannerUrl ? "Change banner" : "Upload banner"}
                 <input type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} disabled={uploadingBanner} />
               </label>
@@ -1204,7 +1204,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 value={welcomeText}
                 onChange={(e) => setWelcomeText(e.target.value)}
                 placeholder="e.g. Welcome to our store! 🎉"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
               <p className="text-[11px] text-slate-400 mt-1">Shown as the headline on your store hero section.</p>
             </div>
@@ -1228,12 +1228,12 @@ export function SettingsClient({ business, members, locations: initialLocations,
                         toast.success("All Items image updated");
                       }}
                       className="relative aspect-square rounded-lg overflow-hidden border-2 transition"
-                      style={{ borderColor: allItemsImageUrl === p.image_url ? "#1a9c38" : "transparent" }}
+                      style={{ borderColor: allItemsImageUrl === p.image_url ? "#F2542D" : "transparent" }}
                       title={p.name}
                     >
                       <Image src={p.image_url!} alt={p.name} fill className="object-cover" sizes="80px" />
                       {allItemsImageUrl === p.image_url && (
-                        <div className="absolute inset-0 bg-green-600/20 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                           <Check className="w-4 h-4 text-white drop-shadow" />
                         </div>
                       )}
@@ -1278,7 +1278,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 onClick={saveBranding}
                 disabled={savingBranding}
                 className="ml-auto text-xs font-semibold px-4 py-2 rounded-lg text-white transition disabled:opacity-50"
-                style={{ backgroundColor: invoiceAccentColor || "#1a9c38" }}
+                style={{ backgroundColor: invoiceAccentColor || "#F2542D" }}
               >
                 {savingBranding ? "Saving…" : "Save Color"}
               </button>
@@ -1288,14 +1288,14 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <div className="flex items-center gap-3 flex-wrap">
                 <button
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold border"
-                  style={{ color: invoiceAccentColor || "#1a9c38", borderColor: invoiceAccentColor || "#1a9c38" }}
+                  style={{ color: invoiceAccentColor || "#F2542D", borderColor: invoiceAccentColor || "#F2542D" }}
                 >
                   Add To Cart
                 </button>
-                <span className="text-sm font-bold" style={{ color: invoiceAccentColor || "#1a9c38" }}>₦25,000.00</span>
+                <span className="text-sm font-bold" style={{ color: invoiceAccentColor || "#F2542D" }}>₦25,000.00</span>
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white"
-                  style={{ backgroundColor: invoiceAccentColor || "#1a9c38" }}
+                  style={{ backgroundColor: invoiceAccentColor || "#F2542D" }}
                 >
                   3 items
                 </span>
@@ -1319,14 +1319,14 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   value={customDomain}
                   onChange={(e) => setCustomDomain(e.target.value)}
                   placeholder="shop.yourbrand.com"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary font-mono"
                 />
               </div>
 
               <button
                 onClick={saveCustomDomain}
                 disabled={savingDomain}
-                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+                className="flex items-center gap-1.5 bg-primary hover:bg-ember-deep disabled:opacity-50 text-on-primary text-xs font-semibold px-4 py-2 rounded-lg transition"
               >
                 {domainSaved ? <Check className="w-3.5 h-3.5" /> : null}
                 {savingDomain ? "Saving…" : domainSaved ? "Saved!" : "Save Domain"}
@@ -1370,9 +1370,9 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   <p className="text-sm font-medium text-[#0F172A]">Enable Delivery Fee</p>
                   <p className="text-xs text-slate-400">Charge customers a delivery fee at checkout</p>
                 </div>
-                <button onClick={() => setShippingEnabled(!shippingEnabled)} className="text-slate-400 hover:text-green-600 transition">
+                <button onClick={() => setShippingEnabled(!shippingEnabled)} className="text-slate-400 hover:text-primary transition">
                   {shippingEnabled
-                    ? <ToggleRight className="w-8 h-8 text-green-600" />
+                    ? <ToggleRight className="w-8 h-8 text-primary" />
                     : <ToggleLeft className="w-8 h-8" />}
                 </button>
               </div>
@@ -1387,7 +1387,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       value={shippingFee}
                       onChange={(e) => setShippingFee(e.target.value)}
                       placeholder="0"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -1398,7 +1398,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       value={freeShippingAbove}
                       onChange={(e) => setFreeShippingAbove(e.target.value)}
                       placeholder="e.g. 10000 — leave blank to disable"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -1407,7 +1407,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       value={deliveryNote}
                       onChange={(e) => setDeliveryNote(e.target.value)}
                       placeholder="e.g. Delivered within 2–3 business days"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                 </>
@@ -1422,7 +1422,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={fbPixelId}
                     onChange={(e) => setFbPixelId(e.target.value)}
                     placeholder="e.g. 1234567890123456"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -1431,7 +1431,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                     value={gaMeasurementId}
                     onChange={(e) => setGaMeasurementId(e.target.value)}
                     placeholder="e.g. G-XXXXXXXXXX"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -1439,7 +1439,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <button
                 onClick={saveShippingSettings}
                 disabled={savingShipping}
-                className="px-5 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                className="px-5 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50"
               >
                 {savingShipping ? "Saving..." : "Save Store Settings"}
               </button>
@@ -1455,7 +1455,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <h3 className="font-semibold text-[#0F172A] mb-3">Invite Staff Member</h3>
             {inviteSuccess && (
-              <div className="bg-emerald-50 text-emerald-700 text-sm px-3 py-2 rounded-lg mb-3">
+              <div className="bg-primary-soft text-primary text-sm px-3 py-2 rounded-lg mb-3">
                 Invitation sent! The staff member will receive an email with instructions.
               </div>
             )}
@@ -1465,7 +1465,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="staff@email.com"
-                className="flex-1 min-w-0 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="flex-1 min-w-0 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <select
                 value={inviteRole}
@@ -1479,7 +1479,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
               <button
                 onClick={inviteStaff}
                 disabled={inviting || !inviteEmail.trim()}
-                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-green-300/40"
+                className="flex items-center gap-1.5 bg-primary hover:bg-ember-deep text-on-primary px-4 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-60 shadow-sm shadow-ember/20"
               >
                 <Mail className="w-4 h-4" />
                 {inviting ? "Sending..." : "Invite"}
@@ -1501,7 +1501,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                   <div key={member.id} className="px-5 py-4 space-y-3">
                     {/* Name row */}
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-sm flex-shrink-0">
+                      <div className="w-9 h-9 bg-primary-soft rounded-full flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
                         {member.profiles.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1534,8 +1534,8 @@ export function SettingsClient({ business, members, locations: initialLocations,
                             disabled={isOwner || isCurrentUser}
                             className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
                               member.role === role
-                                ? "bg-green-600 text-white border-green-600 shadow-sm shadow-green-200"
-                                : "bg-white text-slate-500 border-slate-200 hover:border-green-400 hover:text-green-600"
+                                ? "bg-primary text-on-primary border-primary shadow-sm shadow-ember/20"
+                                : "bg-white text-slate-500 border-slate-200 hover:border-primary hover:text-primary"
                             }`}
                           >
                             {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -1552,7 +1552,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                         <select
                           value={member.location_id ?? ""}
                           onChange={(e) => changeStaffLocation(member.id, e.target.value)}
-                          className="flex-1 px-2 py-1 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-green-400"
+                          className="flex-1 px-2 py-1 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-primary"
                         >
                           <option value="">All locations</option>
                           {locationsList.filter((l) => l.is_active).map((l) => (
@@ -1568,7 +1568,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
                       <select
                         value={commissionRules[member.profiles.id]?.type ?? "percentage"}
                         onChange={(e) => setCommissionRules((prev) => ({ ...prev, [member.profiles.id]: { ...prev[member.profiles.id], type: e.target.value as "percentage" | "flat" } }))}
-                        className="px-2 py-1 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-green-400"
+                        className="px-2 py-1 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-primary"
                       >
                         <option value="percentage">% of sale</option>
                         <option value="flat">Flat per sale</option>
@@ -1580,12 +1580,12 @@ export function SettingsClient({ business, members, locations: initialLocations,
                         value={commissionRules[member.profiles.id]?.value ?? ""}
                         onChange={(e) => setCommissionRules((prev) => ({ ...prev, [member.profiles.id]: { type: prev[member.profiles.id]?.type ?? "percentage", value: e.target.value } }))}
                         placeholder="0"
-                        className="w-20 px-2 py-1 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-400"
+                        className="w-20 px-2 py-1 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary"
                       />
                       <button
                         onClick={() => saveCommissionRule(member.profiles.id)}
                         disabled={savingCommission === member.profiles.id}
-                        className="px-2.5 py-1 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                        className="px-2.5 py-1 bg-primary text-on-primary rounded-lg text-xs font-semibold hover:bg-ember-deep transition disabled:opacity-50"
                       >
                         {savingCommission === member.profiles.id ? "..." : "Save"}
                       </button>

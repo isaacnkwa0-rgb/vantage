@@ -37,7 +37,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -125,7 +125,7 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
       {!showForm && (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full flex items-center justify-center gap-2 h-11 border-2 border-dashed border-slate-200 rounded-[8px] text-[13px] font-semibold text-slate-400 hover:border-[#1a9c38] hover:text-[#1a9c38] transition"
+          className="w-full flex items-center justify-center gap-2 h-11 border-2 border-dashed border-slate-200 rounded-[8px] text-[13px] font-semibold text-slate-400 hover:border-primary hover:text-primary transition"
         >
           <Plus className="w-4 h-4" /> Add Payment Account
         </button>
@@ -168,7 +168,7 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
           </div>
           <div className="px-4 pb-4 flex gap-3">
             <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); }} className="py-2.5 px-4 border border-slate-200 rounded-[8px] text-[14px] text-slate-600 hover:bg-slate-50 transition">Cancel</button>
-            <button onClick={addAccount} disabled={saving || !form.account_name.trim() || !form.bank_name.trim()} className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20">
+            <button onClick={addAccount} disabled={saving || !form.account_name.trim() || !form.bank_name.trim()} className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20">
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               Save Account
             </button>
@@ -226,7 +226,7 @@ export function BankAccountsClient({ accounts: initial, businessId }: Props) {
                       className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition active:scale-95"
                     >
                       {copiedId === account.id
-                        ? <><CheckCheck className="w-3 h-3 text-[#1a9c38]" /> Copied</>
+                        ? <><CheckCheck className="w-3 h-3 text-primary" /> Copied</>
                         : <><Copy className="w-3 h-3" /> Copy Number</>}
                     </button>
                   )}

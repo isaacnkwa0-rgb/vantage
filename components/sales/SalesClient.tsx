@@ -57,8 +57,8 @@ const PAYMENT_ICONS: Record<string, React.ElementType> = {
 };
 
 const PAYMENT_COLORS: Record<string, string> = {
-  cash: "bg-emerald-50 text-emerald-700",
-  card: "bg-green-50 text-green-700",
+  cash: "bg-primary-soft text-primary",
+  card: "bg-primary-soft text-primary",
   transfer: "bg-violet-50 text-violet-700",
   credit: "bg-amber-50 text-amber-700",
 };
@@ -204,9 +204,9 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
       {/* ── Desktop summary cards (hidden on mobile) ─── */}
       <div className="hidden sm:grid grid-cols-3 gap-3 px-5 pt-5">
         <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 to-green-400" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ember to-green-400" />
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200">
+            <div className="w-7 h-7 bg-gradient-to-br from-ember to-ember-deep rounded-lg flex items-center justify-center shadow-sm shadow-ember/20">
               <ShoppingBag className="w-3.5 h-3.5 text-white" />
             </div>
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Transactions</p>
@@ -223,7 +223,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             </div>
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Revenue</p>
           </div>
-          <p className="text-xl font-bold text-emerald-600 truncate">{fmt(totalRevenue)}</p>
+          <p className="text-xl font-bold text-success truncate">{fmt(totalRevenue)}</p>
           <p className="text-xs text-slate-400 mt-0.5">from filtered sales</p>
         </div>
 
@@ -248,7 +248,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by sale number or customer..."
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38] bg-white"
+            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
           />
         </div>
 
@@ -259,14 +259,14 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
             className={cn(
               "flex items-center gap-1.5 px-3 py-2.5 border rounded-[8px] text-sm font-medium transition bg-white",
               paymentFilter !== "all"
-                ? "border-[#1a9c38] text-[#1a9c38]"
+                ? "border-primary text-primary"
                 : "border-slate-200 text-slate-600 hover:bg-slate-50"
             )}
           >
             <SlidersHorizontal className="w-4 h-4" />
             <span className="hidden sm:inline capitalize">{paymentFilter === "all" ? "Filter" : paymentFilter}</span>
             {paymentFilter !== "all" && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1a9c38] flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
             )}
           </button>
 
@@ -279,7 +279,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                   className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition"
                 >
                   {tab.label}
-                  {paymentFilter === tab.value && <Check className="w-3.5 h-3.5 text-[#1a9c38]" />}
+                  {paymentFilter === tab.value && <Check className="w-3.5 h-3.5 text-primary" />}
                 </button>
               ))}
             </div>
@@ -319,9 +319,9 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                     <div className="flex items-start gap-3">
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5",
-                        isReturned ? "bg-orange-50" : "bg-green-50"
+                        isReturned ? "bg-orange-50" : "bg-primary-soft"
                       )}>
-                        <PayIcon className={cn("w-4 h-4", isReturned ? "text-orange-400" : "text-[#1a9c38]")} />
+                        <PayIcon className={cn("w-4 h-4", isReturned ? "text-orange-400" : "text-primary")} />
                       </div>
 
                       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
@@ -432,7 +432,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                           {fmt(sale.total_amount)}
                         </p>
                         {sale.discount_amount > 0 && !isReturned && (
-                          <p className="text-xs text-emerald-600">-{fmt(sale.discount_amount)} disc.</p>
+                          <p className="text-xs text-success">-{fmt(sale.discount_amount)} disc.</p>
                         )}
                       </div>
 
@@ -440,7 +440,7 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
                         <button
                           onClick={() => handleReprint(sale)}
                           disabled={isReprinting}
-                          className="flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-green-300 hover:text-green-600 hover:bg-green-50 transition opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                          className="flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-green-300 hover:text-primary hover:bg-primary-soft transition opacity-0 group-hover:opacity-100 disabled:opacity-50"
                         >
                           {isReprinting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Printer className="w-3.5 h-3.5" />}
                         </button>

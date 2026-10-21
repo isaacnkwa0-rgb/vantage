@@ -119,7 +119,7 @@ export function BarcodeLabelsClient({ products, currency }: Props) {
         <button
           onClick={printLabels}
           disabled={selectedProducts.length === 0}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm disabled:opacity-40"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition shadow-sm disabled:opacity-40"
         >
           <Printer className="w-4 h-4" /> Print Labels ({selectedProducts.length})
         </button>
@@ -129,7 +129,7 @@ export function BarcodeLabelsClient({ products, currency }: Props) {
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-wrap gap-4 items-center">
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">Label Size</label>
-          <select value={size} onChange={(e) => setSize(e.target.value as LabelSize)} className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          <select value={size} onChange={(e) => setSize(e.target.value as LabelSize)} className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
             {LABEL_SIZES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
         </div>
@@ -153,7 +153,7 @@ export function BarcodeLabelsClient({ products, currency }: Props) {
             placeholder="Search by name, SKU or barcode..."
             className="flex-1 text-sm focus:outline-none"
           />
-          <button onClick={selectAll} className="text-xs text-green-600 hover:text-green-700 font-medium transition flex-shrink-0">
+          <button onClick={selectAll} className="text-xs text-primary hover:text-primary font-medium transition flex-shrink-0">
             {allSelected ? "Deselect All" : "Select All"}
           </button>
         </div>
@@ -179,7 +179,7 @@ export function BarcodeLabelsClient({ products, currency }: Props) {
                   )}
                 >
                   {isSelected
-                    ? <CheckSquare className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    ? <CheckSquare className="w-4 h-4 text-primary flex-shrink-0" />
                     : <Square className="w-4 h-4 text-slate-300 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#0F172A] truncate">{p.name}</p>
@@ -201,7 +201,7 @@ export function BarcodeLabelsClient({ products, currency }: Props) {
                         value={qty[p.id] ?? 1}
                         onClick={(e) => e.stopPropagation()}
                         onChange={(e) => { e.stopPropagation(); setQty((q) => ({ ...q, [p.id]: parseInt(e.target.value) || 1 })); }}
-                        className="w-14 px-2 py-1 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-14 px-2 py-1 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   )}

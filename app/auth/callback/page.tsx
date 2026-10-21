@@ -64,7 +64,7 @@ function CallbackInner() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-[#1a9c38]" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
         <p className="text-slate-500 text-sm">Signing you in…</p>
       </div>
     </div>

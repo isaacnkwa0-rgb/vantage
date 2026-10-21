@@ -49,7 +49,7 @@ export function ConfirmDialog({
               "flex-1 py-2.5 rounded-[10px] text-[14px] font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2",
               destructive
                 ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-[#1a9c38] hover:bg-green-700 text-white",
+                : "bg-primary hover:bg-ember-deep text-on-primary",
             ].join(" ")}
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}

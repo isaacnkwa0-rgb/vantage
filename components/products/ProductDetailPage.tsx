@@ -179,7 +179,7 @@ export function ProductDetailPage({
       <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-100 flex items-center px-4 h-14 gap-3 flex-shrink-0">
         <Link
           href={`/${slug}/products`}
-          className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium flex-shrink-0"
+          className="flex items-center gap-0.5 text-primary text-[15px] font-medium flex-shrink-0"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Products</span>
@@ -189,7 +189,7 @@ export function ProductDetailPage({
         </h1>
         <button
           onClick={() => setShowEdit(true)}
-          className="text-green-600 text-sm font-semibold flex-shrink-0"
+          className="text-primary text-sm font-semibold flex-shrink-0"
         >
           Edit
         </button>
@@ -223,7 +223,7 @@ export function ProductDetailPage({
             <div className="px-4 py-4 flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <p className="font-bold text-[#0F172A] text-lg leading-tight">{product.name}</p>
-                <p className="text-2xl font-bold text-green-600 mt-1">{fmt(product.selling_price)}</p>
+                <p className="text-2xl font-bold text-primary mt-1">{fmt(product.selling_price)}</p>
                 {!isService && product.cost_price > 0 && (
                   <p className="text-xs text-slate-400 mt-0.5">
                     {margin.toFixed(0)}% margin · cost {fmt(product.cost_price)}
@@ -237,8 +237,8 @@ export function ProductDetailPage({
                   disabled={toggling}
                   aria-label={isActive ? "Unpublish product" : "Publish product"}
                   className={cn(
-                    "w-12 h-6 rounded-full transition-colors relative flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
-                    isActive ? "bg-green-500" : "bg-slate-200",
+                    "w-12 h-6 rounded-full transition-colors relative flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                    isActive ? "bg-primary" : "bg-slate-200",
                     toggling && "opacity-60"
                   )}
                 >
@@ -324,10 +324,10 @@ export function ProductDetailPage({
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
               <button
                 onClick={() => setShowHistory((v) => !v)}
-                className="w-full flex items-center gap-3 px-4 py-4 active:bg-slate-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500"
+                className="w-full flex items-center gap-3 px-4 py-4 active:bg-slate-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
               >
-                <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-                  <History className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
+                  <History className="w-5 h-5 text-primary" />
                 </div>
                 <span className="flex-1 text-left text-sm font-semibold text-slate-700">
                   Stock History
@@ -353,7 +353,7 @@ export function ProductDetailPage({
                         <span
                           className={cn(
                             "text-sm font-bold w-10 text-center flex-shrink-0",
-                            adj.adjustment > 0 ? "text-green-600" : "text-red-500"
+                            adj.adjustment > 0 ? "text-primary" : "text-red-500"
                           )}
                         >
                           {adj.adjustment > 0 ? `+${adj.adjustment}` : adj.adjustment}
@@ -405,7 +405,7 @@ export function ProductDetailPage({
             </button>
             <button
               onClick={handleShare}
-              className="flex items-center justify-center gap-2 bg-green-600 text-white rounded-2xl h-12 text-sm font-semibold active:bg-green-700 transition"
+              className="flex items-center justify-center gap-2 bg-primary text-on-primary rounded-2xl h-12 text-sm font-semibold active:bg-ember-deep transition"
             >
               <Share2 className="w-4 h-4" />
               {copied ? "Link copied!" : "Share link"}

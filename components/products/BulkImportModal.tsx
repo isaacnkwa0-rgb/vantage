@@ -141,14 +141,14 @@ export function BulkImportModal({ businessId, categories, onClose }: Props) {
           <div className="p-6 space-y-4">
             <button
               onClick={downloadTemplate}
-              className="flex items-center gap-2 text-sm text-green-600 hover:underline font-medium"
+              className="flex items-center gap-2 text-sm text-primary hover:underline font-medium"
             >
               <Download className="w-4 h-4" />
               Download CSV template
             </button>
 
             <div
-              className="border-2 border-dashed border-slate-200 rounded-xl p-10 text-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition"
+              className="border-2 border-dashed border-slate-200 rounded-xl p-10 text-center cursor-pointer hover:border-primary hover:bg-primary-soft transition"
               onClick={() => fileRef.current?.click()}
             >
               <Upload className="w-10 h-10 text-slate-300 mx-auto mb-3" />
@@ -180,7 +180,7 @@ export function BulkImportModal({ businessId, categories, onClose }: Props) {
                     <tr key={i} className={row.errors.length > 0 ? "bg-red-50" : ""}>
                       <td className="px-3 py-2">
                         {row.errors.length === 0 ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          <CheckCircle2 className="w-4 h-4 text-success" />
                         ) : (
                           <div title={row.errors.join(", ")}>
                             <AlertCircle className="w-4 h-4 text-red-500" />
@@ -208,7 +208,7 @@ export function BulkImportModal({ businessId, categories, onClose }: Props) {
               <button
                 onClick={handleImport}
                 disabled={validRows.length === 0 || importing}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 shadow-sm shadow-green-300/40"
+                className="flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-5 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
               >
                 {importing && <Loader2 className="w-4 h-4 animate-spin" />}
                 {importing ? "Importing..." : `Import ${validRows.length} product${validRows.length !== 1 ? "s" : ""}`}
@@ -220,7 +220,7 @@ export function BulkImportModal({ businessId, categories, onClose }: Props) {
         {/* Done step */}
         {step === "done" && (
           <div className="p-8 text-center space-y-4">
-            <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
+            <CheckCircle2 className="w-16 h-16 text-success mx-auto" />
             <div>
               <p className="text-lg font-bold text-[#0F172A]">{importedCount} products imported!</p>
               {invalidCount > 0 && (
@@ -229,7 +229,7 @@ export function BulkImportModal({ businessId, categories, onClose }: Props) {
             </div>
             <button
               onClick={onClose}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition"
+              className="bg-primary hover:bg-ember-deep text-on-primary px-6 py-2.5 rounded-xl text-sm font-semibold transition"
             >
               Done
             </button>

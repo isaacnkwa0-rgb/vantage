@@ -38,7 +38,7 @@ export default async function CustomersPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title={isService ? "Clients" : "Customers"} bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title={isService ? "Clients" : "Customers"} bg="bg-surface" border={false} centered />
       <CustomersClient
         customers={(customersRes.data ?? []) as any}
         tags={(tagsRes.data ?? []) as any}

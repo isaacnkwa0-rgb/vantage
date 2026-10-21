@@ -47,12 +47,12 @@ export default async function BusinessLayout({ children, params }: Props) {
         {/* Skip to main content — visible on focus for keyboard users */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200] focus:px-4 focus:py-2 focus:bg-green-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200] focus:px-4 focus:py-2 focus:bg-primary focus:text-on-primary focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg"
         >
           Skip to main content
         </a>
 
-        <div className="flex h-[100dvh] overflow-hidden bg-[#F8FAFC]">
+        <div className="flex h-[100dvh] overflow-hidden bg-bg">
           {/* Desktop only — icon-strip sidebar, hidden on mobile */}
           <div className="hidden lg:block">
             <Sidebar slug={businessSlug} />

@@ -210,8 +210,8 @@ export function ThermalPrinterClient({ business, recentSales }: Props) {
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", port ? "bg-green-100" : "bg-slate-100")}>
-              <Usb className={cn("w-5 h-5", port ? "text-green-600" : "text-slate-400")} />
+            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", port ? "bg-primary-soft" : "bg-slate-100")}>
+              <Usb className={cn("w-5 h-5", port ? "text-primary" : "text-slate-400")} />
             </div>
             <div>
               <p className="text-sm font-semibold text-[#0F172A]">
@@ -227,13 +227,13 @@ export function ThermalPrinterClient({ business, recentSales }: Props) {
           {supportsSerial && (
             port
               ? <button onClick={disconnectPrinter} className="px-3 py-1.5 text-sm text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition">Disconnect</button>
-              : <button onClick={connectPrinter} disabled={connecting} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+              : <button onClick={connectPrinter} disabled={connecting} className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50">
                   <Usb className="w-4 h-4" /> {connecting ? "Connecting..." : "Connect Printer"}
                 </button>
           )}
         </div>
         {lastStatus && (
-          <div className={cn("mt-3 flex items-center gap-2 text-sm", lastStatus === "ok" ? "text-green-600" : "text-red-500")}>
+          <div className={cn("mt-3 flex items-center gap-2 text-sm", lastStatus === "ok" ? "text-primary" : "text-red-500")}>
             {lastStatus === "ok" ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
             {lastStatus === "ok" ? "Last operation successful" : "Last operation failed — check printer connection"}
           </div>

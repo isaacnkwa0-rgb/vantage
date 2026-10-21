@@ -74,10 +74,10 @@ export default async function SettingsPage({ params, searchParams }: Props) {
   return (
     <div className="flex flex-col flex-1 overflow-auto">
       <header className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 flex-shrink-0 relative">
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-600 via-green-400 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ember via-green-400 to-transparent pointer-events-none" />
         <Link
           href={`/${businessSlug}/settings`}
-          className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium"
+          className="flex items-center gap-0.5 text-primary text-[15px] font-medium"
           aria-label="Back to settings"
         >
           <ChevronLeft className="w-4 h-4" />

@@ -20,7 +20,7 @@ interface Props {
 }
 
 const METHOD_STYLES: Record<string, string> = {
-  cash: "bg-green-50 text-green-700",
+  cash: "bg-primary-soft text-primary",
   card: "bg-blue-50 text-blue-700",
   transfer: "bg-purple-50 text-purple-700",
   split: "bg-amber-50 text-amber-700",
@@ -44,7 +44,7 @@ export function RecentTransactions({ sales, currency, businessType, slug }: Prop
           <h3 className="text-sm font-semibold text-slate-900">{heading}</h3>
           <p className="text-xs text-slate-400 mt-0.5">{sales.length} {txLabel} today</p>
         </div>
-        <Link href={`/${slug}/sales`} className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-semibold transition">
+        <Link href={`/${slug}/sales`} className="flex items-center gap-1 text-xs text-primary hover:text-primary font-semibold transition">
           View all <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
@@ -62,7 +62,7 @@ export function RecentTransactions({ sales, currency, businessType, slug }: Prop
           </div>
           <Link
             href={`/${slug}/pos`}
-            className="mt-1 px-3.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition"
+            className="mt-1 px-3.5 py-1.5 bg-primary hover:bg-ember-deep text-on-primary text-xs font-semibold rounded-lg transition"
           >
             {isService ? "Record service" : isRestaurant ? "New order" : "Make a sale"}
           </Link>

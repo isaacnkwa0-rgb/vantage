@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY ?? "placeholder");
 
 export async function POST(req: NextRequest) {
   const { email, businessSlug } = await req.json();
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     subject: `Your ${business.name} portal login code`,
     html: `
       <div style="font-family:sans-serif;max-width:400px;margin:0 auto">
-        <h2 style="color:#1a9c38">${business.name}</h2>
+        <h2 style="color:#F2542D">${business.name}</h2>
         <p>Hi ${customer.name},</p>
         <p>Your one-time login code is:</p>
         <div style="background:#f1f5f9;border-radius:8px;padding:20px;text-align:center;font-size:32px;font-weight:bold;letter-spacing:8px;font-family:monospace">${otp}</div>

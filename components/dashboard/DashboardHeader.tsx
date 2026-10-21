@@ -27,7 +27,7 @@ function getFormattedDate() {
 }
 
 const QUICK_ACTIONS = [
-  { label: "New Sale", icon: ShoppingCart, href: "pos", color: "bg-green-600 hover:bg-green-700 text-white shadow-sm shadow-green-200" },
+  { label: "New Sale", icon: ShoppingCart, href: "pos", color: "bg-primary hover:bg-ember-deep text-on-primary shadow-sm shadow-ember/20" },
   { label: "Add Product", icon: Package, href: "products", color: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200" },
   { label: "Add Customer", icon: Users, href: "customers", color: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200" },
   { label: "Create Invoice", icon: FileText, href: "invoices", color: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200" },
@@ -35,7 +35,7 @@ const QUICK_ACTIONS = [
 ] as const;
 
 const SERVICE_ACTIONS = [
-  { label: "Record Service", icon: ShoppingCart, href: "pos", color: "bg-green-600 hover:bg-green-700 text-white shadow-sm shadow-green-200" },
+  { label: "Record Service", icon: ShoppingCart, href: "pos", color: "bg-primary hover:bg-ember-deep text-on-primary shadow-sm shadow-ember/20" },
   { label: "Add Client", icon: Users, href: "customers", color: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200" },
   { label: "Create Invoice", icon: FileText, href: "invoices", color: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200" },
   { label: "Record Expense", icon: Receipt, href: "expenses", color: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200" },

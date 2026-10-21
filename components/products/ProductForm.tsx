@@ -222,7 +222,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                 onClick={() => setShowScanner(true)}
                 disabled={lookingUp}
                 title="Scan barcode to auto-fill product details"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition disabled:opacity-60"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-ember-deep text-on-primary text-xs font-semibold rounded-lg transition disabled:opacity-60"
               >
                 {lookingUp
                   ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -243,7 +243,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
           {/* Scan status banner */}
           {scanStatus === "found" && (
-            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-3 py-2 rounded-lg">
+            <div className="flex items-center gap-2 bg-primary-soft border border-primary text-primary text-sm px-3 py-2 rounded-lg">
               <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
               Product details filled from barcode database — review and add your prices.
             </div>
@@ -279,7 +279,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   </div>
                 )}
               </div>
-              <label className="cursor-pointer text-sm text-green-500 hover:underline font-medium">
+              <label className="cursor-pointer text-sm text-primary hover:underline font-medium">
                 {uploading ? "Uploading..." : imageUrl ? "Change image" : "Upload image"}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
               </label>
@@ -292,7 +292,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
             <input
               {...register("name")}
               placeholder={isService ? "e.g. Haircut, Full Body Massage" : "e.g. Samsung Galaxy A15"}
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
           </div>
@@ -303,7 +303,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Category</label>
               <select
                 {...register("category_id")}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
               >
                 <option value="">No category</option>
                 {categories.map((c) => (
@@ -317,7 +317,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                 <input
                   {...register("sku")}
                   placeholder="Optional"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             )}
@@ -328,7 +328,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               <input
                 {...register("barcode")}
                 placeholder="EAN / UPC — or scan above to fill automatically"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           )}
@@ -338,7 +338,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Location / Branch</label>
               <select
                 {...register("location_id")}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
               >
                 <option value="">No specific location</option>
                 {locations.map((l) => (
@@ -362,7 +362,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {errors.selling_price && <p className="text-red-500 text-xs mt-1">{errors.selling_price.message}</p>}
               </div>
@@ -377,7 +377,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -391,7 +391,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {errors.selling_price && <p className="text-red-500 text-xs mt-1">{errors.selling_price.message}</p>}
               </div>
@@ -403,7 +403,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -432,7 +432,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                       {...register("stock_quantity")}
                       type="number"
                       min="0"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -441,7 +441,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                       {...register("low_stock_threshold")}
                       type="number"
                       min="0"
-                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                 </div>
@@ -458,7 +458,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                     {...register("min_order_qty")}
                     type="number"
                     min="1"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">Minimum units per sale</p>
                 </div>
@@ -472,7 +472,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                     type="number"
                     min="1"
                     placeholder="No limit"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">Leave blank for no limit</p>
                 </div>
@@ -487,7 +487,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               {...register("description")}
               rows={2}
               placeholder={isService ? "Optional service description" : "Optional product description"}
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             />
           </div>
 
@@ -507,8 +507,8 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
               type="button"
               onClick={() => setValue("is_active", !isPublished, { shouldDirty: true })}
               className={cn(
-                "w-12 h-6 rounded-full transition-colors relative flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500",
-                isPublished ? "bg-green-500" : "bg-slate-200"
+                "w-12 h-6 rounded-full transition-colors relative flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                isPublished ? "bg-primary" : "bg-slate-200"
               )}
               aria-label={isPublished ? "Unpublish" : "Publish"}
             >
@@ -539,7 +539,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-sm shadow-green-300/40"
+              className="flex-1 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-sm shadow-ember/20"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {editingProduct ? "Save changes" : isService ? "Add service" : "Add product"}

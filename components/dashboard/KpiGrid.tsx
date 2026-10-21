@@ -45,7 +45,7 @@ function KpiCard({ label, value, sub, trend, trendLabel, accentClass }: KpiCardP
         <p className="text-xs font-semibold text-slate-500 tracking-wide">{label}</p>
         <TrendBadge value={trend} />
       </div>
-      <p className={cn("text-2xl font-bold tracking-tight", accentClass)}>{value}</p>
+      <p className={cn("text-2xl font-bold tracking-tight font-display", accentClass)}>{value}</p>
       <p className="text-xs text-slate-400 mt-1.5">{sub}</p>
       {trend !== null && (
         <p className="text-[11px] text-slate-400 mt-0.5">{trendLabel}</p>
@@ -109,7 +109,7 @@ export function KpiGrid({
         sub={margin !== null ? `${margin.toFixed(1)}% margin` : "this month"}
         trend={pct(netProfit, lastMonthProfit)}
         trendLabel="vs last month"
-        accentClass={netProfit >= 0 ? "text-emerald-600" : "text-red-600"}
+        accentClass={netProfit >= 0 ? "text-success" : "text-danger"}
       />
     </div>
   );

@@ -29,7 +29,7 @@ export default async function ExpensesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Expenses" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Expenses" bg="bg-surface" border={false} centered />
       <ExpensesClient
         expenses={expenses ?? []}
         businessId={business.id}

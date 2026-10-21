@@ -71,7 +71,7 @@ export function SettingsMenu({ business, businessSlug }: Props) {
     <div className="flex-1 flex flex-col overflow-auto bg-[#f5f5f5]">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 bg-white border-b border-slate-100">
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-600 via-green-400 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ember via-green-400 to-transparent" />
         <div className="flex items-center px-4 h-14">
           <div className="flex-1" />
           <p className="text-base font-bold text-[#0F172A]">{business.name}</p>
@@ -102,7 +102,7 @@ export function SettingsMenu({ business, businessSlug }: Props) {
                     idx !== section.items.length - 1 ? "border-b border-slate-100" : ""
                   }`}
                 >
-                  <item.icon className="w-5 h-5 text-[#1a9c38] flex-shrink-0" />
+                  <item.icon className="w-5 h-5 text-primary flex-shrink-0" />
                   <span className="flex-1 text-[#1a1a1a] text-[15px]">{item.label}</span>
                   <ChevronRight className="w-4 h-4 text-slate-300" />
                 </Link>

@@ -34,15 +34,15 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-green-600" />
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 bg-primary-soft rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8 text-primary" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
         <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
           We sent a password reset link to your email. Click it to set a new password.
         </p>
-        <Link href="/login" className="mt-6 inline-block text-[#1a9c38] font-semibold text-sm">
+        <Link href="/login" className="mt-6 inline-block text-primary font-semibold text-sm">
           Back to sign in →
         </Link>
       </div>
@@ -50,11 +50,11 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       <div className="px-5 pt-12 pb-4">
         <Link
           href="/login"
-          className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit"
+          className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit"
         >
           <ChevronLeft className="w-[13px] h-[13px]" /> Back
         </Link>
@@ -63,8 +63,8 @@ export default function ForgotPasswordPage() {
       <div className="flex-1 px-5 pt-8 pb-10">
         <Logo variant="full" size={36} className="mb-6" />
 
-        <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-          <Mail className="w-6 h-6 text-[#1a9c38]" />
+        <div className="w-12 h-12 bg-primary-soft rounded-2xl flex items-center justify-center mb-6">
+          <Mail className="w-6 h-6 text-primary" />
         </div>
 
         <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">
@@ -81,7 +81,7 @@ export default function ForgotPasswordPage() {
               type="email"
               autoComplete="email"
               placeholder="Email Address*"
-              className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+              className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
+            className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
           >
             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
             {isSubmitting ? "Sending..." : "Send reset link"}
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-[14px] text-slate-400 mt-6">
           Remembered it?{" "}
-          <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
+          <Link href="/login" className="text-primary font-semibold">Sign in</Link>
         </p>
       </div>
     </div>

@@ -196,7 +196,7 @@ export function ReturnModal({ sale, items, business, userId, onClose, onSuccess 
                 <span className="font-medium">{reason}</span>
               </div>
               {refundMethod === "store_credit" && sale.customers && (
-                <p className="text-xs text-emerald-600 pt-1 border-t border-slate-200">
+                <p className="text-xs text-success pt-1 border-t border-slate-200">
                   {fmt(refundAmount)} added to {sale.customers.name}&apos;s store credit
                 </p>
               )}

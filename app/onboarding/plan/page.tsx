@@ -106,12 +106,12 @@ function PlanPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       {/* Header */}
       <div className="px-5 pt-12 pb-2">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit"
+          className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit"
         >
           <ChevronLeft className="w-[13px] h-[13px]" /> Back
         </button>
@@ -136,7 +136,7 @@ function PlanPage() {
         {/* Billing period segmented control */}
         <div
           className="flex rounded-[4px] p-1 mb-5"
-          style={{ backgroundColor: "#ecf7f1" }}
+          style={{ backgroundColor: "#FDE3D9" }}
         >
           {BILLING_PERIODS.map((b) => (
             <button
@@ -145,7 +145,7 @@ function PlanPage() {
               className={cn(
                 "flex-1 h-9 rounded-[4px] text-[13px] font-semibold transition",
                 billing === b.key
-                  ? "bg-white text-[#1a9c38] shadow-sm"
+                  ? "bg-white text-primary shadow-sm"
                   : "text-slate-600"
               )}
             >
@@ -165,11 +165,11 @@ function PlanPage() {
             <button
               key={p.key}
               onClick={() => setSelectedPlan(p.key)}
-              style={selectedPlan === p.key ? { backgroundColor: "#ecf7f1" } : undefined}
+              style={selectedPlan === p.key ? { backgroundColor: "#FDE3D9" } : undefined}
               className={cn(
                 "px-4 h-8 rounded-[8px] border text-[14px] font-medium whitespace-nowrap flex-shrink-0 transition",
                 selectedPlan === p.key
-                  ? "border-[#1a9c38] text-slate-900"
+                  ? "border-primary text-slate-900"
                   : "bg-[#F3F4F6] border-transparent text-slate-700"
               )}
             >
@@ -184,7 +184,7 @@ function PlanPage() {
           <div className="flex items-start justify-between mb-1">
             <h2 className="text-[17px] font-bold text-slate-900">{plan.label}</h2>
             {plan.badge && (
-              <span className="bg-[#1a9c38] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+              <span className="bg-primary text-on-primary text-[11px] font-bold px-2.5 py-0.5 rounded-full">
                 {plan.badge}
               </span>
             )}
@@ -213,7 +213,7 @@ function PlanPage() {
                 </span>
               </div>
               {billing !== "monthly" && (
-                <p className="text-[#1a9c38] text-[12px] font-semibold mt-0.5">
+                <p className="text-primary text-[12px] font-semibold mt-0.5">
                   Save {BILLING_PERIODS.find((b) => b.key === billing)?.discount}
                 </p>
               )}
@@ -227,7 +227,7 @@ function PlanPage() {
           <ul className="space-y-3">
             {plan.features.map((f) => (
               <li key={f} className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-[#1a9c38] flex-shrink-0" />
+                <Check className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-[13px] text-slate-700">{f}</span>
               </li>
             ))}
@@ -243,14 +243,14 @@ function PlanPage() {
         <button
           onClick={handleSelect}
           disabled={isLoading}
-          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition disabled:opacity-60"
+          className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition disabled:opacity-60"
         >
           Select Plan
         </button>
 
         <button
           onClick={handleFreeTrial}
-          className="w-full h-11 border border-[#1a9c38] rounded-[4px] text-[15px] text-[#1a9c38] font-semibold flex items-center justify-center"
+          className="w-full h-11 border border-primary rounded-[4px] text-[15px] text-primary font-semibold flex items-center justify-center"
         >
           Start free trial for 14 days
         </button>

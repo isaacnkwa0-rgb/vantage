@@ -47,7 +47,7 @@ function Field({
         <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex items-center justify-between">
           <p className="text-[13px] text-slate-500 truncate leading-none flex-1">{value}</p>
           {actionLabel && onAction && (
-            <button onClick={onAction} className="text-[13px] text-[#1a9c38] font-semibold ml-2 flex-shrink-0">
+            <button onClick={onAction} className="text-[13px] text-primary font-semibold ml-2 flex-shrink-0">
               {actionLabel}
             </button>
           )}
@@ -182,7 +182,7 @@ export function ProfileClient({ slug, profile, userId }: Props) {
               <div className="py-6 text-center">
                 <p className="text-[14px] text-slate-700 mb-1">Confirmation sent!</p>
                 <p className="text-[13px] text-slate-400">Check <span className="font-semibold">{newEmail}</span> to confirm the change.</p>
-                <button onClick={() => { setShowEmailChange(false); setEmailSent(false); setNewEmail(""); }} className="mt-5 w-full h-11 bg-[#1a9c38] text-white font-bold rounded-[4px] text-[15px]">Done</button>
+                <button onClick={() => { setShowEmailChange(false); setEmailSent(false); setNewEmail(""); }} className="mt-5 w-full h-11 bg-primary text-on-primary font-bold rounded-[4px] text-[15px]">Done</button>
               </div>
             ) : (
               <>
@@ -198,7 +198,7 @@ export function ProfileClient({ slug, profile, userId }: Props) {
                   />
                 </div>
                 {emailError && <p className="text-[12px] text-red-500 mb-2">{emailError}</p>}
-                <button onClick={handleEmailChange} className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center">
+                <button onClick={handleEmailChange} className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition flex items-center justify-center">
                   Send confirmation
                 </button>
               </>
@@ -207,8 +207,8 @@ export function ProfileClient({ slug, profile, userId }: Props) {
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-10 pb-4 bg-[#fafefb]">
-        <button onClick={() => router.back()} className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium">
+      <div className="flex items-center justify-between px-4 pt-10 pb-4 bg-surface">
+        <button onClick={() => router.back()} className="flex items-center gap-0.5 text-primary text-[15px] font-medium">
           <ChevronLeft className="w-4 h-4" />
           Back
         </button>
@@ -232,7 +232,7 @@ export function ProfileClient({ slug, profile, userId }: Props) {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={uploadingPhoto}
-              className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#1a9c38] flex items-center justify-center border-2 border-white"
+              className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary flex items-center justify-center border-2 border-white"
             >
               <span className="text-white text-[18px] leading-none">+</span>
             </button>
@@ -248,14 +248,14 @@ export function ProfileClient({ slug, profile, userId }: Props) {
         <Field label="Phone Number"  value={phone}        onChange={setPhone} type="tel" />
 
         {error   && <p className="text-[13px] text-red-500">{error}</p>}
-        {success && <p className="text-[13px] text-[#1a9c38] font-medium">Profile saved!</p>}
+        {success && <p className="text-[13px] text-primary font-medium">Profile saved!</p>}
       </div>
 
       <div className="px-4 pt-3" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center disabled:opacity-60"
+          className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition flex items-center justify-center disabled:opacity-60"
         >
           {saving ? "Saving..." : "Save"}
         </button>

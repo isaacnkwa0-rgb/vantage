@@ -48,7 +48,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -137,7 +137,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
           />
         </div>
         <div ref={filterRef} className="relative">
@@ -146,7 +146,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
             className={cn(
               "h-full flex items-center gap-1 px-3 border rounded-[8px] text-[13px] font-semibold transition",
               filterCategory !== "all"
-                ? "border-[#1a9c38] text-[#1a9c38] bg-emerald-50"
+                ? "border-primary text-primary bg-primary-soft"
                 : "border-slate-200 text-slate-600 bg-white hover:bg-slate-50"
             )}
           >
@@ -159,7 +159,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
                 onClick={() => { setFilterCategory("all"); setFilterOpen(false); }}
                 className={cn(
                   "w-full text-left px-4 py-2.5 text-[13px] font-medium transition",
-                  filterCategory === "all" ? "bg-emerald-50 text-[#1a9c38] font-semibold" : "text-slate-700 hover:bg-slate-50"
+                  filterCategory === "all" ? "bg-primary-soft text-primary font-semibold" : "text-slate-700 hover:bg-slate-50"
                 )}
               >
                 All categories
@@ -170,7 +170,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
                   onClick={() => { setFilterCategory(c.value); setFilterOpen(false); }}
                   className={cn(
                     "w-full text-left px-4 py-2.5 text-[13px] font-medium transition flex items-center gap-2",
-                    filterCategory === c.value ? "bg-emerald-50 text-[#1a9c38] font-semibold" : "text-slate-700 hover:bg-slate-50"
+                    filterCategory === c.value ? "bg-primary-soft text-primary font-semibold" : "text-slate-700 hover:bg-slate-50"
                   )}
                 >
                   <span>{c.icon}</span> {c.label}
@@ -182,7 +182,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
           >
             <Plus className="w-4 h-4" /> New
           </button>
@@ -270,7 +270,7 @@ export function ExpensesClient({ expenses, businessId, currency, userId }: Props
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
               >
                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 Log Expense

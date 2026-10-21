@@ -160,7 +160,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
     <div className="flex-1 flex flex-col min-h-0 bg-[#F5F6F8]">
 
       {/* ── Mobile header (Bumpa-style) ── */}
-      <div className="lg:hidden bg-[#fafefb] flex items-center justify-between px-4 pt-8 pb-3 flex-shrink-0">
+      <div className="lg:hidden bg-surface flex items-center justify-between px-4 pt-8 pb-3 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Tag className="w-5 h-5 text-[#0F172A]" />
           <span className="text-xl font-bold text-[#0F172A]">{pageTitle}</span>
@@ -168,7 +168,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
         </div>
         <button
           onClick={() => { setEditingProduct(null); setShowForm(true); }}
-          className="w-10 h-9 rounded-full bg-[#1a9c38] text-white flex items-center justify-center shadow-md shadow-green-900/20 active:scale-95 transition-transform"
+          className="w-10 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md shadow-ember/20 active:scale-95 transition-transform"
           aria-label={isService ? "Add service" : "Add product"}
         >
           <Plus className="w-5 h-5" />
@@ -176,14 +176,14 @@ export function ProductsClient({ products, categories, locations, businessId, cu
       </div>
 
       {/* ── Mobile search + filter row ── */}
-      <div className="lg:hidden bg-[#fafefb] px-3 pb-[10px] flex items-center gap-2 flex-shrink-0">
+      <div className="lg:hidden bg-surface px-3 pb-[10px] flex items-center gap-2 flex-shrink-0">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isService ? "Search services..." : "Search products..."}
-            className="w-full h-9 pl-9 pr-4 border border-slate-300 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full h-9 pl-9 pr-4 border border-slate-300 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
           />
         </div>
         <button className="w-11 h-9 rounded-[6px] border border-slate-300 bg-white flex items-center justify-center flex-shrink-0 active:bg-slate-50">
@@ -207,7 +207,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
             className={cn(
               "min-w-0 py-1.5 rounded-[6px] text-[12px] font-medium transition-colors text-center",
               selectedFilter === tab.value
-                ? "bg-[#1a9c38] text-white border border-[#1a9c38]"
+                ? "bg-primary text-on-primary border border-primary"
                 : "bg-white border border-slate-200 text-slate-600 active:bg-slate-50"
             )}
           >
@@ -224,9 +224,9 @@ export function ProductsClient({ products, categories, locations, businessId, cu
           {isService ? (
             <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 to-green-400" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ember to-green-400" />
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center shadow-sm shadow-green-200 flex-shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-ember to-ember-deep rounded-lg flex items-center justify-center shadow-sm shadow-ember/20 flex-shrink-0">
                     <Briefcase className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
                   </div>
                   <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Total Services</p>
@@ -242,7 +242,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                   </div>
                   <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Avg. Charge</p>
                 </div>
-                <p className="text-sm sm:text-xl font-bold text-emerald-600">
+                <p className="text-sm sm:text-xl font-bold text-success">
                   {products.length > 0 ? fmt(products.reduce((s, p) => s + p.selling_price, 0) / products.length) : "—"}
                 </p>
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">per service</p>
@@ -282,7 +282,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                   </div>
                   <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Retail Value</p>
                 </div>
-                <p className="text-sm sm:text-xl font-bold text-emerald-600">{fmt(retailValue)}</p>
+                <p className="text-sm sm:text-xl font-bold text-success">{fmt(retailValue)}</p>
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">at selling price</p>
               </div>
               <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative col-span-2 sm:col-span-1">
@@ -307,13 +307,13 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={isService ? "Search services..." : "Search products or SKU..."}
-                className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
               />
             </div>
             <select
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
-              className="px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">{isService ? "All services" : "All products"}</option>
               <option value="active">Published</option>
@@ -368,7 +368,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
             </button>
             <button
               onClick={() => { setEditingProduct(null); setShowForm(true); }}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm shadow-green-300/40"
+              className="flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm shadow-ember/20"
             >
               <Plus className="w-4 h-4" />
               {isService ? "Add Service" : "Add Product"}
@@ -429,7 +429,7 @@ export function ProductsClient({ products, categories, locations, businessId, cu
               {!search && (
                 <button
                   onClick={() => setShowForm(true)}
-                  className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+                  className="mt-4 bg-primary hover:bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-medium transition"
                 >
                   {isService ? "Add your first service" : "Add your first product"}
                 </button>

@@ -106,7 +106,7 @@ interface Props {
 
 export function StoreFront({ business, products, categories, bankAccount, orderNumber, paymentStatus, bundles = [], randomAllItemsImage }: Props) {
   const fmt = (n: number) => formatCurrency(n, business.currency);
-  const brand = business.invoice_accent_color || "#1a9c38";
+  const brand = business.invoice_accent_color || "#F2542D";
   const flag = CURRENCY_FLAGS[business.currency] ?? "";
 
   const [cart, setCart] = useState<CartItem[]>([]);

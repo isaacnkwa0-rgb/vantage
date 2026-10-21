@@ -33,7 +33,7 @@ interface Props {
 const FREQ_LABELS: Record<string, string> = { weekly: "Weekly", monthly: "Monthly", quarterly: "Quarterly", yearly: "Yearly" };
 
 const STATUS_STYLES: Record<string, string> = {
-  active: "bg-green-100 text-green-700",
+  active: "bg-primary-soft text-primary",
   paused: "bg-amber-100 text-amber-700",
   cancelled: "bg-slate-100 text-slate-500",
 };
@@ -121,7 +121,7 @@ export function RecurringClient({ schedules: initial, customers, currency, busin
           <h2 className="text-base font-bold text-[#0F172A]">Recurring Billing Schedules</h2>
           {totalMonthly > 0 && <p className="text-xs text-slate-400 mt-0.5">{fmt(totalMonthly)}/month from monthly schedules</p>}
         </div>
-        <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm">
+        <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition shadow-sm">
           <Plus className="w-4 h-4" /> New Schedule
         </button>
       </div>
@@ -166,7 +166,7 @@ export function RecurringClient({ schedules: initial, customers, currency, busin
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition justify-end">
                       {s.status !== "cancelled" && (
                         <>
-                          <button onClick={() => issueNow(s)} title="Issue now" className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition">
+                          <button onClick={() => issueNow(s)} title="Issue now" className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary-soft rounded-lg transition">
                             <RefreshCw className="w-3.5 h-3.5" />
                           </button>
                           <button onClick={() => toggleStatus(s.id, s.status)} className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition">
@@ -196,11 +196,11 @@ export function RecurringClient({ schedules: initial, customers, currency, busin
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Monthly Retainer" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Monthly Retainer" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Customer</label>
-                <select value={form.customer_id} onChange={(e) => setForm({ ...form, customer_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select value={form.customer_id} onChange={(e) => setForm({ ...form, customer_id: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="">— None —</option>
                   {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -208,23 +208,23 @@ export function RecurringClient({ schedules: initial, customers, currency, busin
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Amount *</label>
-                  <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Frequency</label>
-                  <select value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value as Schedule["frequency"] })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <select value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value as Schedule["frequency"] })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                     {Object.entries(FREQ_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">First Issue Date</label>
-                <input type="date" value={form.next_issue_date} onChange={(e) => setForm({ ...form, next_issue_date: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input type="date" value={form.next_issue_date} onChange={(e) => setForm({ ...form, next_issue_date: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
             </div>
             <div className="flex gap-2 pt-1">
               <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={create} disabled={saving || !form.name.trim() || !form.amount} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+              <button onClick={create} disabled={saving || !form.name.trim() || !form.amount} className="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50">
                 {saving ? "Saving..." : "Create"}
               </button>
             </div>

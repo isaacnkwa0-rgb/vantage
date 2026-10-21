@@ -435,10 +435,10 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="flex-shrink-0 bg-[#fafefb] flex items-center px-4 h-16">
+      <div className="flex-shrink-0 bg-surface flex items-center px-4 h-16">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-0.5 text-[#1a9c38] text-[15px] font-medium flex-shrink-0 w-16"
+          className="flex items-center gap-0.5 text-primary text-[15px] font-medium flex-shrink-0 w-16"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
@@ -448,7 +448,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
           <button
             onClick={handleRecordSale}
             disabled={submitting}
-            className="flex items-center gap-1 text-[#1a9c38] text-[15px] font-medium"
+            className="flex items-center gap-1 text-primary text-[15px] font-medium"
           >
             {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
             Save
@@ -522,7 +522,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                 className={cn(
                   "flex flex-col items-center gap-1 py-2 rounded-lg border-2 transition",
                   channel === ch.value
-                    ? "border-green-500 bg-green-50"
+                    ? "border-primary bg-primary-soft"
                     : "border-slate-200 bg-white"
                 )}
               >
@@ -537,7 +537,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                     {ch.logo.letter}
                   </span>
                 )}
-                <span className={cn("text-[10px] font-medium leading-tight", channel === ch.value ? "text-green-700" : "text-slate-400")}>
+                <span className={cn("text-[10px] font-medium leading-tight", channel === ch.value ? "text-primary" : "text-slate-400")}>
                   {ch.label}
                 </span>
               </button>
@@ -553,7 +553,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
           <div className="flex gap-2 mb-3">
             <button
               onClick={() => setShowProductPicker(true)}
-              className="flex-1 flex items-center justify-center gap-2 h-10 border-2 border-green-500 text-green-600 rounded-[4px] text-sm font-semibold hover:bg-green-50 transition active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-2 h-10 border-2 border-primary text-primary rounded-[4px] text-sm font-semibold hover:bg-primary-soft transition active:scale-[0.98]"
             >
               <Tag className="w-4 h-4" />
               Select Item
@@ -572,7 +572,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
             <div className={cn(
               "flex items-center gap-2 mb-3 px-3 py-2 rounded-lg text-sm font-medium",
               scanFeedback.found
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                ? "bg-primary-soft text-primary border border-primary"
                 : "bg-red-50 text-red-600 border border-red-200"
             )}>
               {scanFeedback.found
@@ -594,7 +594,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#0F172A] truncate">{item.name}</p>
                     {item.variantName && <p className="text-xs text-slate-400">{item.variantName}</p>}
-                    <p className="text-sm font-semibold text-green-600 mt-0.5">
+                    <p className="text-sm font-semibold text-primary mt-0.5">
                       {fmt(item.unitPrice * item.quantity)}
                       {item.quantity > 1 && (
                         <span className="text-xs text-slate-400 font-normal ml-1">({fmt(item.unitPrice)} each)</span>
@@ -612,7 +612,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                     <button
                       onClick={() => updateQuantity(item.productId, item.quantity + (item.minOrderQty ?? 1), item.variantId)}
                       disabled={item.maxOrderQty !== null && item.quantity >= item.maxOrderQty}
-                      className="w-7 h-7 border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-green-400 transition disabled:opacity-40"
+                      className="w-7 h-7 border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:border-primary transition disabled:opacity-40"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -633,7 +633,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   <span>{fmt(sub)}</span>
                 </div>
                 {disc > 0 && (
-                  <div className="flex justify-between text-sm text-emerald-600">
+                  <div className="flex justify-between text-sm text-success">
                     <span>Discount</span><span>-{fmt(disc)}</span>
                   </div>
                 )}
@@ -645,7 +645,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                 )}
                 <div className="flex justify-between font-bold text-base text-[#0F172A] pt-1 border-t border-slate-100">
                   <span>Total</span>
-                  <span className="text-green-600">{fmt(tot)}</span>
+                  <span className="text-primary">{fmt(tot)}</span>
                 </div>
               </div>
             </div>
@@ -665,7 +665,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   "flex-1 h-8 rounded-[4px] text-xs font-medium border-2 transition",
                   paymentStatus === status
                     ? status === "paid"
-                      ? "bg-green-600 border-green-600 text-white"
+                      ? "bg-primary border-primary text-on-primary"
                       : status === "unpaid"
                       ? "bg-red-500 border-red-500 text-white"
                       : "bg-amber-500 border-amber-500 text-white"
@@ -691,7 +691,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                     className={cn(
                       "flex flex-col items-center gap-1.5 py-2.5 rounded-[4px] border-2 text-xs font-medium transition",
                       paymentMethod === m.value
-                        ? "border-green-600 bg-green-600 text-white"
+                        ? "border-primary bg-primary text-on-primary"
                         : "border-slate-200 text-slate-600 hover:border-green-300"
                     )}
                   >
@@ -714,7 +714,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   value={reference}
                   onChange={(e) => setReference(e.target.value)}
                   placeholder="Reference / Transaction ID (optional)"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               )}
             </div>
@@ -732,7 +732,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   value={partialAmount}
                   onChange={(e) => setPartialAmount(e.target.value)}
                   placeholder={`Enter amount (total: ${fmt(tot)})`}
-                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-[4px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-[4px] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -743,7 +743,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                     className={cn(
                       "flex flex-col items-center gap-1.5 py-2.5 rounded-[4px] border-2 text-xs font-medium transition",
                       paymentMethod === m.value
-                        ? "border-green-600 bg-green-600 text-white"
+                        ? "border-primary bg-primary text-on-primary"
                         : "border-slate-200 text-slate-600"
                     )}
                   >
@@ -783,7 +783,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
         <button
           onClick={handleRecordSale}
           disabled={submitting}
-          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] flex items-center justify-center gap-2 transition disabled:opacity-60"
+          className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] flex items-center justify-center gap-2 transition disabled:opacity-60"
         >
           {submitting && <Loader2 className="w-5 h-5 animate-spin" />}
           {submitting
@@ -819,7 +819,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   value={productSearch}
                   onChange={(e) => setProductSearch(e.target.value)}
                   placeholder="Search products..."
-                  className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -863,7 +863,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                         disabled={outOfStock}
                         className={cn(
                           "w-full flex items-center gap-3 px-4 py-3 text-left transition",
-                          outOfStock ? "opacity-40 cursor-not-allowed" : inCart ? "bg-green-50" : "hover:bg-slate-50"
+                          outOfStock ? "opacity-40 cursor-not-allowed" : inCart ? "bg-primary-soft" : "hover:bg-slate-50"
                         )}
                       >
                         <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200">
@@ -875,8 +875,8 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                           <p className="text-sm font-medium text-[#0F172A] truncate">{product.name}</p>
                           <p className="text-xs text-slate-400">{outOfStock ? "Out of stock" : `${product.stock_quantity} left`}</p>
                         </div>
-                        <p className="text-sm font-bold text-green-600 flex-shrink-0">{fmt(product.selling_price)}</p>
-                        {inCart && <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"><Check className="w-3 h-3 text-white" /></div>}
+                        <p className="text-sm font-bold text-primary flex-shrink-0">{fmt(product.selling_price)}</p>
+                        {inCart && <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center flex-shrink-0"><Check className="w-3 h-3 text-on-primary" /></div>}
                       </button>
                     );
                   })}
@@ -886,7 +886,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
             <div className="px-4 py-3 border-t border-slate-100 flex-shrink-0">
               <button
                 onClick={() => { setShowProductPicker(false); setProductSearch(""); }}
-                className="w-full py-2.5 bg-green-600 text-white rounded-xl font-semibold text-sm"
+                className="w-full py-2.5 bg-primary text-on-primary rounded-xl font-semibold text-sm"
               >
                 Done{cartCount > 0 ? ` · ${cartCount} item${cartCount !== 1 ? "s" : ""}` : ""}
               </button>
@@ -920,25 +920,25 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   value={customerSearch}
                   onChange={(e) => setCustomerSearch(e.target.value)}
                   placeholder="Search customers..."
-                  className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
 
             {showAddCustomer ? (
               <div className="p-4 space-y-2 flex-shrink-0">
-                <p className="text-sm font-semibold text-green-700">Quick add customer</p>
+                <p className="text-sm font-semibold text-primary">Quick add customer</p>
                 <input
                   value={newCustomerName}
                   onChange={(e) => setNewCustomerName(e.target.value)}
                   placeholder="Customer name *"
-                  className="w-full px-3 py-2 text-sm border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-green-50"
+                  className="w-full px-3 py-2 text-sm border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-primary-soft"
                 />
                 <input
                   value={newCustomerPhone}
                   onChange={(e) => setNewCustomerPhone(e.target.value)}
                   placeholder="Phone (optional)"
-                  className="w-full px-3 py-2 text-sm border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-green-50"
+                  className="w-full px-3 py-2 text-sm border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-primary-soft"
                 />
                 <div className="flex gap-2">
                   <button
@@ -950,7 +950,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                   <button
                     onClick={handleAddCustomer}
                     disabled={addingCustomer || !newCustomerName.trim()}
-                    className="flex-1 py-2 text-sm text-white bg-green-600 rounded-xl font-semibold disabled:opacity-60 flex items-center justify-center gap-1"
+                    className="flex-1 py-2 text-sm text-on-primary bg-primary rounded-xl font-semibold disabled:opacity-60 flex items-center justify-center gap-1"
                   >
                     {addingCustomer && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     {addingCustomer ? "Adding..." : "Add"}
@@ -973,7 +973,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                     <button
                       key={c.id}
                       onClick={() => { setCustomer(c.id, c.name); setShowCustomerPicker(false); setCustomerSearch(""); }}
-                      className={cn("w-full flex items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-50", customerId === c.id && "bg-green-50")}
+                      className={cn("w-full flex items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-50", customerId === c.id && "bg-primary-soft")}
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#0F172A]">{c.name}</p>
@@ -984,7 +984,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                           ⭐ {c.loyalty_points} pts
                         </span>
                       )}
-                      {customerId === c.id && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                      {customerId === c.id && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                     </button>
                   ))}
                   {filteredCustomers.length === 0 && (
@@ -995,7 +995,7 @@ export function MobilePOSForm({ products, bundles, customers, business, userId }
                 </div>
                 <button
                   onClick={() => setShowAddCustomer(true)}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-sm text-green-600 font-medium hover:bg-green-50 border-t border-slate-100"
+                  className="w-full flex items-center gap-2 px-4 py-3 text-sm text-primary font-medium hover:bg-primary-soft border-t border-slate-100"
                 >
                   <Plus className="w-4 h-4" />
                   Add new customer

@@ -78,10 +78,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col px-5">
+    <div className="min-h-screen bg-bg flex flex-col px-5">
       {/* Back */}
       <div className="pt-12 pb-2">
-        <Link href="/register" className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit">
+        <Link href="/register" className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit">
           <ChevronLeft className="w-[13px] h-[13px]" /> Back
         </Link>
       </div>
@@ -100,7 +100,7 @@ export default function LoginPage() {
           type="email"
           autoComplete="email"
           placeholder="Email Address"
-          className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+          className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
         {errors.email && <p className="text-red-500 text-xs -mt-1">{errors.email.message}</p>}
 
@@ -109,12 +109,12 @@ export default function LoginPage() {
           type="password"
           autoComplete="current-password"
           placeholder="Password"
-          className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+          className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
         {errors.password && <p className="text-red-500 text-xs -mt-1">{errors.password.message}</p>}
 
         <div>
-          <Link href="/forgot-password" className="text-[#1a9c38] text-[14px] font-semibold">
+          <Link href="/forgot-password" className="text-primary text-[14px] font-semibold">
             Forgot Password?
           </Link>
         </div>
@@ -124,7 +124,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
+          className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-6"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           {isSubmitting ? "Signing in..." : "Sign in"}
@@ -159,17 +159,17 @@ export default function LoginPage() {
 
         <p className="text-center text-[14px] text-slate-500 !mt-5">
           Don&apos;t have an account?{" "}
-          <Link href="/register?step=email-form" className="text-[#1a9c38] font-semibold">Sign up</Link>
+          <Link href="/register?step=email-form" className="text-primary font-semibold">Sign up</Link>
         </p>
       </form>
 
       {/* Footer */}
       <p className="text-center text-[11px] text-slate-400 leading-relaxed py-8 px-4">
         By continuing, I agree to the{" "}
-        <Link href="/terms" className="text-[#1a9c38]">General Terms of Use</Link>,{" "}
-        <Link href="/terms/merchant" className="text-[#1a9c38]">Merchant Terms of Use</Link>{" "}
+        <Link href="/terms" className="text-primary">General Terms of Use</Link>,{" "}
+        <Link href="/terms/merchant" className="text-primary">Merchant Terms of Use</Link>{" "}
         &amp;{" "}
-        <Link href="/privacy" className="text-[#1a9c38]">General Privacy Policy</Link>{" "}
+        <Link href="/privacy" className="text-primary">General Privacy Policy</Link>{" "}
         of Stokka
       </p>
     </div>

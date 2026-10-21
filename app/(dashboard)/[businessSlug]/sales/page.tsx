@@ -51,7 +51,7 @@ export default async function SalesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Transactions" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Transactions" bg="bg-surface" border={false} centered />
       <SalesClient
         sales={(sales ?? []) as any}
         business={business as any}

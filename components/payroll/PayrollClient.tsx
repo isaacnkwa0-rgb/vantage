@@ -56,7 +56,7 @@ const SALARY_LABELS = { monthly: "/ month", weekly: "/ week", daily: "/ day", ho
 const STATUS_CONFIG: Record<string, { label: string; pill: string }> = {
   draft:    { label: "Draft",    pill: "bg-slate-100 text-slate-500" },
   approved: { label: "Approved", pill: "bg-amber-100 text-amber-700" },
-  paid:     { label: "Paid",     pill: "bg-green-100 text-green-700" },
+  paid:     { label: "Paid",     pill: "bg-primary-soft text-primary" },
 };
 
 const AVATAR_PALETTES = [
@@ -74,7 +74,7 @@ function avatarColor(name: string) {
 interface StaffForm { name: string; role: string; email: string; phone: string; salary_type: StaffMember["salary_type"]; salary_amount: number; bank_name: string; account_number: string; joined_at: string; }
 const EMPTY_STAFF: StaffForm = { name: "", role: "", email: "", phone: "", salary_type: "monthly", salary_amount: 0, bank_name: "", account_number: "", joined_at: new Date().toISOString().split("T")[0] };
 
-const INPUT = "w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500";
+const INPUT = "w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-primary";
 const LABEL = "block text-[12px] font-semibold text-slate-500 mb-1.5";
 
 export function PayrollClient({ staff: initial, runs: initialRuns, currency, businessId, userId }: Props) {
@@ -153,10 +153,10 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
 
       {/* Monthly summary card */}
       {totalMonthlyPayroll > 0 && (
-        <div className="px-4 pt-3 pb-1 bg-[#fafefb] flex-shrink-0">
+        <div className="px-4 pt-3 pb-1 bg-surface flex-shrink-0">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-              <Wallet className="w-5 h-5 text-green-600" />
+            <div className="w-11 h-11 rounded-full bg-primary-soft flex items-center justify-center flex-shrink-0">
+              <Wallet className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
               <p className="text-[12px] text-slate-400 font-medium">Monthly Payroll</p>
@@ -187,7 +187,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
           {tab === "staff" && (
             <button
               onClick={() => { setForm({ ...EMPTY_STAFF }); setEditingId(null); setShowAddStaff(true); }}
-              className="h-11 flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+              className="h-11 flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
             >
               <Plus className="w-4 h-4" /> New
             </button>
@@ -195,7 +195,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
           {staff.length > 0 && (
             <button
               onClick={openRunModal}
-              className="h-11 flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+              className="h-11 flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
             >
               <Play className="w-3.5 h-3.5" /> Run
             </button>
@@ -217,7 +217,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
               <p className="text-[13px] text-slate-400">Add staff to start running payroll</p>
               <button
                 onClick={() => { setForm({ ...EMPTY_STAFF }); setShowAddStaff(true); }}
-                className="mt-1 px-5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+                className="mt-1 px-5 py-2.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
               >
                 Add Staff Member
               </button>
@@ -277,7 +277,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
               {staff.length > 0 && (
                 <button
                   onClick={openRunModal}
-                  className="mt-1 px-5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+                  className="mt-1 px-5 py-2.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
                 >
                   Run Payroll
                 </button>
@@ -339,7 +339,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                           {run.status === "approved" && (
                             <button
                               onClick={() => updateRunStatus(run.id, "paid")}
-                              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-green-700 active:bg-green-50 transition-colors border-r border-slate-100"
+                              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-primary active:bg-primary-soft transition-colors border-r border-slate-100"
                             >
                               <CheckCircle className="w-4 h-4" /> Mark as Paid
                             </button>
@@ -416,7 +416,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setShowAddStaff(false)} className="flex-1 py-3.5 border border-slate-200 text-slate-600 rounded-xl text-[14px] font-semibold active:bg-slate-50 transition-colors">Cancel</button>
-              <button onClick={saveStaff} disabled={saving || !form.name.trim()} className="flex-1 py-3.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50">
+              <button onClick={saveStaff} disabled={saving || !form.name.trim()} className="flex-1 py-3.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50">
                 {saving ? "Saving..." : editingId ? "Update" : "Add Staff"}
               </button>
             </div>
@@ -458,16 +458,16 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
                       <div key={e.staffId} className="bg-slate-50 rounded-xl px-4 py-3">
                         <div className="flex items-center justify-between mb-2">
                           <p className="text-[13px] font-semibold text-slate-800">{e.name}</p>
-                          <p className="text-[13px] font-bold text-green-700">{fmt(net)} net</p>
+                          <p className="text-[13px] font-bold text-primary">{fmt(net)} net</p>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <p className="text-[11px] text-slate-400 mb-1">Gross Pay</p>
-                            <input type="number" min="0" value={e.gross} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, gross: ev.target.value } : r))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <input type="number" min="0" value={e.gross} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, gross: ev.target.value } : r))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary" />
                           </div>
                           <div>
                             <p className="text-[11px] text-slate-400 mb-1">Deductions</p>
-                            <input type="number" min="0" value={e.deductions} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, deductions: ev.target.value } : r))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <input type="number" min="0" value={e.deductions} onChange={(ev) => setRunEntries((p) => p.map((r, ri) => ri === i ? { ...r, deductions: ev.target.value } : r))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary" />
                           </div>
                         </div>
                       </div>
@@ -477,9 +477,9 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
               </div>
 
               {/* Totals summary */}
-              <div className="bg-green-50 rounded-xl px-4 py-3 flex items-center justify-between">
-                <p className="text-[13px] font-semibold text-green-800">Total Net Pay</p>
-                <p className="text-[16px] font-extrabold text-green-700">
+              <div className="bg-primary-soft rounded-xl px-4 py-3 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-primary">Total Net Pay</p>
+                <p className="text-[16px] font-extrabold text-primary">
                   {fmt(runEntries.reduce((s, e) => s + ((parseFloat(e.gross) || 0) - (parseFloat(e.deductions) || 0)), 0))}
                 </p>
               </div>
@@ -491,7 +491,7 @@ export function PayrollClient({ staff: initial, runs: initialRuns, currency, bus
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setShowRunModal(false)} className="flex-1 py-3.5 border border-slate-200 text-slate-600 rounded-xl text-[14px] font-semibold active:bg-slate-50 transition-colors">Cancel</button>
-              <button onClick={createRun} disabled={saving || !runForm.period_label.trim()} className="flex-1 py-3.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50">
+              <button onClick={createRun} disabled={saving || !runForm.period_label.trim()} className="flex-1 py-3.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50">
                 {saving ? "Creating..." : "Create Run"}
               </button>
             </div>

@@ -50,7 +50,7 @@ const SLIDES = [
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-[11px] text-slate-400">Hello, Zikky</p>
-            <p className="text-[10px] text-green-600 font-medium">Record your first sale →</p>
+            <p className="text-[10px] text-primary font-medium">Record your first sale →</p>
           </div>
           <div className="flex gap-2">
             <div className="w-7 h-7 bg-slate-100 rounded-full" />
@@ -58,7 +58,7 @@ const SLIDES = [
           </div>
         </div>
         <div className="bg-slate-50 rounded-xl px-3 py-2 flex items-center gap-2 mb-3 border border-slate-100">
-          <div className="w-5 h-5 rounded bg-[#1a9c38] flex items-center justify-center">
+          <div className="w-5 h-5 rounded bg-primary flex items-center justify-center">
             <Package className="w-3 h-3 text-white" />
           </div>
           <span className="text-[11px] font-semibold text-slate-700">Zikky Gadgets</span>
@@ -86,7 +86,7 @@ const SLIDES = [
             { label: "Expenses", icon: TrendingUp, green: false },
           ].map((a) => (
             <div key={a.label} className="flex flex-col items-center gap-1">
-              <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", a.green ? "bg-[#1a9c38]" : "bg-slate-100")}>
+              <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", a.green ? "bg-primary" : "bg-slate-100")}>
                 <a.icon className={cn("w-4 h-4", a.green ? "text-white" : "text-slate-500")} />
               </div>
               <span className="text-[8px] text-slate-500">{a.label}</span>
@@ -104,7 +104,7 @@ const SLIDES = [
       <div className="bg-white rounded-2xl shadow-lg p-4 mx-2 border border-slate-100">
         <div className="flex items-center justify-between mb-3">
           <p className="text-[12px] font-bold text-slate-800">Today&apos;s Sales</p>
-          <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">POS Active</span>
+          <span className="text-[10px] bg-primary-soft text-primary px-2 py-0.5 rounded-full font-semibold">POS Active</span>
         </div>
         <div className="space-y-2 mb-3">
           {[
@@ -113,8 +113,8 @@ const SLIDES = [
             { name: "USB-C Cable", qty: "×3", amount: "₦4,500", method: "Card" },
           ].map((s) => (
             <div key={s.name} className="flex items-center gap-2 py-1.5 border-b border-slate-50">
-              <div className="w-7 h-7 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                <ShoppingCart className="w-3.5 h-3.5 text-[#1a9c38]" />
+              <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center flex-shrink-0">
+                <ShoppingCart className="w-3.5 h-3.5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-semibold text-slate-800 truncate">{s.name} {s.qty}</p>
@@ -125,8 +125,8 @@ const SLIDES = [
           ))}
         </div>
         <div className="bg-[#E8F5EC] rounded-xl p-2.5 flex items-center justify-between">
-          <p className="text-[11px] font-semibold text-green-800">Total today</p>
-          <p className="text-[14px] font-bold text-[#1a9c38]">₦25,000</p>
+          <p className="text-[11px] font-semibold text-primary">Total today</p>
+          <p className="text-[14px] font-bold text-primary">₦25,000</p>
         </div>
       </div>
     ),
@@ -140,7 +140,7 @@ const SLIDES = [
         <p className="text-[12px] font-bold text-slate-800 mb-3">Business Overview</p>
         <div className="space-y-2.5 mb-3">
           {[
-            { label: "Revenue", val: "₦840,000", pct: 85, color: "bg-[#1a9c38]" },
+            { label: "Revenue", val: "₦840,000", pct: 85, color: "bg-primary" },
             { label: "Expenses", val: "₦120,000", pct: 30, color: "bg-amber-400" },
             { label: "Net Profit", val: "₦720,000", pct: 72, color: "bg-blue-400" },
           ].map((r) => (
@@ -161,7 +161,7 @@ const SLIDES = [
             <p className="text-[9px] text-slate-500">Customers</p>
           </div>
           <div className="bg-[#E8F5EC] rounded-xl p-2.5 text-center">
-            <p className="text-[18px] font-bold text-[#1a9c38]">+18%</p>
+            <p className="text-[18px] font-bold text-primary">+18%</p>
             <p className="text-[9px] text-slate-500">vs last month</p>
           </div>
         </div>
@@ -246,9 +246,9 @@ function RegisterPageInner() {
   // ── Success ────────────────────────────────────────────────
   if (success) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-green-600" />
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 bg-primary-soft rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8 text-primary" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
         <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
@@ -256,7 +256,7 @@ function RegisterPageInner() {
         </p>
         <p className="text-slate-900 font-semibold text-sm mt-1 mb-1">{submittedEmail}</p>
         <p className="text-slate-500 text-sm">Click it to activate your account.</p>
-        <Link href="/login" className="mt-6 inline-block text-[#1a9c38] font-semibold text-sm">
+        <Link href="/login" className="mt-6 inline-block text-primary font-semibold text-sm">
           Back to sign in →
         </Link>
       </div>
@@ -270,7 +270,7 @@ function RegisterPageInner() {
     );
 
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-bg flex flex-col">
         {/* Country picker modal */}
         {showCountryPicker && (
           <div className="fixed inset-0 bg-black/40 z-50 flex flex-col justify-end">
@@ -307,7 +307,7 @@ function RegisterPageInner() {
         <div className="px-5 pt-12 pb-4">
           <button
             onClick={() => setStep("methods")}
-            className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit"
+            className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit"
           >
             <ChevronLeft className="w-[13px] h-[13px]" /> Back
           </button>
@@ -328,7 +328,7 @@ function RegisterPageInner() {
                   type="text"
                   autoComplete="given-name"
                   placeholder="First Name*"
-                  className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                  className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
               </div>
@@ -338,7 +338,7 @@ function RegisterPageInner() {
                   type="text"
                   autoComplete="family-name"
                   placeholder="Surname*"
-                  className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                  className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
               </div>
@@ -351,13 +351,13 @@ function RegisterPageInner() {
                 type="email"
                 autoComplete="email"
                 placeholder="Email Address*"
-                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Phone with country picker */}
-            <div className="h-10 flex border border-slate-200 rounded-[4px] overflow-hidden focus-within:ring-2 focus-within:ring-[#1a9c38]">
+            <div className="h-10 flex border border-slate-200 rounded-[4px] overflow-hidden focus-within:ring-2 focus-within:ring-primary">
               <button
                 type="button"
                 onClick={() => setShowCountryPicker(true)}
@@ -382,7 +382,7 @@ function RegisterPageInner() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="Password*"
-                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
@@ -391,7 +391,7 @@ function RegisterPageInner() {
             <div className="relative">
               <select
                 {...register("referral")}
-                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent appearance-none bg-white text-slate-400"
+                className="w-full h-10 px-4 border border-slate-200 rounded-[4px] text-[14px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white text-slate-400"
                 defaultValue=""
               >
                 <option value="" disabled>How did you hear about Stokka?</option>
@@ -408,7 +408,7 @@ function RegisterPageInner() {
                 type="checkbox"
                 checked={marketingConsent}
                 onChange={(e) => setMarketingConsent(e.target.checked)}
-                className="mt-0.5 w-5 h-5 rounded accent-[#1a9c38] cursor-pointer flex-shrink-0"
+                className="mt-0.5 w-5 h-5 rounded accent-primary cursor-pointer flex-shrink-0"
               />
               <span className="text-[13px] text-slate-500 leading-snug">
                 I&apos;ll like to receive marketing communication and tips from Stokka
@@ -421,7 +421,7 @@ function RegisterPageInner() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
+              className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition flex items-center justify-center gap-2 disabled:opacity-60 !mt-5"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {isSubmitting ? "Creating account..." : "Continue"}
@@ -431,14 +431,14 @@ function RegisterPageInner() {
           {/* Terms */}
           <p className="text-center text-[12px] text-slate-400 mt-5 leading-relaxed px-2">
             By continuing, I agree to Stokka&apos;s{" "}
-            <Link href="/terms" className="text-[#1a9c38]">Terms of Use</Link>
+            <Link href="/terms" className="text-primary">Terms of Use</Link>
             {" "}&amp;{" "}
-            <Link href="/privacy" className="text-[#1a9c38]">Privacy Policy</Link>
+            <Link href="/privacy" className="text-primary">Privacy Policy</Link>
           </p>
 
           <p className="text-center text-[14px] text-slate-400 mt-3">
             Already have an account?{" "}
-            <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
+            <Link href="/login" className="text-primary font-semibold">Sign in</Link>
           </p>
         </div>
       </div>
@@ -448,10 +448,10 @@ function RegisterPageInner() {
   // ── Auth method selection ──────────────────────────────────
   if (step === "methods") {
     return (
-      <div className="min-h-screen bg-white flex flex-col px-5">
+      <div className="min-h-screen bg-bg flex flex-col px-5">
         {/* Back */}
         <div className="pt-12 pb-2">
-          <button onClick={() => setStep("carousel")} className="flex items-center gap-1 text-[13px] font-medium text-[#1a9c38] bg-slate-100 px-3 py-1.5 rounded-full w-fit">
+          <button onClick={() => setStep("carousel")} className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit">
             <ChevronLeft className="w-[13px] h-[13px]" /> Back
           </button>
         </div>
@@ -468,7 +468,7 @@ function RegisterPageInner() {
         <div className="space-y-3">
           <button
             onClick={() => setStep("email-form")}
-            className="w-full h-11 flex items-center justify-center gap-3 bg-[#1a9c38] hover:bg-green-700 rounded-[4px] text-[15px] font-semibold text-white transition"
+            className="w-full h-11 flex items-center justify-center gap-3 bg-primary hover:bg-ember-deep rounded-[4px] text-[15px] font-semibold text-on-primary transition"
           >
             <Mail className="w-5 h-5" />
             Join with Email
@@ -495,7 +495,7 @@ function RegisterPageInner() {
         {/* Sign in link */}
         <p className="text-center text-[14px] text-slate-400 mt-8">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#1a9c38] font-semibold">Sign in</Link>
+          <Link href="/login" className="text-primary font-semibold">Sign in</Link>
         </p>
       </div>
     );
@@ -505,7 +505,7 @@ function RegisterPageInner() {
   const { headline, highlight, sub, Illustration } = SLIDES[slide];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       {/* Logo */}
       <div className="flex justify-center pt-12 pb-0">
         <Logo variant="full" size={36} />
@@ -518,7 +518,7 @@ function RegisterPageInner() {
             onClick={() => setSlide(i)}
             className={cn(
               "rounded-full transition-all",
-              i === slide ? "w-6 h-2 bg-[#1a9c38]" : "w-2 h-2 bg-slate-200"
+              i === slide ? "w-6 h-2 bg-primary" : "w-2 h-2 bg-slate-200"
             )}
           />
         ))}
@@ -537,7 +537,7 @@ function RegisterPageInner() {
         <div className="mb-6">
           <h1 className="text-[28px] font-semibold text-slate-900 leading-tight">
             {headline}{" "}
-            <span className="text-[#1a9c38] underline decoration-[#1a9c38] underline-offset-4">
+            <span className="text-primary underline decoration-primary underline-offset-4">
               {highlight}
             </span>
           </h1>
@@ -552,7 +552,7 @@ function RegisterPageInner() {
       <div className="px-5 pb-10 pt-6 space-y-3">
         <Link
           href="/login"
-          className="w-full bg-[#1a9c38] hover:bg-green-700 text-white font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] transition"
+          className="w-full bg-primary hover:bg-ember-deep text-on-primary font-semibold h-11 rounded-[4px] flex items-center justify-center text-[15px] transition"
         >
           Sign In
         </Link>

@@ -35,7 +35,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   info:    <Info className="w-4 h-4 text-blue-500" />,
   warning: <AlertTriangle className="w-4 h-4 text-amber-500" />,
   error:   <XCircle className="w-4 h-4 text-red-500" />,
-  success: <CheckCheck className="w-4 h-4 text-green-500" />,
+  success: <CheckCheck className="w-4 h-4 text-primary" />,
   promo:   <Megaphone className="w-4 h-4 text-purple-500" />,
 };
 
@@ -43,7 +43,7 @@ const TYPE_BG: Record<string, string> = {
   info:    "bg-blue-50 border-blue-100",
   warning: "bg-amber-50 border-amber-100",
   error:   "bg-red-50 border-red-100",
-  success: "bg-green-50 border-green-100",
+  success: "bg-primary-soft border-green-100",
   promo:   "bg-purple-50 border-purple-100",
 };
 
@@ -200,7 +200,7 @@ export function NotificationsClient({ initial, computedAlerts, businessId, busin
                     <p className={cn("text-sm font-semibold", isUnread ? "text-[#0F172A]" : "text-slate-600")}>{n.title}</p>
                     <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition">
                       {isUnread && (
-                        <button onClick={(e) => { e.preventDefault(); markRead(n.id); }} className="p-1 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded transition" title="Mark read">
+                        <button onClick={(e) => { e.preventDefault(); markRead(n.id); }} className="p-1 text-slate-400 hover:text-primary hover:bg-primary-soft rounded transition" title="Mark read">
                           <CheckCheck className="w-3.5 h-3.5" />
                         </button>
                       )}

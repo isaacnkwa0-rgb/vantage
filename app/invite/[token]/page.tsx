@@ -72,14 +72,14 @@ export default async function InvitePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-md w-full p-8">
-        <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-6">
+        <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-6">
           <span className="text-white font-extrabold text-xl">V</span>
         </div>
 
         <h1 className="text-2xl font-bold text-slate-900 mb-2">You're invited!</h1>
         <p className="text-slate-500 mb-6">
           <span className="font-semibold text-slate-800">{business?.name}</span> has invited you to join their team as a{" "}
-          <span className="text-green-600 font-semibold">{roleLabel}</span>.
+          <span className="text-primary font-semibold">{roleLabel}</span>.
         </p>
 
         {user ? (
@@ -87,7 +87,7 @@ export default async function InvitePage({ params }: Props) {
             <form action={acceptInvitation}>
               <button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm shadow-green-200"
+                className="w-full bg-primary hover:bg-ember-deep text-on-primary font-semibold py-3 rounded-xl transition text-sm shadow-sm shadow-ember/20"
               >
                 Accept &amp; Join {business?.name}
               </button>
@@ -102,7 +102,7 @@ export default async function InvitePage({ params }: Props) {
             <p className="text-sm text-slate-500">Please log in or create an account to accept this invitation.</p>
             <Link
               href={`/login?next=/invite/${token}`}
-              className="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition text-sm"
+              className="block w-full text-center bg-primary hover:bg-ember-deep text-on-primary font-semibold py-3 rounded-xl transition text-sm"
             >
               Log In to Accept
             </Link>
@@ -128,7 +128,7 @@ function ErrorPage({ message }: { message: string }) {
         </div>
         <h1 className="text-xl font-bold text-slate-900 mb-2">Invalid Invitation</h1>
         <p className="text-slate-500 text-sm mb-6">{message}</p>
-        <Link href="/login" className="text-green-600 text-sm font-medium hover:underline">
+        <Link href="/login" className="text-primary text-sm font-medium hover:underline">
           Go to Login →
         </Link>
       </div>

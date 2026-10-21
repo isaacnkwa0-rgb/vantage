@@ -133,7 +133,7 @@ export function ProductSearchPanel({ products, bundles, currency }: Props) {
 
   return (
     <>
-      <div className="flex flex-col h-full bg-[#F8FAFC]">
+      <div className="flex flex-col h-full bg-bg">
         {/* Search bar */}
         <div className="p-3 bg-white border-b border-slate-200">
           <div className="relative flex gap-2">
@@ -145,14 +145,14 @@ export function ProductSearchPanel({ products, bundles, currency }: Props) {
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 placeholder="Search products, scan barcode..."
-                className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                 autoFocus
               />
             </div>
             <button
               onClick={() => setShowScanner(true)}
               title="Scan barcode with camera"
-              className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg transition shadow-sm"
+              className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-primary hover:bg-ember-deep text-on-primary rounded-lg transition shadow-sm"
             >
               <ScanLine className="w-5 h-5" />
             </button>
@@ -163,7 +163,7 @@ export function ProductSearchPanel({ products, bundles, currency }: Props) {
             <div className={cn(
               "flex items-center gap-2 mt-2 px-3 py-2 rounded-lg text-sm font-medium transition-all",
               scanResult.found
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                ? "bg-primary-soft text-primary border border-primary"
                 : "bg-red-50 text-red-600 border border-red-200"
             )}>
               {scanResult.found ? (
@@ -249,7 +249,7 @@ export function ProductSearchPanel({ products, bundles, currency }: Props) {
                       outOfStock
                         ? "opacity-40 cursor-not-allowed"
                         : inCart
-                        ? "bg-green-50"
+                        ? "bg-primary-soft"
                         : "hover:bg-slate-50 active:bg-slate-100"
                     )}
                   >
@@ -292,11 +292,11 @@ export function ProductSearchPanel({ products, bundles, currency }: Props) {
 
                     {/* Price + cart indicator */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <p className="text-sm font-bold text-green-600">
+                      <p className="text-sm font-bold text-primary">
                         {formatCurrency(product.selling_price, currency)}
                       </p>
                       {inCart && (
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
                           <ShoppingCart className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}

@@ -25,7 +25,7 @@ interface Props {
 }
 
 const ACTION_CONFIG: Record<string, { label: string; color: string; bg: string; Icon: React.ElementType }> = {
-  "sale.created":      { label: "New sale",          color: "text-emerald-700", bg: "bg-emerald-50",  Icon: ShoppingCart },
+  "sale.created":      { label: "New sale",          color: "text-primary", bg: "bg-primary-soft",  Icon: ShoppingCart },
   "sale.returned":     { label: "Return recorded",   color: "text-orange-700",  bg: "bg-orange-50",   Icon: ArrowRightLeft },
   "product.created":   { label: "Product created",   color: "text-blue-700",    bg: "bg-blue-50",     Icon: Package },
   "product.updated":   { label: "Product updated",   color: "text-blue-600",    bg: "bg-blue-50",     Icon: Package },
@@ -35,11 +35,11 @@ const ACTION_CONFIG: Record<string, { label: string; color: string; bg: string; 
   "customer.deleted":  { label: "Customer deleted",  color: "text-red-600",     bg: "bg-red-50",      Icon: Users },
   "invoice.created":   { label: "Invoice created",   color: "text-indigo-700",  bg: "bg-indigo-50",   Icon: FileText },
   "invoice.updated":   { label: "Invoice updated",   color: "text-indigo-600",  bg: "bg-indigo-50",   Icon: FileText },
-  "invoice.paid":      { label: "Invoice paid",      color: "text-emerald-700", bg: "bg-emerald-50",  Icon: FileText },
+  "invoice.paid":      { label: "Invoice paid",      color: "text-primary", bg: "bg-primary-soft",  Icon: FileText },
   "invoice.cancelled": { label: "Invoice cancelled", color: "text-red-600",     bg: "bg-red-50",      Icon: FileText },
   "quote.created":     { label: "Quote created",     color: "text-cyan-700",    bg: "bg-cyan-50",     Icon: FilePen },
   "quote.updated":     { label: "Quote updated",     color: "text-cyan-600",    bg: "bg-cyan-50",     Icon: FilePen },
-  "quote.accepted":    { label: "Quote accepted",    color: "text-emerald-700", bg: "bg-emerald-50",  Icon: FilePen },
+  "quote.accepted":    { label: "Quote accepted",    color: "text-primary", bg: "bg-primary-soft",  Icon: FilePen },
   "quote.rejected":    { label: "Quote rejected",    color: "text-red-600",     bg: "bg-red-50",      Icon: FilePen },
   "quote.converted":   { label: "Quote → Invoice",   color: "text-violet-700",  bg: "bg-violet-50",   Icon: FilePen },
   "expense.created":   { label: "Expense added",     color: "text-rose-700",    bg: "bg-rose-50",     Icon: Receipt },
@@ -47,7 +47,7 @@ const ACTION_CONFIG: Record<string, { label: string; color: string; bg: string; 
   "bundle.created":    { label: "Bundle created",    color: "text-violet-700",  bg: "bg-violet-50",   Icon: Package },
   "bundle.updated":    { label: "Bundle updated",    color: "text-violet-600",  bg: "bg-violet-50",   Icon: Package },
   "bundle.deleted":    { label: "Bundle deleted",    color: "text-red-600",     bg: "bg-red-50",      Icon: Package },
-  "shift.opened":      { label: "Shift started",     color: "text-green-700",   bg: "bg-green-50",    Icon: Vault },
+  "shift.opened":      { label: "Shift started",     color: "text-primary",   bg: "bg-primary-soft",    Icon: Vault },
   "shift.closed":      { label: "Shift closed",      color: "text-slate-600",   bg: "bg-slate-100",   Icon: Vault },
   "discount.created":  { label: "Discount created",  color: "text-amber-700",   bg: "bg-amber-50",    Icon: Tag },
   "discount.deleted":  { label: "Discount deleted",  color: "text-red-600",     bg: "bg-red-50",      Icon: Tag },
@@ -151,7 +151,7 @@ export function ActivityClient({ logs, currency }: Props) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search activity..."
-              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
             />
           </div>
           <div ref={dropdownRef} className="relative">
@@ -160,7 +160,7 @@ export function ActivityClient({ logs, currency }: Props) {
               className={[
                 "h-full flex items-center gap-1.5 px-3 border rounded-[8px] text-[13px] font-medium transition bg-white",
                 filter !== "all"
-                  ? "border-[#1a9c38] text-[#1a9c38]"
+                  ? "border-primary text-primary"
                   : "border-slate-200 text-slate-600 hover:bg-slate-50",
               ].join(" ")}
             >
@@ -176,7 +176,7 @@ export function ActivityClient({ logs, currency }: Props) {
                     className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition"
                   >
                     {f.label}
-                    {filter === f.value && <Check className="w-3.5 h-3.5 text-[#1a9c38]" />}
+                    {filter === f.value && <Check className="w-3.5 h-3.5 text-primary" />}
                   </button>
                 ))}
               </div>

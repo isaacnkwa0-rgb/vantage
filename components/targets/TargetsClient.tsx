@@ -45,7 +45,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -68,7 +68,7 @@ function MilestoneRow({ m, fmt, isRevenue }: { m: ComputedMilestone; fmt: (n: nu
       <div className="flex items-center gap-3">
         <div className={cn(
           "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
-          m.status === "achieved" ? "bg-emerald-50" :
+          m.status === "achieved" ? "bg-primary-soft" :
           m.status === "next"     ? "bg-amber-50"   : "bg-slate-50"
         )}>
           {m.status === "future"
@@ -79,7 +79,7 @@ function MilestoneRow({ m, fmt, isRevenue }: { m: ComputedMilestone; fmt: (n: nu
           <div className="flex items-center justify-between gap-2">
             <span className="text-[13px] font-semibold text-[#0F172A] truncate">{m.label}</span>
             {m.status === "achieved" && (
-              <span className="flex items-center gap-1 text-[11px] font-bold text-[#1a9c38] bg-emerald-50 px-2 py-0.5 rounded-full flex-shrink-0">
+              <span className="flex items-center gap-1 text-[11px] font-bold text-primary bg-primary-soft px-2 py-0.5 rounded-full flex-shrink-0">
                 <CheckCircle2 className="w-3 h-3" /> Done
               </span>
             )}
@@ -191,7 +191,7 @@ export function TargetsClient({
       <div className="grid grid-cols-2 gap-3">
         <div className="border border-slate-200 rounded-[8px] px-4 py-3">
           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Revenue</p>
-          <p className="text-[17px] font-extrabold text-[#1a9c38] leading-tight mt-0.5">{fmt(revenueThisMonth)}</p>
+          <p className="text-[17px] font-extrabold text-primary leading-tight mt-0.5">{fmt(revenueThisMonth)}</p>
           <p className="text-[11px] text-slate-400">This month</p>
         </div>
         <div className="border border-slate-200 rounded-[8px] px-4 py-3">
@@ -212,7 +212,7 @@ export function TargetsClient({
         <div className="border border-slate-200 rounded-[12px] overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
             <span className="text-[13px] font-semibold text-[#0F172A]">Revenue</span>
-            <span className="text-[12px] font-bold text-[#1a9c38]">{revAchieved}/{REVENUE_MILESTONES.length}</span>
+            <span className="text-[12px] font-bold text-primary">{revAchieved}/{REVENUE_MILESTONES.length}</span>
           </div>
           <div className="divide-y divide-slate-100">
             {revenueMilestones.map((m) => (
@@ -225,7 +225,7 @@ export function TargetsClient({
         <div className="border border-slate-200 rounded-[12px] overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
             <span className="text-[13px] font-semibold text-[#0F172A]">Sales Count</span>
-            <span className="text-[12px] font-bold text-[#1a9c38]">{salesAchieved}/{SALES_MILESTONES.length}</span>
+            <span className="text-[12px] font-bold text-primary">{salesAchieved}/{SALES_MILESTONES.length}</span>
           </div>
           <div className="divide-y divide-slate-100">
             {salesMilestones.map((m) => (
@@ -242,7 +242,7 @@ export function TargetsClient({
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="w-full flex items-center justify-center gap-2 h-11 border-2 border-dashed border-slate-200 rounded-[8px] text-[13px] font-semibold text-slate-400 hover:border-[#1a9c38] hover:text-[#1a9c38] transition"
+            className="w-full flex items-center justify-center gap-2 h-11 border-2 border-dashed border-slate-200 rounded-[8px] text-[13px] font-semibold text-slate-400 hover:border-primary hover:text-primary transition"
           >
             <Plus className="w-4 h-4" /> Add Target
           </button>
@@ -323,7 +323,7 @@ export function TargetsClient({
               <button
                 onClick={createTarget}
                 disabled={saving || !form.name.trim() || !form.target_value}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Create Target
@@ -356,7 +356,7 @@ export function TargetsClient({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-[14px] font-semibold text-[#0F172A] truncate">{target.name}</p>
-                        {achieved && <CheckCircle2 className="w-4 h-4 text-[#1a9c38] flex-shrink-0" />}
+                        {achieved && <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />}
                       </div>
                       <p className="text-[12px] text-slate-400 mt-0.5">
                         {PERIOD_LABELS[target.period]} · {target.start_date} → {target.end_date}
@@ -380,7 +380,7 @@ export function TargetsClient({
                         {isRevenue ? fmt(target.target_value) : target.target_value.toLocaleString()}
                       </span>
                       <span className={cn("text-[13px] font-extrabold",
-                        achieved ? "text-[#1a9c38]" : progress > 66 ? "text-amber-500" : "text-blue-500"
+                        achieved ? "text-primary" : progress > 66 ? "text-amber-500" : "text-blue-500"
                       )}>
                         {Math.round(progress)}%
                       </span>
@@ -388,13 +388,13 @@ export function TargetsClient({
                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className={cn("h-full rounded-full transition-all duration-500",
-                          achieved ? "bg-[#1a9c38]" : progress > 66 ? "bg-amber-400" : "bg-blue-400"
+                          achieved ? "bg-primary" : progress > 66 ? "bg-amber-400" : "bg-blue-400"
                         )}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
                     {achieved
-                      ? <p className="text-[12px] text-[#1a9c38] font-semibold">Target achieved!</p>
+                      ? <p className="text-[12px] text-primary font-semibold">Target achieved!</p>
                       : <p className="text-[12px] text-slate-400">
                           {isRevenue
                             ? `${fmt(target.target_value - current)} remaining`

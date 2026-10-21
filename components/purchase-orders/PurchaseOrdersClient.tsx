@@ -42,7 +42,7 @@ interface Props {
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-slate-100 text-slate-600",
   sent: "bg-blue-100 text-blue-700",
-  received: "bg-green-100 text-green-700",
+  received: "bg-primary-soft text-primary",
   cancelled: "bg-red-100 text-red-600",
 };
 
@@ -156,12 +156,12 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search POs..."
-            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition shadow-sm"
         >
           <Plus className="w-4 h-4" />
           New PO
@@ -238,7 +238,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                 <select
                   value={form.supplier_id}
                   onChange={(e) => setForm({ ...form, supplier_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">— None —</option>
                   {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -250,7 +250,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                   type="date"
                   value={form.expected_date}
                   onChange={(e) => setForm({ ...form, expected_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -265,7 +265,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                       value={item.description}
                       onChange={(e) => updateItem(idx, "description", e.target.value)}
                       placeholder="Item description"
-                      className="col-span-6 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="col-span-6 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                     <input
                       type="number"
@@ -273,7 +273,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                       value={item.quantity}
                       onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 0)}
                       placeholder="Qty"
-                      className="col-span-2 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="col-span-2 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                     <input
                       type="number"
@@ -281,7 +281,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                       value={item.unit_cost}
                       onChange={(e) => updateItem(idx, "unit_cost", parseFloat(e.target.value) || 0)}
                       placeholder="Cost"
-                      className="col-span-3 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="col-span-3 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                     <button onClick={() => removeItem(idx)} className="col-span-1 flex justify-center text-slate-300 hover:text-red-500 transition">
                       <X className="w-4 h-4" />
@@ -289,7 +289,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                   </div>
                 ))}
               </div>
-              <button onClick={addItem} className="mt-2 flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-semibold">
+              <button onClick={addItem} className="mt-2 flex items-center gap-1 text-xs text-primary hover:text-primary font-semibold">
                 <Plus className="w-3.5 h-3.5" /> Add item
               </button>
             </div>
@@ -306,7 +306,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={2}
                 placeholder="Optional notes..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </div>
 
@@ -317,7 +317,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
               <button
                 onClick={createPO}
                 disabled={saving || items.every((i) => !i.description.trim())}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50"
               >
                 {saving ? "Creating..." : "Create PO"}
               </button>
@@ -356,7 +356,7 @@ export function PurchaseOrdersClient({ orders: initialOrders, suppliers, currenc
                 </button>
               )}
               {viewOrder.status === "sent" && (
-                <button onClick={() => updateStatus(viewOrder.id, "received")} className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition">
+                <button onClick={() => updateStatus(viewOrder.id, "received")} className="px-3 py-1.5 bg-primary text-on-primary rounded-lg text-xs font-semibold hover:bg-ember-deep transition">
                   Mark as Received
                 </button>
               )}

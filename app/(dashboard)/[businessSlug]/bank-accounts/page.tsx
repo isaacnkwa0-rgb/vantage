@@ -38,7 +38,7 @@ export default async function BankAccountsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Bank Accounts" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Bank Accounts" bg="bg-surface" border={false} centered />
       <BankAccountsClient
         accounts={(accountsRes.data ?? []) as any}
         transactions={(txRes.data ?? []) as any}

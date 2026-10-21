@@ -68,10 +68,10 @@ function Chip({ label, selected, onClick }: { label: string; selected: boolean; 
     <button
       type="button"
       onClick={onClick}
-      style={selected ? { backgroundColor: "#ecf7f1" } : undefined}
+      style={selected ? { backgroundColor: "#FDE3D9" } : undefined}
       className={cn(
         "px-4 h-10 rounded-[4px] text-[14px] font-medium border transition",
-        selected ? "border-[#1a9c38] text-slate-900" : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
+        selected ? "border-primary text-slate-900" : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
       )}
     >
       {label}
@@ -84,15 +84,15 @@ function CheckChip({ label, selected, onClick }: { label: string; selected: bool
     <button
       type="button"
       onClick={onClick}
-      style={selected ? { backgroundColor: "#ecf7f1" } : undefined}
+      style={selected ? { backgroundColor: "#FDE3D9" } : undefined}
       className={cn(
         "flex items-center gap-2 px-4 h-10 rounded-[4px] text-[14px] font-medium border transition",
-        selected ? "border-[#1a9c38] text-slate-900" : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
+        selected ? "border-primary text-slate-900" : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
       )}
     >
       <span className={cn(
         "w-4 h-4 rounded-sm border-2 flex items-center justify-center flex-shrink-0",
-        selected ? "border-[#1a9c38] bg-[#1a9c38]" : "border-slate-400 bg-transparent"
+        selected ? "border-primary bg-primary" : "border-slate-400 bg-transparent"
       )}>
         {selected && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       {/* Scrollable content */}
       <div className="flex-1 overflow-auto px-5 pt-14 pb-32">
 
@@ -210,11 +210,11 @@ export default function OnboardingPage() {
                 placeholder="Business Name"
                 autoCapitalize="words"
                 autoComplete="organization"
-                className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a9c38] focus:border-transparent"
+                className="w-full h-10 px-4 border border-slate-300 rounded-[4px] text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
               {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
             </div>
-            <div className="flex items-center h-10 border border-slate-300 rounded-[4px] focus-within:ring-2 focus-within:ring-[#1a9c38] focus-within:border-transparent">
+            <div className="flex items-center h-10 border border-slate-300 rounded-[4px] focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent">
               <input
                 type="text"
                 value={storeUrl}
@@ -237,11 +237,11 @@ export default function OnboardingPage() {
                   key={c.label}
                   type="button"
                   onClick={() => setCountry(c)}
-                  style={country.label === c.label ? { backgroundColor: "#ecf7f1" } : undefined}
+                  style={country.label === c.label ? { backgroundColor: "#FDE3D9" } : undefined}
                   className={cn(
                     "flex items-center gap-2 px-5 h-10 rounded-[4px] text-[14px] font-medium border transition",
                     country.label === c.label
-                      ? "border-[#1a9c38] text-slate-900"
+                      ? "border-primary text-slate-900"
                       : "bg-[#F3F4F6] border-transparent text-slate-700 hover:bg-slate-200"
                   )}
                 >
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
             <p className="text-[15px] font-bold text-slate-900 mb-0.5">
               What currencies do you receive payment in?
             </p>
-            <p className="text-[13px] text-[#1a9c38] font-medium mb-3">(Select all that apply)</p>
+            <p className="text-[13px] text-primary font-medium mb-3">(Select all that apply)</p>
             <div className="flex flex-wrap gap-3">
               {CURRENCIES.map((c) => (
                 <CheckChip
@@ -356,7 +356,7 @@ export default function OnboardingPage() {
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white text-[15px] font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full h-11 bg-primary hover:bg-ember-deep text-on-primary text-[15px] font-bold rounded-[4px] transition flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           {isSubmitting ? "Setting up..." : "Continue"}

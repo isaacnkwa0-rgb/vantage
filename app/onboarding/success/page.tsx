@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
 
-const COLORS = ["#1a9c38", "#0f6624", "#34d058", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#dcfce7", "#052e16", "#14532d", "#166534"];
+const COLORS = ["#F2542D", "#B8320F", "#FFC93C", "#FFF6EC", "#16130F", "#F87A52", "#FBBCAA", "#FDDDD4", "#FDE3D9", "#3A322B", "#7B5E4E", "#9E7B69"];
 
 function Confetti() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -134,7 +134,7 @@ function SuccessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 relative overflow-hidden">
       <Confetti />
 
       <div className="w-full max-w-sm flex flex-col items-center text-center relative z-20">
@@ -177,7 +177,7 @@ function SuccessPage() {
 
         <button
           onClick={handleExplore}
-          className="fade-up-3 w-full h-11 bg-[#1a9c38] hover:bg-green-700 text-white font-bold rounded-[4px] text-[15px] transition"
+          className="fade-up-3 w-full h-11 bg-primary hover:bg-ember-deep text-on-primary font-bold rounded-[4px] text-[15px] transition"
         >
           Start Exploring
         </button>

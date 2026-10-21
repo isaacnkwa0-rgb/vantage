@@ -43,7 +43,7 @@ const PRESETS = [
 ] as const;
 
 const METHOD_COLORS: Record<string, string> = {
-  cash:     "text-emerald-600",
+  cash:     "text-success",
   card:     "text-blue-600",
   transfer: "text-violet-600",
   pos:      "text-orange-500",
@@ -53,7 +53,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -159,7 +159,7 @@ export function ReportsClient({ businessId, currency }: Props) {
             className={cn(
               "flex-1 py-2 rounded-[8px] text-[13px] font-semibold transition border",
               activePreset === key
-                ? "bg-[#1a9c38] text-white border-[#1a9c38]"
+                ? "bg-primary text-on-primary border-primary"
                 : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
             )}
           >
@@ -185,7 +185,7 @@ export function ReportsClient({ businessId, currency }: Props) {
         <button
           onClick={() => fetchReport()}
           disabled={loading}
-          className="w-full h-11 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition disabled:opacity-60"
+          className="w-full h-11 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition disabled:opacity-60"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           Apply
@@ -195,7 +195,7 @@ export function ReportsClient({ businessId, currency }: Props) {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-[#1a9c38]" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       )}
 
@@ -209,14 +209,14 @@ export function ReportsClient({ businessId, currency }: Props) {
               <span className="text-[12px] text-slate-400">{data.salesCount} sale{data.salesCount !== 1 ? "s" : ""}</span>
             </div>
             <div className="px-4 divide-y divide-slate-100">
-              <PLRow label="Gross Revenue"   value={fmt(data.grossRevenue)}  color="text-[#1a9c38]" />
+              <PLRow label="Gross Revenue"   value={fmt(data.grossRevenue)}  color="text-primary" />
               <PLRow label="Cost of Goods"   value={`− ${fmt(data.cogs)}`}   color="text-slate-500" />
-              <PLRow label="Gross Profit"    value={fmt(data.grossProfit)}   color={data.grossProfit >= 0 ? "text-[#1a9c38]" : "text-red-500"} bold divider />
+              <PLRow label="Gross Profit"    value={fmt(data.grossProfit)}   color={data.grossProfit >= 0 ? "text-primary" : "text-red-500"} bold divider />
               <PLRow label="Total Expenses"  value={`− ${fmt(data.totalExpenses)}`} color="text-red-500" />
               <PLRow
                 label="Net Profit"
                 value={fmt(data.netProfit)}
-                color={data.netProfit >= 0 ? "text-[#1a9c38]" : "text-red-500"}
+                color={data.netProfit >= 0 ? "text-primary" : "text-red-500"}
                 bold
                 divider
               />
@@ -224,15 +224,15 @@ export function ReportsClient({ businessId, currency }: Props) {
             {/* Margin strip */}
             <div className={cn(
               "flex items-center justify-between px-4 py-3 border-t border-slate-100",
-              data.marginPercent >= 0 ? "bg-emerald-50" : "bg-red-50"
+              data.marginPercent >= 0 ? "bg-primary-soft" : "bg-red-50"
             )}>
               <div className="flex items-center gap-1.5">
                 {data.marginPercent >= 0
-                  ? <TrendingUp className="w-4 h-4 text-[#1a9c38]" />
+                  ? <TrendingUp className="w-4 h-4 text-primary" />
                   : <TrendingDown className="w-4 h-4 text-red-500" />}
                 <span className="text-[13px] font-semibold text-slate-600">Net Profit Margin</span>
               </div>
-              <span className={cn("text-[18px] font-extrabold", data.marginPercent >= 0 ? "text-[#1a9c38]" : "text-red-500")}>
+              <span className={cn("text-[18px] font-extrabold", data.marginPercent >= 0 ? "text-primary" : "text-red-500")}>
                 {data.marginPercent.toFixed(1)}%
               </span>
             </div>
@@ -264,7 +264,7 @@ export function ReportsClient({ businessId, currency }: Props) {
                           <span className="text-[12px] text-slate-400 flex-shrink-0" suppressHydrationWarning>· {shortDate(sale.created_at)}</span>
                         </div>
                       </div>
-                      <span className="text-[14px] font-extrabold text-[#1a9c38] flex-shrink-0">{fmt(sale.total_amount)}</span>
+                      <span className="text-[14px] font-extrabold text-primary flex-shrink-0">{fmt(sale.total_amount)}</span>
                     </div>
                   );
                 })}

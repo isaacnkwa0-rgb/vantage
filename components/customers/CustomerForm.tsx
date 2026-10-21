@@ -99,33 +99,33 @@ async function onSubmit(data: FormData) {
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4 overflow-y-auto">
           <div>
             <label className="block text-sm font-medium text-[#0F172A] mb-1">Name *</label>
-            <input {...register("name")} placeholder="Customer name" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38]" />
+            <input {...register("name")} placeholder="Customer name" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Phone</label>
-              <input {...register("phone")} type="tel" placeholder="+234..." className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38]" />
+              <input {...register("phone")} type="tel" placeholder="+234..." className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             </div>
             <div>
               <label className="block text-sm font-medium text-[#0F172A] mb-1">Email</label>
-              <input {...register("email")} type="email" placeholder="email@..." className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38]" />
+              <input {...register("email")} type="email" placeholder="email@..." className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-[#0F172A] mb-1">Address</label>
-            <input {...register("address")} placeholder="Optional" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38]" />
+            <input {...register("address")} placeholder="Optional" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
           </div>
           <div>
             <label className="block text-sm font-medium text-[#0F172A] mb-1">Notes</label>
-            <textarea {...register("notes")} rows={2} placeholder="Optional notes" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a9c38] resize-none" />
+            <textarea {...register("notes")} rows={2} placeholder="Optional notes" className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
           </div>
 
 {error && <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg">{error}</div>}
 
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={() => onClose()} className="flex-1 py-2.5 text-sm border border-slate-200 rounded-[8px] text-slate-600 hover:bg-slate-50 transition">Cancel</button>
-            <button type="submit" disabled={isSubmitting} className="flex-1 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-sm font-semibold transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-sm shadow-green-900/20">
+            <button type="submit" disabled={isSubmitting} className="flex-1 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-sm font-semibold transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-sm shadow-ember/20">
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {editingCustomer ? "Save changes" : "Add customer"}
             </button>
