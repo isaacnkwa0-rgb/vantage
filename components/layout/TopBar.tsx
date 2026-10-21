@@ -204,7 +204,7 @@ export function TopBar({ title, bg = "bg-white", border = true, centered = false
           document.dispatchEvent(event);
         }}
         aria-label="Open command palette"
-        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition text-xs font-medium flex-shrink-0 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:outline-none"
+        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition text-xs font-medium flex-shrink-0 focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-1 focus-visible:outline-none"
       >
         <Search className="w-3.5 h-3.5" />
         <span className="hidden md:inline">Search</span>
@@ -220,10 +220,10 @@ export function TopBar({ title, bg = "bg-white", border = true, centered = false
             aria-label="Notifications"
             aria-expanded={showNotifications}
             aria-haspopup="true"
-            className={`relative p-2 rounded-lg transition focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
+            className={`relative p-2 rounded-lg transition focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-1 focus-visible:outline-none ${
               showNotifications
-                ? "bg-green-600 text-white shadow-md shadow-green-200"
-                : "text-slate-500 hover:text-green-600 hover:bg-green-50"
+                ? "bg-ember text-ink shadow-md shadow-ember/30"
+                : "text-slate-500 hover:text-ember hover:bg-primary-soft"
             }`}
           >
             <Bell className="w-5 h-5" aria-hidden="true" />
@@ -236,7 +236,7 @@ export function TopBar({ title, bg = "bg-white", border = true, centered = false
 
           {showNotifications && (
             <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-1rem))] bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden">
-              <div className="h-0.5 bg-gradient-to-r from-green-600 to-green-400" />
+              <div className="h-0.5 bg-gradient-to-r from-ember to-ember-deep" />
               <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                 <p className="font-semibold text-sm text-[#0F172A]">Notifications</p>
                 {count > 0 && (
@@ -279,7 +279,7 @@ export function TopBar({ title, bg = "bg-white", border = true, centered = false
                 <button
                   onClick={fetchNotifications}
                   aria-label="Refresh notifications"
-                  className="text-xs text-green-600 hover:underline font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-500 rounded"
+                  className="text-xs text-primary hover:underline font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ember rounded"
                 >
                   Refresh
                 </button>

@@ -40,14 +40,14 @@ function shortDate(iso: string) {
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   pending:   { label: "Pending",   bg: "bg-amber-50",   text: "text-amber-700" },
   converted: { label: "Converted", bg: "bg-blue-50",    text: "text-blue-700" },
-  rewarded:  { label: "Rewarded",  bg: "bg-emerald-50", text: "text-emerald-700" },
+  rewarded:  { label: "Rewarded",  bg: "bg-primary-soft", text: "text-primary" },
 };
 
 const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A] placeholder:text-slate-400 pt-0.5 pb-1";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -109,7 +109,7 @@ export function ReferralsClient({ program: initialProgram, referrals, currency, 
             className="transition"
           >
             {form.is_active
-              ? <ToggleRight className="w-8 h-8 text-[#1a9c38]" />
+              ? <ToggleRight className="w-8 h-8 text-primary" />
               : <ToggleLeft  className="w-8 h-8 text-slate-400" />}
           </button>
         </div>
@@ -156,7 +156,7 @@ export function ReferralsClient({ program: initialProgram, referrals, currency, 
           <button
             onClick={saveProgram}
             disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+            className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             {program ? "Update Program" : "Enable Program"}
@@ -175,7 +175,7 @@ export function ReferralsClient({ program: initialProgram, referrals, currency, 
           <p className="text-[11px] text-slate-400 mt-0.5">Converted</p>
         </div>
         <div className="border border-slate-200 rounded-[8px] p-3 text-center">
-          <p className="text-[20px] font-extrabold text-[#1a9c38]">{rewarded}</p>
+          <p className="text-[20px] font-extrabold text-primary">{rewarded}</p>
           <p className="text-[11px] text-slate-400 mt-0.5">Rewarded</p>
         </div>
       </div>

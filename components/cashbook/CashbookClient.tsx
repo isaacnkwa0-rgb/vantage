@@ -116,18 +116,18 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-slate-600">From</label>
-          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-slate-600">To</label>
-          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
-        <button onClick={applyRange} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition">Apply</button>
+        <button onClick={applyRange} className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-ember-deep transition">Apply</button>
         <div className="ml-auto flex gap-2">
           <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">
             <Download className="w-4 h-4" /> Export
           </button>
-          <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-2 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95">
+          <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95">
             <Plus className="w-4 h-4" /> New Entry
           </button>
         </div>
@@ -136,16 +136,16 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-xs text-slate-500 flex items-center gap-1"><ArrowUpCircle className="w-3.5 h-3.5 text-green-500" /> Total Income</p>
-          <p className="text-xl font-bold text-green-600 mt-1">{fmt(totalIncome)}</p>
+          <p className="text-xs text-slate-500 flex items-center gap-1"><ArrowUpCircle className="w-3.5 h-3.5 text-primary" /> Total Income</p>
+          <p className="text-xl font-bold text-primary mt-1">{fmt(totalIncome)}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p className="text-xs text-slate-500 flex items-center gap-1"><ArrowDownCircle className="w-3.5 h-3.5 text-red-500" /> Total Expenses</p>
           <p className="text-xl font-bold text-red-500 mt-1">{fmt(totalExpense)}</p>
         </div>
-        <div className={cn("rounded-xl border p-4 shadow-sm", balance >= 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200")}>
+        <div className={cn("rounded-xl border p-4 shadow-sm", balance >= 0 ? "bg-primary-soft border-primary" : "bg-red-50 border-red-200")}>
           <p className="text-xs text-slate-500">Net Balance</p>
-          <p className={cn("text-xl font-bold mt-1", balance >= 0 ? "text-green-700" : "text-red-600")}>{fmt(balance)}</p>
+          <p className={cn("text-xl font-bold mt-1", balance >= 0 ? "text-primary" : "text-red-600")}>{fmt(balance)}</p>
         </div>
       </div>
 
@@ -178,14 +178,14 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       {e.type === "income"
-                        ? <ArrowUpCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        ? <ArrowUpCircle className="w-4 h-4 text-primary flex-shrink-0" />
                         : <ArrowDownCircle className="w-4 h-4 text-red-400 flex-shrink-0" />}
                       <span className="text-sm text-[#0F172A]">{e.description}</span>
                     </div>
                   </td>
                   <td className="px-5 py-3 text-xs text-slate-400">{e.category ?? <span className="text-slate-200">—</span>}</td>
                   <td className="px-5 py-3 text-xs text-slate-400 font-mono">{e.reference ?? <span className="text-slate-200">—</span>}</td>
-                  <td className={cn("px-5 py-3 text-right text-sm font-bold", e.type === "income" ? "text-green-600" : "text-red-500")}>
+                  <td className={cn("px-5 py-3 text-right text-sm font-bold", e.type === "income" ? "text-primary" : "text-red-500")}>
                     {e.type === "income" ? "+" : "-"}{fmt(e.amount)}
                   </td>
                   <td className="px-5 py-3">
@@ -224,7 +224,7 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
                   className={cn(
                     "flex-1 py-2 rounded-xl text-sm font-semibold transition",
                     form.type === t
-                      ? t === "income" ? "bg-green-600 text-white" : "bg-red-500 text-white"
+                      ? t === "income" ? "bg-primary text-on-primary" : "bg-red-500 text-white"
                       : "border border-slate-200 text-slate-500 hover:bg-slate-50"
                   )}
                 >
@@ -236,34 +236,34 @@ export function CashbookClient({ entries: initialEntries, currency, businessId, 
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Description *</label>
-                <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What is this for?" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What is this for?" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Amount *</label>
-                  <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                  <input type="date" value={form.entry_date} onChange={(e) => setForm({ ...form, entry_date: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <input type="date" value={form.entry_date} onChange={(e) => setForm({ ...form, entry_date: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Category</label>
-                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                   <option value="">— None —</option>
                   {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Reference</label>
-                <input value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} placeholder="Receipt no., invoice no., etc." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} placeholder="Receipt no., invoice no., etc." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
             </div>
 
             <div className="flex gap-2 pt-1">
               <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-              <button onClick={save} disabled={saving || !form.amount || !form.description.trim()} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50">
+              <button onClick={save} disabled={saving || !form.amount || !form.description.trim()} className="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50">
                 {saving ? "Saving..." : "Add Entry"}
               </button>
             </div>

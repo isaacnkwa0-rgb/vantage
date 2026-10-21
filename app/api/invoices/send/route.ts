@@ -3,7 +3,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { generateInvoiceHTML } from "@/lib/utils/invoice";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY ?? "placeholder");
 
 export async function POST(req: NextRequest) {
   const { invoice_id } = await req.json();

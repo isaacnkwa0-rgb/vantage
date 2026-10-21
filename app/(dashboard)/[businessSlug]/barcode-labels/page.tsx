@@ -29,7 +29,7 @@ export default async function BarcodeLabelsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Barcode Labels" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Barcode Labels" bg="bg-surface" border={false} centered />
       <BarcodeLabelsClient
         products={(products ?? []) as any}
         currency={business.currency}

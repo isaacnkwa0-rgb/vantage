@@ -41,7 +41,7 @@ export default async function InvoicesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Invoices" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Invoices" bg="bg-surface" border={false} centered />
       <InvoicesClient
         invoices={(invoices ?? []) as any}
         business={business as any}

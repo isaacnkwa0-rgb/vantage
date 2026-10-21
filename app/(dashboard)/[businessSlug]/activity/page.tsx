@@ -30,7 +30,7 @@ export default async function ActivityPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Activity Log" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Activity Log" bg="bg-surface" border={false} centered />
       <ActivityClient logs={(logs ?? []) as any} currency={business.currency} />
     </div>
   );

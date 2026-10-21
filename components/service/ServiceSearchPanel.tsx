@@ -52,7 +52,7 @@ export function ServiceSearchPanel({ services, currency }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-bg">
       {/* Search */}
       <div className="p-3 bg-white border-b border-slate-200 space-y-2">
         <div className="relative">
@@ -61,7 +61,7 @@ export function ServiceSearchPanel({ services, currency }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search services..."
-            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
             autoFocus
           />
         </div>
@@ -74,7 +74,7 @@ export function ServiceSearchPanel({ services, currency }: Props) {
               className={cn(
                 "flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition",
                 !activeCategory
-                  ? "bg-green-600 text-white"
+                  ? "bg-primary text-on-primary"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               )}
             >
@@ -116,7 +116,7 @@ export function ServiceSearchPanel({ services, currency }: Props) {
                   className={cn(
                     "relative flex flex-col items-start p-4 rounded-xl border-2 text-left transition active:scale-[0.97]",
                     inCart
-                      ? "border-green-500 bg-green-50 shadow-md shadow-green-100"
+                      ? "border-primary bg-primary-soft shadow-md shadow-ember/20"
                       : "border-slate-200 bg-white hover:border-green-300 hover:shadow-sm"
                   )}
                 >
@@ -130,16 +130,16 @@ export function ServiceSearchPanel({ services, currency }: Props) {
                     </span>
                   )}
 
-                  <p className={cn("font-semibold text-sm leading-snug", inCart ? "text-green-700" : "text-[#0F172A]")}>
+                  <p className={cn("font-semibold text-sm leading-snug", inCart ? "text-primary" : "text-[#0F172A]")}>
                     {service.name}
                   </p>
 
-                  <p className={cn("text-base font-bold mt-1.5", inCart ? "text-green-600" : "text-green-600")}>
+                  <p className={cn("text-base font-bold mt-1.5", inCart ? "text-primary" : "text-primary")}>
                     {formatCurrency(service.selling_price, currency)}
                   </p>
 
                   {inCart && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
                       <span className="text-white text-[10px] font-bold">✓</span>
                     </div>
                   )}

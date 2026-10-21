@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, ShoppingCart, Package, Package2, Vault,
@@ -126,7 +126,7 @@ const NAV_SECTIONS: NavSection[] = [
 
 function Tooltip({ label }: { label: string }) {
   return (
-    <span className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-800 border border-slate-700 text-white text-xs font-medium rounded-lg opacity-0 group-hover/tip:opacity-100 pointer-events-none whitespace-nowrap z-[60] transition-opacity duration-150 shadow-lg">
+    <span className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-[#2A231D] border border-[#3A322B] text-cream text-xs font-medium rounded-lg opacity-0 group-hover/tip:opacity-100 pointer-events-none whitespace-nowrap z-[60] transition-opacity duration-150 shadow-lg">
       {label}
     </span>
   );
@@ -152,20 +152,20 @@ function NavLink({ href, label, Icon, isActive, collapsed, onClick }: NavLinkPro
           ? "px-3 py-2 lg:w-9 lg:h-9 lg:p-0 lg:justify-center"
           : "px-3 py-2",
         isActive
-          ? "bg-green-600 text-white shadow-md shadow-green-900/30"
-          : "text-slate-400 hover:text-white hover:bg-slate-800/80"
+          ? "bg-[#2A231D] text-ember"
+          : "text-sidebar-foreground hover:text-sidebar-foreground-active hover:bg-[#2A231D]/60"
       )}
     >
       <Icon
         className={cn(
           "flex-shrink-0 transition-colors",
           collapsed ? "w-[18px] h-[18px]" : "w-4 h-4",
-          isActive ? "text-green-100" : "text-slate-500 group-hover/link:text-green-400"
+          isActive ? "text-ember" : "text-sidebar-foreground"
         )}
       />
       <span className={cn("truncate group/link", collapsed && "lg:hidden")}>{label}</span>
       {isActive && !collapsed && (
-        <div className="ml-auto w-1 h-4 bg-green-300/60 rounded-full flex-shrink-0" />
+        <div className="ml-auto w-1 h-4 bg-ember/40 rounded-full flex-shrink-0" />
       )}
     </Link>
   );
@@ -240,7 +240,7 @@ export function Sidebar({ slug }: { slug: string }) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0C1526] transition-all duration-300 ease-in-out overflow-hidden",
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar transition-all duration-300 ease-in-out overflow-hidden",
           "lg:relative lg:translate-x-0 lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           // Width: mobile always 256px, desktop depends on collapsed state
@@ -249,7 +249,7 @@ export function Sidebar({ slug }: { slug: string }) {
         )}
       >
         {/* Top accent line */}
-        <div className="h-0.5 bg-gradient-to-r from-green-600 via-green-400 to-emerald-500 flex-shrink-0" />
+        <div className="h-0.5 bg-gradient-to-r from-ember via-ember/60 to-ember-deep flex-shrink-0" />
 
         {/* Header */}
         <div
@@ -260,10 +260,9 @@ export function Sidebar({ slug }: { slug: string }) {
         >
           {/* Expanded: logo + name */}
           <div className={cn("flex items-center gap-2.5 min-w-0", sidebarCollapsed && "lg:hidden")}>
-            <Image src="/vantage-icon.svg" alt="Stokka" width={32} height={32} className="flex-shrink-0 rounded-lg" />
+            <Logo variant="inverted" size={32} />
             <div className="min-w-0">
-              <p className="text-[13px] font-extrabold tracking-tight text-white leading-tight">Stokka</p>
-              <p className="text-[11px] text-slate-500 truncate leading-tight">
+              <p className="text-[11px] text-sidebar-foreground truncate leading-tight">
                 {activeBusiness?.name ?? "Loading..."}
               </p>
             </div>
@@ -274,9 +273,9 @@ export function Sidebar({ slug }: { slug: string }) {
             <button
               onClick={toggleSidebarCollapsed}
               aria-label="Expand sidebar"
-              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg hover:opacity-80 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0C1526]"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg hover:opacity-80 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-2 focus-visible:ring-offset-[#16130F]"
             >
-              <Image src="/vantage-icon.svg" alt="Stokka" width={36} height={36} className="rounded-lg" />
+              <Logo variant="mark" size={36} />
             </button>
           )}
 
@@ -286,7 +285,7 @@ export function Sidebar({ slug }: { slug: string }) {
             <button
               onClick={toggleSidebarCollapsed}
               aria-label="Collapse sidebar"
-              className="hidden lg:flex p-1.5 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-slate-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0C1526]"
+              className="hidden lg:flex p-1.5 text-sidebar-foreground/50 hover:text-sidebar-foreground rounded-lg hover:bg-[#2A231D] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-1 focus-visible:ring-offset-[#16130F]"
             >
               <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -294,7 +293,7 @@ export function Sidebar({ slug }: { slug: string }) {
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Close navigation"
-              className="lg:hidden p-1.5 text-slate-600 hover:text-slate-300 rounded-lg hover:bg-slate-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              className="lg:hidden p-1.5 text-sidebar-foreground/50 hover:text-sidebar-foreground rounded-lg hover:bg-[#2A231D] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember"
             >
               <X className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -322,8 +321,8 @@ export function Sidebar({ slug }: { slug: string }) {
                     aria-expanded={isOpen}
                     aria-label={`${section.label.charAt(0) + section.label.slice(1).toLowerCase()} section`}
                     className={cn(
-                      "w-full flex items-center justify-between px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-500 rounded",
-                      hasActiveItem ? "text-green-400" : "text-slate-600 hover:text-slate-400"
+                      "w-full flex items-center justify-between px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ember rounded",
+                      hasActiveItem ? "text-ember" : "text-sidebar-foreground/40 hover:text-sidebar-foreground"
                     )}
                   >
                     {section.label}
@@ -384,7 +383,7 @@ export function Sidebar({ slug }: { slug: string }) {
                   <Link
                     href={`/${slug}/settings?tab=billing`}
                     aria-label="Upgrade to Starter"
-                    className="flex w-9 h-9 items-center justify-center rounded-lg bg-green-700 hover:bg-green-600 text-white transition shadow-md shadow-green-900/50"
+                    className="flex w-9 h-9 items-center justify-center rounded-lg bg-ember hover:bg-ember-deep text-ink transition"
                   >
                     <Zap className="w-4 h-4" aria-hidden="true" />
                   </Link>
@@ -397,7 +396,7 @@ export function Sidebar({ slug }: { slug: string }) {
             <div className={cn(sidebarCollapsed && "lg:hidden")}>
               <Link
                 href={`/${slug}/settings?tab=billing`}
-                className="flex items-center gap-2 w-full px-3 py-2.5 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-green-900/40"
+                className="flex items-center gap-2 w-full px-3 py-2.5 bg-ember hover:bg-ember-deep text-ink rounded-xl text-xs font-bold transition"
               >
                 <Zap className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                 <span>Upgrade to Starter</span>

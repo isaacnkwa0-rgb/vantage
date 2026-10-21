@@ -24,8 +24,8 @@ function getLevel(value: number | null, thresholds: [number, number]): HealthLev
 }
 
 const LEVEL_CONFIG: Record<HealthLevel, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  excellent: { label: "Excellent", icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
-  good:      { label: "Good",      icon: TrendingUp,  color: "text-green-600",   bg: "bg-green-50"   },
+  excellent: { label: "Excellent", icon: CheckCircle, color: "text-success", bg: "bg-primary-soft" },
+  good:      { label: "Good",      icon: TrendingUp,  color: "text-primary",   bg: "bg-primary-soft"   },
   attention: { label: "Needs attention", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50" },
   critical:  { label: "Critical",  icon: XCircle,     color: "text-red-600",     bg: "bg-red-50"     },
   "no-data": { label: "No data",   icon: Minus,       color: "text-slate-400",   bg: "bg-slate-50"   },

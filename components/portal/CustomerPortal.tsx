@@ -130,7 +130,7 @@ export function CustomerPortal({ business }: Props) {
   }
 
   const STATUS_COLORS: Record<string, string> = {
-    paid: "text-green-600",
+    paid: "text-primary",
     unpaid: "text-red-500",
     partial: "text-amber-600",
     overdue: "text-red-600",
@@ -145,7 +145,7 @@ export function CustomerPortal({ business }: Props) {
           <div className="flex items-center gap-3">
             {business.logo_url
               ? <Image src={business.logo_url} alt={business.name} width={36} height={36} className="rounded-xl object-cover" />
-              : <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center"><Store className="w-4 h-4 text-white" /></div>}
+              : <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center"><Store className="w-4 h-4 text-on-primary" /></div>}
             <div>
               <p className="text-sm font-extrabold text-[#0F172A]">{business.name}</p>
               <p className="text-xs text-slate-400">Customer Portal</p>
@@ -164,8 +164,8 @@ export function CustomerPortal({ business }: Props) {
           /* Login form */
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 max-w-sm mx-auto space-y-5">
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <KeyRound className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary-soft rounded-full flex items-center justify-center mx-auto mb-3">
+                <KeyRound className="w-6 h-6 text-primary" />
               </div>
               <h2 className="text-base font-bold text-[#0F172A]">Sign in to your account</h2>
               <p className="text-xs text-slate-400 mt-1">We'll send a one-time code to your email</p>
@@ -181,14 +181,14 @@ export function CustomerPortal({ business }: Props) {
                     onChange={(e) => setEmail(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && requestOTP()}
                     placeholder="you@email.com"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 {error && <p className="text-xs text-red-500">{error}</p>}
                 <button
                   onClick={requestOTP}
                   disabled={loading || !email.trim()}
-                  className="w-full py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
                   {loading ? "Sending..." : "Send Code"}
@@ -207,14 +207,14 @@ export function CustomerPortal({ business }: Props) {
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     onKeyDown={(e) => e.key === "Enter" && verifyOTP()}
                     placeholder="000000"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 {error && <p className="text-xs text-red-500">{error}</p>}
                 <button
                   onClick={verifyOTP}
                   disabled={loading || otp.length < 6}
-                  className="w-full py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                   {loading ? "Verifying..." : "Sign In"}

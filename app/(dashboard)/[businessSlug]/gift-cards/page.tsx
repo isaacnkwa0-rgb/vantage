@@ -37,7 +37,7 @@ export default async function GiftCardsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Gift Cards" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Gift Cards" bg="bg-surface" border={false} centered />
       <GiftCardsClient
         cards={(cardsRes.data ?? []) as any}
         customers={(customersRes.data ?? []) as any}

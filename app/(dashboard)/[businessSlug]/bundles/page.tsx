@@ -37,7 +37,7 @@ export default async function BundlesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Bundles" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Bundles" bg="bg-surface" border={false} centered />
       <BundlesClient
         bundles={(bundlesRes.data ?? []) as any}
         products={(productsRes.data ?? []) as any}

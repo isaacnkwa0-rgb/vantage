@@ -71,12 +71,12 @@ export function InventoryPanel({ products, slug }: Props) {
           </Link>
         )}
 
-        <div className="flex items-center justify-between py-2 px-3 bg-green-50 rounded-lg">
+        <div className="flex items-center justify-between py-2 px-3 bg-primary-soft rounded-lg">
           <div className="flex items-center gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex-shrink-0" />
-            <span className="text-xs font-semibold text-green-700">Healthy</span>
+            <div className="w-3.5 h-3.5 rounded-full bg-primary flex-shrink-0" />
+            <span className="text-xs font-semibold text-primary">Healthy</span>
           </div>
-          <span className="text-xs font-bold text-green-700">{healthy}</span>
+          <span className="text-xs font-bold text-primary">{healthy}</span>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export function InventoryPanel({ products, slug }: Props) {
               </div>
             ))}
           </div>
-          <Link href={`/${slug}/products`} className="mt-2 flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-semibold transition">
+          <Link href={`/${slug}/products`} className="mt-2 flex items-center gap-1 text-xs text-primary hover:text-primary font-semibold transition">
             View all inventory <ArrowRight className="w-3 h-3" />
           </Link>
         </div>

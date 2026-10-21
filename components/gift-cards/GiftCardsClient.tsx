@@ -32,7 +32,7 @@ interface Props {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; iconBg: string; iconColor: string }> = {
-  active:   { label: "Active",   bg: "bg-emerald-50",  text: "text-emerald-700", iconBg: "bg-emerald-50",  iconColor: "text-emerald-500" },
+  active:   { label: "Active",   bg: "bg-primary-soft",  text: "text-primary", iconBg: "bg-primary-soft",  iconColor: "text-success" },
   redeemed: { label: "Redeemed", bg: "bg-slate-100",   text: "text-slate-500",   iconBg: "bg-slate-100",   iconColor: "text-slate-400" },
   expired:  { label: "Expired",  bg: "bg-amber-50",    text: "text-amber-700",   iconBg: "bg-amber-50",    iconColor: "text-amber-500" },
   voided:   { label: "Voided",   bg: "bg-red-50",      text: "text-red-600",     iconBg: "bg-red-50",      iconColor: "text-red-400" },
@@ -55,7 +55,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -172,13 +172,13 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
           />
         </div>
         {!showForm && (
           <button
             onClick={openForm}
-            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
           >
             <Plus className="w-4 h-4" /> New
           </button>
@@ -192,7 +192,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
           <p className="text-[11px] text-slate-400 mt-0.5">Active</p>
         </div>
         <div className="border border-slate-200 rounded-[8px] p-3 text-center">
-          <p className="text-[15px] font-extrabold text-[#1a9c38] leading-tight mt-0.5">{fmt(activeTotal)}</p>
+          <p className="text-[15px] font-extrabold text-primary leading-tight mt-0.5">{fmt(activeTotal)}</p>
           <p className="text-[11px] text-slate-400 mt-0.5">Outstanding</p>
         </div>
         <div className="border border-slate-200 rounded-[8px] p-3 text-center">
@@ -215,7 +215,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
             <SectionDivider label="Card" />
             <div className="space-y-3">
               {/* Code field with regenerate */}
-              <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+              <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
                 <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">Card code</legend>
                 <div className="flex items-center gap-2">
                   <input
@@ -226,7 +226,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
                   <button
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, code: generateCode() }))}
-                    className="flex-shrink-0 p-1 text-slate-400 hover:text-[#1a9c38] transition"
+                    className="flex-shrink-0 p-1 text-slate-400 hover:text-primary transition"
                     title="Regenerate code"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -291,7 +291,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
             <button
               onClick={create}
               disabled={saving || !form.initial_value}
-              className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               Issue Card
@@ -343,7 +343,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
                         {card.customers?.name ?? card.customer_email ?? <span className="text-slate-300">No recipient</span>}
                       </p>
                       <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        <span className="text-[13px] font-semibold text-[#1a9c38]">{fmt(card.balance)}</span>
+                        <span className="text-[13px] font-semibold text-primary">{fmt(card.balance)}</span>
                         <span className="text-[12px] text-slate-400">of {fmt(card.initial_value)}</span>
                         {card.expires_at && (
                           <span className="text-[12px] text-slate-400">
@@ -356,7 +356,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
                       {card.initial_value > 0 && (
                         <div className="mt-2 h-1 rounded-full bg-slate-100 overflow-hidden">
                           <div
-                            className={cn("h-full rounded-full transition-all", card.status === "active" ? "bg-[#1a9c38]" : "bg-slate-300")}
+                            className={cn("h-full rounded-full transition-all", card.status === "active" ? "bg-primary" : "bg-slate-300")}
                             style={{ width: `${100 - pctUsed}%` }}
                           />
                         </div>
@@ -371,7 +371,7 @@ export function GiftCardsClient({ cards: initialCards, customers, currency, busi
                       className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition active:scale-95"
                     >
                       {copiedId === card.id
-                        ? <><CheckCheck className="w-3 h-3 text-[#1a9c38]" /> Copied</>
+                        ? <><CheckCheck className="w-3 h-3 text-primary" /> Copied</>
                         : <><Copy className="w-3 h-3" /> Copy Code</>}
                     </button>
                     {card.status === "active" && (

@@ -56,7 +56,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -64,7 +64,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const STATUS_CONFIG = {
-  active:   { label: "Active",    bg: "bg-emerald-50",  text: "text-emerald-700", icon: CheckCircle2 },
+  active:   { label: "Active",    bg: "bg-primary-soft",  text: "text-primary", icon: CheckCircle2 },
   inactive: { label: "Inactive",  bg: "bg-slate-100",   text: "text-slate-500",   icon: XCircle },
   expired:  { label: "Expired",   bg: "bg-orange-50",   text: "text-orange-600",  icon: Clock },
   maxed:    { label: "Limit hit", bg: "bg-red-50",      text: "text-red-600",     icon: XCircle },
@@ -176,13 +176,13 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search"
-              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
             />
           </div>
           {!showForm && (
             <button
               onClick={() => { setShowForm(true); setForm({ ...EMPTY_FORM, code: generateCode() }); }}
-              className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+              className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
             >
               <Plus className="w-4 h-4" />
               New
@@ -205,7 +205,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
             </div>
 
             {/* Code + generate */}
-            <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+            <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
               <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">Code</legend>
               <div className="flex items-center gap-2">
                 <input
@@ -216,7 +216,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
                 />
                 <button
                   onClick={() => setForm((f) => ({ ...f, code: generateCode() }))}
-                  className="p-1 text-slate-400 hover:text-[#1a9c38] transition flex-shrink-0"
+                  className="p-1 text-slate-400 hover:text-primary transition flex-shrink-0"
                   title="Generate random code"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
@@ -302,7 +302,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {saving ? "Saving..." : "Create Code"}
@@ -321,7 +321,7 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
             <p className="text-[13px] text-slate-400 mt-1.5 max-w-xs">Create a code and share it with customers to apply at checkout</p>
             <button
               onClick={() => { setShowForm(true); setForm({ ...EMPTY_FORM, code: generateCode() }); }}
-              className="mt-6 flex items-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition"
+              className="mt-6 flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-5 py-3 rounded-xl text-sm font-semibold transition"
             >
               <Plus className="w-4 h-4" />
               New Code
@@ -360,10 +360,10 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
                           <span className="font-mono text-[13px] text-slate-500 tracking-wider">{c.code}</span>
                           <button
                             onClick={() => copyCode(c.code)}
-                            className="text-slate-400 hover:text-[#1a9c38] transition"
+                            className="text-slate-400 hover:text-primary transition"
                           >
                             {copied === c.code
-                              ? <CheckCircle2 className="w-3 h-3 text-[#1a9c38]" />
+                              ? <CheckCircle2 className="w-3 h-3 text-primary" />
                               : <Copy className="w-3 h-3" />}
                           </button>
                         </div>
@@ -396,13 +396,13 @@ export function DiscountsClient({ codes: initial, businessId, currency, userId }
                           "flex items-center gap-1.5 text-[13px] font-semibold px-3 py-1.5 rounded-lg border transition active:scale-95 disabled:opacity-50",
                           c.is_active
                             ? "text-slate-600 bg-slate-50 border-slate-200 hover:bg-slate-100"
-                            : "text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100"
+                            : "text-primary bg-primary-soft border-primary hover:bg-primary-soft"
                         )}
                       >
                         {toggling === c.id
                           ? <Loader2 className="w-3 h-3 animate-spin" />
                           : c.is_active
-                            ? <ToggleRight className="w-3 h-3 text-[#1a9c38]" />
+                            ? <ToggleRight className="w-3 h-3 text-primary" />
                             : <ToggleLeft className="w-3 h-3" />}
                         {c.is_active ? "Deactivate" : "Activate"}
                       </button>

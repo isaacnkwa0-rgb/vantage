@@ -22,11 +22,11 @@ export function UpgradePrompt({ feature, description, requiredPlan, onClose, inl
   const content = (
     <div className={`flex flex-col items-center text-center gap-3 p-6 ${inline ? "" : ""}`}>
       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-        requiredPlan === "pro" ? "bg-purple-100" : "bg-green-100"
+        requiredPlan === "pro" ? "bg-purple-100" : "bg-primary-soft"
       }`}>
         {requiredPlan === "pro"
           ? <Star className="w-6 h-6 text-purple-600" />
-          : <Zap className="w-6 h-6 text-green-600" />
+          : <Zap className="w-6 h-6 text-primary" />
         }
       </div>
       <div>
@@ -35,10 +35,10 @@ export function UpgradePrompt({ feature, description, requiredPlan, onClose, inl
       </div>
       <Link
         href={`/${slug}/settings?tab=billing`}
-        className={`w-full py-2.5 rounded-xl text-sm font-bold text-white transition shadow-md ${
+        className={`w-full py-2.5 rounded-xl text-sm font-bold text-on-primary transition shadow-md ${
           requiredPlan === "pro"
             ? "bg-gradient-to-b from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-purple-200"
-            : "bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 shadow-green-200"
+            : "bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-ember-deep shadow-ember/20"
         }`}
       >
         Upgrade to {planLabel}
@@ -52,7 +52,7 @@ export function UpgradePrompt({ feature, description, requiredPlan, onClose, inl
   if (inline) {
     return (
       <div className={`rounded-2xl border-2 ${
-        requiredPlan === "pro" ? "border-purple-200 bg-purple-50" : "border-green-200 bg-green-50"
+        requiredPlan === "pro" ? "border-purple-200 bg-purple-50" : "border-primary bg-primary-soft"
       }`}>
         {content}
       </div>
@@ -73,7 +73,7 @@ export function UpgradePrompt({ feature, description, requiredPlan, onClose, inl
         <div className={`h-1.5 rounded-t-2xl ${
           requiredPlan === "pro"
             ? "bg-gradient-to-r from-purple-400 to-purple-600"
-            : "bg-gradient-to-r from-green-400 to-green-600"
+            : "bg-gradient-to-r from-green-400 to-ember"
         }`} />
         {content}
       </div>

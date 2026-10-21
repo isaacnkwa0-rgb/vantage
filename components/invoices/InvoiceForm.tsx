@@ -203,7 +203,7 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
 
   function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
-      <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+      <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
         <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
         {children}
       </fieldset>
@@ -231,13 +231,13 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
           <div className="flex gap-2">
             <button
               onClick={() => setClientMode("existing")}
-              className={`flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold border transition ${clientMode === "existing" ? "bg-[#1a9c38] text-white border-[#1a9c38]" : "border-slate-200 text-slate-500 bg-white"}`}
+              className={`flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold border transition ${clientMode === "existing" ? "bg-primary text-on-primary border-primary" : "border-slate-200 text-slate-500 bg-white"}`}
             >
               Existing customer
             </button>
             <button
               onClick={() => setClientMode("manual")}
-              className={`flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold border transition ${clientMode === "manual" ? "bg-[#1a9c38] text-white border-[#1a9c38]" : "border-slate-200 text-slate-500 bg-white"}`}
+              className={`flex-1 py-2.5 rounded-[8px] text-[13px] font-semibold border transition ${clientMode === "manual" ? "bg-primary text-on-primary border-primary" : "border-slate-200 text-slate-500 bg-white"}`}
             >
               Manual entry
             </button>
@@ -294,7 +294,7 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
           label="Line Items"
           action={
             !loadingItems && (
-              <button onClick={addItem} className="flex items-center gap-1 text-[12px] text-[#1a9c38] font-semibold flex-shrink-0">
+              <button onClick={addItem} className="flex items-center gap-1 text-[12px] text-primary font-semibold flex-shrink-0">
                 <Plus className="w-3 h-3" /> Add
               </button>
             )
@@ -391,7 +391,7 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
         <button
           onClick={() => handleSave(isEdit ? status : "sent")}
           disabled={saving || loadingItems}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+          className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
           {isEdit ? "Save Changes" : "Create & Send"}

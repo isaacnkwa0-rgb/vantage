@@ -54,7 +54,7 @@ export default async function TargetsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Targets" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Targets" bg="bg-surface" border={false} centered />
       <TargetsClient
         targets={(targetsRes.data ?? []) as any}
         currency={business.currency}

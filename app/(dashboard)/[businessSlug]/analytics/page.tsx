@@ -45,7 +45,7 @@ export default async function AnalyticsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Analytics" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Analytics" bg="bg-surface" border={false} centered />
       <AnalyticsClient
         sales={sales ?? []}
         saleItems={saleItems ?? []}

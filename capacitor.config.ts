@@ -20,8 +20,8 @@ const config: CapacitorConfig = {
       showSpinner: false,
     },
     StatusBar: {
-      style: "Light",
-      backgroundColor: "#0F172A",
+      style: "Dark",           // dark content (Ink icons) on Cream background
+      backgroundColor: "#FFF6EC",
     },
   },
   android: {

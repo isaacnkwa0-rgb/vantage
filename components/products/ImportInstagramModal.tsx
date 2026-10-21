@@ -307,14 +307,14 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
                         value={draft.name}
                         onChange={(e) => updateDraft(draft.id, "name", e.target.value)}
                         placeholder="Product name *"
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                       <textarea
                         value={draft.description}
                         onChange={(e) => updateDraft(draft.id, "description", e.target.value)}
                         placeholder="Description"
                         rows={2}
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                       />
                     </div>
                   </div>
@@ -327,7 +327,7 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
                         onChange={(e) => updateDraft(draft.id, "selling_price", e.target.value)}
                         placeholder="0"
                         min={0}
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                     <div>
@@ -338,7 +338,7 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
                         onChange={(e) => updateDraft(draft.id, "cost_price", e.target.value)}
                         placeholder="0"
                         min={0}
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                     <div>
@@ -349,7 +349,7 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
                         onChange={(e) => updateDraft(draft.id, "stock_quantity", e.target.value)}
                         placeholder="0"
                         min={0}
-                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
@@ -367,8 +367,8 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
           {/* Done */}
           {step === "done" && (
             <div className="flex flex-col items-center justify-center px-8 py-14 gap-5 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
-                <CheckCircle2 className="w-9 h-9 text-green-500" />
+              <div className="w-16 h-16 bg-primary-soft rounded-2xl flex items-center justify-center">
+                <CheckCircle2 className="w-9 h-9 text-primary" />
               </div>
               <div>
                 <h3 className="text-base font-bold text-[#0F172A]">Products imported!</h3>
@@ -378,7 +378,7 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
               </div>
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 bg-green-600 text-white font-semibold rounded-xl text-sm hover:bg-green-700 transition"
+                className="px-6 py-2.5 bg-primary text-on-primary font-semibold rounded-xl text-sm hover:bg-ember-deep transition"
               >
                 Done
               </button>
@@ -415,7 +415,7 @@ export function ImportInstagramModal({ slug, businessId, onClose, startConnected
               <button
                 onClick={importProducts}
                 disabled={validDrafts.length === 0}
-                className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition disabled:opacity-40"
+                className="flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold hover:bg-ember-deep transition disabled:opacity-40"
               >
                 Import {validDrafts.length} Product{validDrafts.length !== 1 ? "s" : ""}
                 <ChevronRight className="w-3.5 h-3.5" />

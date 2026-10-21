@@ -10,7 +10,7 @@ import {
 
 const PROMO_SLIDES = [
   {
-    bg: "#1a9c38",
+    bg: "#F2542D",
     title: "Record Sales Anywhere",
     body: "Use the Stokka POS to record in-store and online sales with ease.",
     cta: "Get started",
@@ -87,7 +87,7 @@ interface Props {
 }
 
 const METHOD_STYLES: Record<string, string> = {
-  cash:     "bg-green-50 text-green-700",
+  cash:     "bg-primary-soft text-primary",
   card:     "bg-blue-50 text-blue-700",
   transfer: "bg-purple-50 text-purple-700",
   split:    "bg-amber-50 text-amber-700",
@@ -246,7 +246,7 @@ export function MobileDashboard({
                 <p className="text-[15px] font-semibold text-slate-900 leading-tight">
                   Hi, {firstName ?? businessName.split(" ")[0]}
                 </p>
-                <p className="text-[12px] text-[#1a9c38] mt-0.5 flex items-center gap-0.5">
+                <p className="text-[12px] text-primary mt-0.5 flex items-center gap-0.5">
                   Share your website link
                   <ChevronRight className="w-3 h-3" aria-hidden="true" />
                 </p>
@@ -255,7 +255,7 @@ export function MobileDashboard({
 
             {/* Subscription badge */}
             {isFree ? (
-              <span className="text-[11px] text-green-600 mt-1">Free plan</span>
+              <span className="text-[11px] text-primary mt-1">Free plan</span>
             ) : (
               <span className="text-[11px] text-violet-600 mt-1 capitalize">
                 {activeBusiness?.subscription_tier ?? "Starter"}
@@ -291,14 +291,14 @@ export function MobileDashboard({
             <div className="flex-1" />
             <Link
               href={`/${slug}/reports`}
-              className="p-1 text-[#1a9c38]"
+              className="p-1 text-primary"
               aria-label="Analytics"
             >
               <BarChart2 className="w-5 h-5" aria-hidden="true" />
             </Link>
             <Link
               href={`/${slug}/notifications`}
-              className="relative p-1 text-[#1a9c38]"
+              className="relative p-1 text-primary"
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5" aria-hidden="true" />
@@ -317,7 +317,7 @@ export function MobileDashboard({
             onClick={() => setShowLocationPicker(true)}
             className="w-full flex items-center gap-2.5 text-[13px] font-semibold text-slate-700 bg-white border border-slate-200 px-4 py-3 rounded-[8px]"
           >
-            <MapPin className="w-4 h-4 text-[#1a9c38] flex-shrink-0" aria-hidden="true" />
+            <MapPin className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
             <span className="flex-1 text-left">{selectedLocationName}</span>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" aria-hidden="true" />
           </button>
@@ -354,13 +354,13 @@ export function MobileDashboard({
                       onClick={() => { setSelectedLocationId(loc.id); setShowLocationPicker(false); }}
                       className={cn(
                         "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition",
-                        active ? "bg-[#ecf7f1] border border-[#1a9c38]" : "bg-slate-50"
+                        active ? "bg-primary-soft border border-primary" : "bg-slate-50"
                       )}
                     >
                       <span className={cn("text-[14px] font-semibold flex-1", active ? "text-slate-900" : "text-slate-700")}>
                         {loc.name}
                       </span>
-                      {active && <Check className="w-4 h-4 text-[#1a9c38] flex-shrink-0" aria-hidden="true" />}
+                      {active && <Check className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />}
                     </button>
                   );
                 })}
@@ -370,7 +370,7 @@ export function MobileDashboard({
         )}
 
         {/* ── Revenue card (Bumpa wallet style) ───────────── */}
-        <div className="mx-4 mb-3 rounded-[14px] px-4 pt-4 pb-[34px] relative overflow-hidden border-l-4 border-[#1a9c38]" style={{ backgroundColor: "#f6f6f6" }}>
+        <div className="mx-4 mb-3 rounded-[14px] px-4 pt-4 pb-[34px] relative overflow-hidden border-l-4 border-primary" style={{ backgroundColor: "#f6f6f6" }}>
 
           {/* Label row — label left, eye right */}
           <div className="flex items-center justify-between mb-3">
@@ -378,7 +378,7 @@ export function MobileDashboard({
             <button
               onClick={() => setHidden((v) => !v)}
               aria-label={hidden ? "Show amounts" : "Hide amounts"}
-              className="text-[#1a9c38] p-0.5"
+              className="text-primary p-0.5"
             >
               {hidden
                 ? <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -405,7 +405,7 @@ export function MobileDashboard({
           {period === "month" && revenueGrowthPct !== null && (
             <div className={cn(
               "inline-flex items-center gap-1 mt-3 px-2.5 py-1 rounded-full text-[11px] font-bold",
-              revenueGrowthPct >= 0 ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"
+              revenueGrowthPct >= 0 ? "bg-primary-soft text-primary" : "bg-red-50 text-red-500"
             )}>
               {revenueGrowthPct >= 0
                 ? <TrendingUp   className="w-3 h-3" aria-hidden="true" />
@@ -447,7 +447,7 @@ export function MobileDashboard({
                   onClick={() => { setPeriod(p); setShowPeriod(false); }}
                   className={cn(
                     "w-full text-left px-4 py-3 text-[13px] font-medium",
-                    period === p ? "text-[#1a9c38] bg-green-50" : "text-slate-700 hover:bg-slate-50"
+                    period === p ? "text-primary bg-primary-soft" : "text-slate-700 hover:bg-slate-50"
                   )}
                 >
                   {p === "today" ? "Today" : p === "week" ? "This week" : "This month"}
@@ -492,9 +492,9 @@ export function MobileDashboard({
                 </>
               ) : (
                 <>
-                  <p className="text-[12px] text-[#1a9c38] font-semibold mt-0.5">🎉 All milestones achieved!</p>
-                  <div className="mt-2 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#1a9c38] rounded-full w-full" />
+                  <p className="text-[12px] text-primary font-semibold mt-0.5">🎉 All milestones achieved!</p>
+                  <div className="mt-2 h-1.5 bg-primary-soft rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full w-full" />
                   </div>
                 </>
               )}
@@ -511,7 +511,7 @@ export function MobileDashboard({
           className="mx-4 mb-3 flex items-center justify-between bg-[#f6f6f6] rounded-[32px] px-4 h-12"
         >
           <p className="text-[13px] font-medium text-slate-500">Your business report is ready.</p>
-          <div className="w-9 h-9 rounded-full bg-[#1a9c38] flex items-center justify-center flex-shrink-0 ml-3">
+          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0 ml-3">
             <Download className="w-4 h-4 text-white" aria-hidden="true" />
           </div>
         </Link>
@@ -526,7 +526,7 @@ export function MobileDashboard({
                 <Link key={action.href} href={`/${slug}/${action.href}`} className="flex flex-col items-center">
                   <div className="w-full h-[96px] rounded-[10px] border border-slate-200 flex flex-col items-center justify-center gap-2.5">
                     <Icon aria-hidden="true" className={cn("w-[26px] h-[26px]",
-                      action.href === "pos"      ? "text-[#1a9c38]"   :
+                      action.href === "pos"      ? "text-primary"   :
                       action.href === "products" ? "text-blue-500"    :
                       action.href === "invoices" ? "text-violet-500"  :
                       "text-orange-400"
@@ -550,7 +550,7 @@ export function MobileDashboard({
             </p>
             <Link
               href={`/${slug}/sales`}
-              className="flex items-center gap-0.5 text-[13px] text-[#1a9c38] font-semibold"
+              className="flex items-center gap-0.5 text-[13px] text-primary font-semibold"
             >
               View all <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </Link>
@@ -574,8 +574,8 @@ export function MobileDashboard({
             <div className="divide-y divide-slate-50">
               {sales.slice(0, 7).map((sale) => (
                 <div key={sale.id} className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                    <ShoppingCart className="w-4 h-4 text-[#1a9c38]" aria-hidden="true" />
+                  <div className="w-9 h-9 rounded-full bg-primary-soft flex items-center justify-center flex-shrink-0">
+                    <ShoppingCart className="w-4 h-4 text-primary" aria-hidden="true" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[14px] font-semibold text-slate-900 truncate">
@@ -649,7 +649,7 @@ export function MobileDashboard({
                 onClick={() => setPromoSlide(i)}
                 className={cn(
                   "rounded-full transition-all",
-                  i === promoSlide ? "w-4 h-1.5 bg-[#1a9c38]" : "w-1.5 h-1.5 bg-slate-200"
+                  i === promoSlide ? "w-4 h-1.5 bg-primary" : "w-1.5 h-1.5 bg-slate-200"
                 )}
               />
             ))}
@@ -667,7 +667,7 @@ export function MobileDashboard({
           <div className="px-4 pb-4 space-y-3">
             <Link
               href={`/${slug}/referrals`}
-              className="w-full h-10 bg-[#1a9c38] rounded-[8px] flex items-center justify-center"
+              className="w-full h-10 bg-primary rounded-[8px] flex items-center justify-center"
             >
               <span className="text-[13px] font-bold text-white">Join the Stokka Referral Community</span>
             </Link>
@@ -684,10 +684,10 @@ export function MobileDashboard({
                     aria-label="Copy referral code"
                   >
                     {codeCopied
-                      ? <Check className="w-3.5 h-3.5 text-[#1a9c38]" aria-hidden="true" />
+                      ? <Check className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
                       : <Copy className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />}
                   </button>
-                  <Link href={`/${slug}/referrals`} className="text-[12px] font-semibold text-[#1a9c38] flex items-center gap-0.5">
+                  <Link href={`/${slug}/referrals`} className="text-[12px] font-semibold text-primary flex items-center gap-0.5">
                     View Earnings <ChevronRight className="w-3 h-3" aria-hidden="true" />
                   </Link>
                 </div>

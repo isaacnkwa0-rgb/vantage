@@ -69,12 +69,12 @@ function shortDate(iso: string) {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; icon: React.ElementType }> = {
-  draft:     { label: "Draft",     bg: "bg-slate-100",   text: "text-slate-600",   icon: FileText },
-  sent:      { label: "Sent",      bg: "bg-blue-50",     text: "text-blue-600",    icon: Send },
-  accepted:  { label: "Accepted",  bg: "bg-emerald-50",  text: "text-emerald-700", icon: CheckCircle2 },
-  rejected:  { label: "Rejected",  bg: "bg-red-50",      text: "text-red-600",     icon: X },
-  expired:   { label: "Expired",   bg: "bg-orange-50",   text: "text-orange-600",  icon: Clock },
-  converted: { label: "Converted", bg: "bg-violet-50",   text: "text-violet-700",  icon: ArrowRightLeft },
+  draft:     { label: "Draft",     bg: "bg-[#EADFD2]",     text: "text-text-muted",  icon: FileText },
+  sent:      { label: "Sent",      bg: "bg-ink/10",         text: "text-ink",         icon: Send },
+  accepted:  { label: "Accepted",  bg: "bg-primary-soft",   text: "text-primary",     icon: CheckCircle2 },
+  rejected:  { label: "Rejected",  bg: "bg-danger/10",      text: "text-danger",      icon: X },
+  expired:   { label: "Expired",   bg: "bg-sun/20",         text: "text-ink",         icon: Clock },
+  converted: { label: "Converted", bg: "bg-violet-50",      text: "text-violet-700",  icon: ArrowRightLeft },
 };
 
 const STATUS_TABS = [
@@ -191,7 +191,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search"
-              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
             />
           </div>
           <div ref={filterRef} className="relative">
@@ -200,12 +200,12 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
               className={cn(
                 "h-full flex items-center gap-1.5 px-3 border rounded-[8px] text-[13px] font-medium transition bg-white",
                 statusFilter !== "all"
-                  ? "border-[#1a9c38] text-[#1a9c38]"
+                  ? "border-primary text-primary"
                   : "border-slate-200 text-slate-600 hover:bg-slate-50"
               )}
             >
               <SlidersHorizontal className="w-4 h-4" />
-              {statusFilter !== "all" && <span className="w-1.5 h-1.5 rounded-full bg-[#1a9c38]" />}
+              {statusFilter !== "all" && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
             </button>
             {showFilterMenu && (
               <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-[8px] border border-slate-200 shadow-lg z-20 overflow-hidden">
@@ -216,7 +216,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
                     className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition"
                   >
                     {tab.label}
-                    {statusFilter === tab.value && <Check className="w-3.5 h-3.5 text-[#1a9c38]" />}
+                    {statusFilter === tab.value && <Check className="w-3.5 h-3.5 text-primary" />}
                   </button>
                 ))}
               </div>
@@ -225,7 +225,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
           {/* New Quote */}
           <button
             onClick={() => router.push(`/${businessSlug}/quotes/new`)}
-            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
           >
             <Plus className="w-4 h-4" />
             New
@@ -253,7 +253,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
             {!search && statusFilter === "all" && (
               <button
                 onClick={() => router.push(`/${businessSlug}/quotes/new`)}
-                className="mt-6 flex items-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition"
+                className="mt-6 flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-5 py-3 rounded-xl text-sm font-semibold transition"
               >
                 <Plus className="w-4 h-4" />
                 New Quote
@@ -306,7 +306,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
                       <div className="flex flex-col items-end gap-1.5 flex-shrink-0 min-w-0 max-w-[100px]">
                         <span className="text-[15px] font-bold text-slate-900 leading-none truncate w-full text-right">{fmt(q.total_amount)}</span>
                         {q.status === "accepted" || q.status === "converted" ? (
-                          <span className="text-[11px] text-emerald-600 font-semibold">Accepted</span>
+                          <span className="text-[11px] text-success font-semibold">Accepted</span>
                         ) : q.status === "rejected" ? (
                           <span className="text-[11px] text-red-500 font-semibold">Rejected</span>
                         ) : (
@@ -335,7 +335,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
                             <button
                               onClick={(e) => { e.stopPropagation(); updateStatus(q, "accepted"); }}
                               disabled={!!updatingStatus}
-                              className="flex items-center gap-1.5 text-[13px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
+                              className="flex items-center gap-1.5 text-[13px] font-semibold text-primary bg-primary-soft hover:bg-primary-soft border border-primary px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
                             >
                               <CheckCircle2 className="w-3 h-3" />
                               Accept

@@ -129,7 +129,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
           <div className="p-5 space-y-4">
             {/* Success */}
             <div className="flex flex-col items-center text-center">
-              <CheckCircle2 className="w-14 h-14 text-emerald-500 mb-2" />
+              <CheckCircle2 className="w-14 h-14 text-success mb-2" />
               <p className="font-bold text-[#0F172A] text-lg">{fmt(sale.total_amount)}</p>
               <p className="text-slate-400 text-sm">{sale.sale_number}</p>
               {sale.customer_name && (
@@ -146,7 +146,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
                 </div>
               ))}
               {sale.discount_amount > 0 && (
-                <div className="flex justify-between text-emerald-600 border-t border-slate-200 pt-1.5 mt-1.5">
+                <div className="flex justify-between text-success border-t border-slate-200 pt-1.5 mt-1.5">
                   <span>Discount</span>
                   <span className="">-{fmt(sale.discount_amount)}</span>
                 </div>
@@ -162,7 +162,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
                 <span className="">{fmt(sale.total_amount)}</span>
               </div>
               {sale.change_amount > 0 && (
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between text-primary">
                   <span>Change</span>
                   <span className="">{fmt(sale.change_amount)}</span>
                 </div>
@@ -173,7 +173,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={handleWhatsApp}
-                className="flex items-center justify-center gap-1.5 border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 py-2.5 rounded-xl text-sm font-medium transition"
+                className="flex items-center justify-center gap-1.5 border border-primary bg-primary-soft text-primary hover:bg-primary-soft py-2.5 rounded-xl text-sm font-medium transition"
               >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp
@@ -203,7 +203,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
 
             <button
               onClick={onClose}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition"
+              className="w-full bg-primary hover:bg-primary text-on-primary font-semibold py-3 rounded-xl transition"
             >
               New Sale
             </button>
@@ -223,7 +223,7 @@ export function ReceiptModal({ sale, business, onClose }: Props) {
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePreviewPrint}
-                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+                className="flex items-center gap-1.5 bg-primary hover:bg-ember-deep text-on-primary text-sm font-semibold px-4 py-2 rounded-lg transition"
               >
                 <Printer className="w-4 h-4" />
                 Print

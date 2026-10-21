@@ -163,14 +163,14 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
     /* Covers full viewport except the bottom nav (h-16 = 64px) */
     <div className="fixed inset-x-0 top-0 z-50 bg-white flex flex-col overflow-hidden" style={{ bottom: "calc(4rem + env(safe-area-inset-bottom))" }}>
       {/* Mint hero — profile only */}
-      <div className="bg-[#fafefb] px-4 pt-12 pb-4 flex-shrink-0">
+      <div className="bg-[#FDE3D9] px-4 pt-12 pb-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="w-14 h-14 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
             {profileAvatar ? (
               <img src={profileAvatar} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-xl font-bold text-green-600">{avatarInitial}</span>
+              <span className="text-xl font-bold text-ember">{avatarInitial}</span>
             )}
           </div>
           {/* Name + business */}
@@ -191,9 +191,9 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
           <Link
             href={`/${slug}/settings?tab=billing`}
             onClick={onClose}
-            className="flex items-center gap-3 bg-[#eff3f1] rounded-[8px] px-4 py-5 active:bg-[#e8edea] transition-colors"
+            className="flex items-center gap-3 bg-primary-soft rounded-[8px] px-4 py-5 active:bg-[#FCD0C0] transition-colors"
           >
-            <Award className="w-6 h-6 text-green-600 flex-shrink-0" aria-hidden="true" />
+            <Award className="w-6 h-6 text-ember flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-slate-900">Upgrade to Starter</p>
               <p className="text-xs text-slate-500 mt-0.5">Unlock the full benefits of Stokka</p>
@@ -211,7 +211,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
           onClick={() => setShowLocationSheet(true)}
           className="w-full flex items-center gap-3 bg-white rounded-[8px] px-4 h-11 border border-slate-200 active:bg-slate-50 transition-colors mb-6"
         >
-          <Store className="w-5 h-5 text-green-600 flex-shrink-0" aria-hidden="true" />
+          <Store className="w-5 h-5 text-ember flex-shrink-0" aria-hidden="true" />
           <span className="flex-1 text-left text-[14px] font-medium text-slate-800">{locationLabel}</span>
           <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
         </button>
@@ -236,11 +236,11 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
               {/* Headquarters (all branches) */}
               <button
                 onClick={() => { setSelectedLocation(null); setShowLocationSheet(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-colors ${!selectedLocationId ? "bg-green-50" : "hover:bg-slate-50 active:bg-slate-100"}`}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-colors ${!selectedLocationId ? "bg-primary-soft" : "hover:bg-slate-50 active:bg-slate-100"}`}
               >
-                <Store className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <span className={`flex-1 text-left text-[14px] font-medium ${!selectedLocationId ? "text-green-700" : "text-slate-700"}`}>Headquarters</span>
-                {!selectedLocationId && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                <Store className="w-5 h-5 text-ember flex-shrink-0" />
+                <span className={`flex-1 text-left text-[14px] font-medium ${!selectedLocationId ? "text-ember" : "text-slate-700"}`}>Headquarters</span>
+                {!selectedLocationId && <Check className="w-4 h-4 text-ember flex-shrink-0" />}
               </button>
 
               {/* Other branches */}
@@ -248,11 +248,11 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                 <button
                   key={loc.id}
                   onClick={() => { setSelectedLocation(loc.id); setShowLocationSheet(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-colors ${selectedLocationId === loc.id ? "bg-green-50" : "hover:bg-slate-50 active:bg-slate-100"}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-colors ${selectedLocationId === loc.id ? "bg-primary-soft" : "hover:bg-slate-50 active:bg-slate-100"}`}
                 >
-                  <MapPin className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span className={`flex-1 text-left text-[14px] font-medium ${selectedLocationId === loc.id ? "text-green-700" : "text-slate-700"}`}>{loc.name}</span>
-                  {selectedLocationId === loc.id && <Check className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                  <MapPin className="w-5 h-5 text-ember flex-shrink-0" />
+                  <span className={`flex-1 text-left text-[14px] font-medium ${selectedLocationId === loc.id ? "text-ember" : "text-slate-700"}`}>{loc.name}</span>
+                  {selectedLocationId === loc.id && <Check className="w-4 h-4 text-ember flex-shrink-0" />}
                 </button>
               ))}
 
@@ -300,7 +300,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
               </button>
 
               {/* Items card */}
-              {isOpen && <div className="bg-[#fafefb] rounded-xl overflow-hidden">
+              {isOpen && <div className="bg-surface rounded-xl overflow-hidden">
               {items.map((item, i) => {
                 const label = isService && item.serviceLabel ? item.serviceLabel : item.label;
                 const href = `/${slug}/${item.href}`;
@@ -314,7 +314,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                     onClick={onClose}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-[18px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 active:bg-slate-50",
+                      "flex items-center gap-3 px-4 py-[18px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ember active:bg-slate-50",
                       i > 0 && "border-t border-slate-100"
                     )}
                   >
@@ -322,7 +322,7 @@ function MorePage({ slug, onClose }: { slug: string; onClose: () => void }) {
                       aria-hidden="true"
                       className={cn(
                         "w-5 h-5 flex-shrink-0",
-                        isActive ? "text-green-700" : "text-green-600"
+                        isActive ? "text-ember" : "text-primary"
                       )}
                     />
 
@@ -390,15 +390,15 @@ export function BottomNav({ slug }: { slug: string }) {
               aria-current={isActive ? "page" : undefined}
               aria-label={label}
               className={cn(
-                "flex-1 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
-                isActive ? "text-green-600" : "text-slate-500 active:text-slate-700"
+                "flex-1 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ember",
+                isActive ? "text-ember-deep" : "text-slate-500 active:text-slate-700"
               )}
             >
               <Icon
                 aria-hidden="true"
                 className="w-7 h-7"
               />
-              <span className={cn("text-[12px] font-normal leading-none", isActive ? "text-green-600" : "text-slate-500")}>
+              <span className={cn("text-[12px] font-normal leading-none", isActive ? "text-ember-deep" : "text-slate-500")}>
                 {label}
               </span>
             </Link>
@@ -411,15 +411,15 @@ export function BottomNav({ slug }: { slug: string }) {
           aria-label="Open full navigation menu"
           aria-expanded={showMore}
           className={cn(
-            "flex-1 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500",
-            showMore ? "text-green-600" : "text-slate-400 active:text-slate-600"
+            "flex-1 flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ember",
+            showMore ? "text-ember-deep" : "text-slate-400 active:text-slate-600"
           )}
         >
           <CircleEllipsis
             aria-hidden="true"
             className="w-7 h-7"
           />
-          <span className={cn("text-[12px] font-normal leading-none", showMore ? "text-green-600" : "text-slate-400")}>
+          <span className={cn("text-[12px] font-normal leading-none", showMore ? "text-ember-deep" : "text-slate-400")}>
             More
           </span>
         </button>

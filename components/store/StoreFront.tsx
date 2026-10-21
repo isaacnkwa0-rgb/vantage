@@ -106,7 +106,7 @@ interface Props {
 
 export function StoreFront({ business, products, categories, bankAccount, orderNumber, paymentStatus, bundles = [], randomAllItemsImage }: Props) {
   const fmt = (n: number) => formatCurrency(n, business.currency);
-  const brand = business.invoice_accent_color || "#1a9c38";
+  const brand = business.invoice_accent_color || "#F2542D";
   const flag = CURRENCY_FLAGS[business.currency] ?? "";
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -431,11 +431,11 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
 
         {/* Payment banners */}
         {succeeded && (
-          <div className="mb-5 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+          <div className="mb-5 bg-primary-soft border border-primary rounded-xl p-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-green-700">Order placed successfully!</p>
-              {orderNumber && <p className="text-xs text-green-600 mt-0.5">Order #{orderNumber} — confirmation sent to your email.</p>}
+              <p className="text-sm font-semibold text-primary">Order placed successfully!</p>
+              {orderNumber && <p className="text-xs text-primary mt-0.5">Order #{orderNumber} — confirmation sent to your email.</p>}
             </div>
           </div>
         )}
@@ -978,7 +978,7 @@ export function StoreFront({ business, products, categories, bankAccount, orderN
                       className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 transition flex-shrink-0"
                     >
                       {copied === key
-                        ? <Check className="w-3.5 h-3.5 text-green-500" />
+                        ? <Check className="w-3.5 h-3.5 text-primary" />
                         : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                     </button>
                   </div>

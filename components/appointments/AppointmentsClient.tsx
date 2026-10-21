@@ -39,7 +39,7 @@ interface Props {
 
 const STATUS_CONFIG: Record<string, { label: string; pill: string }> = {
   scheduled:  { label: "Scheduled",  pill: "bg-blue-100 text-blue-700" },
-  confirmed:  { label: "Confirmed",  pill: "bg-green-100 text-green-700" },
+  confirmed:  { label: "Confirmed",  pill: "bg-primary-soft text-primary" },
   completed:  { label: "Completed",  pill: "bg-slate-100 text-slate-600" },
   cancelled:  { label: "Cancelled",  pill: "bg-red-100 text-red-500" },
   no_show:    { label: "No Show",    pill: "bg-amber-100 text-amber-700" },
@@ -194,7 +194,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="h-11 flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+          className="h-11 flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
         >
           <Plus className="w-4 h-4" /> New
         </button>
@@ -208,11 +208,11 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
         >
           <span className="text-[14px] font-semibold text-slate-800">
             {(() => { const d = parseDay(selectedDay); return `${DAYS_SHORT[d.getUTCDay()]}, ${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`; })()}
-            {selectedDay === today && <span className="ml-2 text-[11px] font-semibold text-green-600">Today</span>}
+            {selectedDay === today && <span className="ml-2 text-[11px] font-semibold text-primary">Today</span>}
           </span>
           <div className="flex items-center gap-2">
             {(dayAppts[selectedDay]?.length ?? 0) > 0 && (
-              <span className="text-[11px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold text-primary bg-primary-soft px-2 py-0.5 rounded-full">
                 {dayAppts[selectedDay].length}
               </span>
             )}
@@ -249,20 +249,20 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                     onClick={() => { setSelectedDay(day); setShowDayPicker(false); }}
                     className={cn(
                       "w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors",
-                      isSelected ? "bg-green-50" : "active:bg-slate-50"
+                      isSelected ? "bg-primary-soft" : "active:bg-slate-50"
                     )}
                   >
                     <div className="flex items-center gap-3">
                       <div className={cn(
                         "w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold flex-shrink-0",
-                        isSelected ? "bg-green-600 text-white" : isToday ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"
+                        isSelected ? "bg-primary text-on-primary" : isToday ? "bg-primary-soft text-primary" : "bg-slate-100 text-slate-600"
                       )}>
                         {d.getUTCDate()}
                       </div>
                       <div className="text-left">
-                        <p className={cn("text-[14px] font-semibold", isSelected ? "text-green-700" : "text-slate-800")}>
+                        <p className={cn("text-[14px] font-semibold", isSelected ? "text-primary" : "text-slate-800")}>
                           {DAYS_SHORT[d.getUTCDay()]}
-                          {isToday && <span className="ml-2 text-[11px] font-medium text-green-500">Today</span>}
+                          {isToday && <span className="ml-2 text-[11px] font-medium text-primary">Today</span>}
                         </p>
                         <p className="text-[12px] text-slate-400">
                           {MONTHS_LONG[d.getUTCMonth()]} {d.getUTCDate()}
@@ -270,11 +270,11 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                       </div>
                     </div>
                     {count > 0 ? (
-                      <span className={cn("text-[11px] font-bold px-2.5 py-1 rounded-full", isSelected ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600")}>
+                      <span className={cn("text-[11px] font-bold px-2.5 py-1 rounded-full", isSelected ? "bg-primary-soft text-primary" : "bg-slate-100 text-slate-600")}>
                         {count} appt{count !== 1 ? "s" : ""}
                       </span>
                     ) : (
-                      isSelected && <Check className="w-4 h-4 text-green-600" />
+                      isSelected && <Check className="w-4 h-4 text-primary" />
                     )}
                   </button>
                 );
@@ -298,7 +298,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
             </p>
             <button
               onClick={() => { setForm((f) => ({ ...f, date: selectedDay })); setShowCreate(true); }}
-              className="mt-1 px-5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+              className="mt-1 px-5 py-2.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
             >
               Add Appointment
             </button>
@@ -351,7 +351,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                       {a.status === "scheduled" && (
                         <button
                           onClick={() => updateStatus(a.id, "confirmed")}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-green-600 active:bg-green-50 transition-colors border-r border-slate-100"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold text-primary active:bg-primary-soft transition-colors border-r border-slate-100"
                         >
                           <Check className="w-4 h-4" />
                           Confirm
@@ -401,7 +401,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">Existing Customer</label>
                   <select
                     onChange={(e) => selectCustomer(e.target.value)}
-                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Walk-in / New customer</option>
                     {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -414,7 +414,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   value={form.customer_name}
                   onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
                   placeholder="Full name"
-                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -423,7 +423,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   value={form.customer_phone}
                   onChange={(e) => setForm({ ...form, customer_phone: e.target.value })}
                   placeholder="+234..."
-                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -432,7 +432,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   value={form.service_name}
                   onChange={(e) => setForm({ ...form, service_name: e.target.value })}
                   placeholder="e.g. Haircut, Consultation"
-                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               {members.length > 0 && (
@@ -441,7 +441,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   <select
                     value={form.staff_id}
                     onChange={(e) => setForm({ ...form, staff_id: e.target.value })}
-                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Any staff</option>
                     {members.map((m) => <option key={m.user_id} value={m.user_id}>{m.profiles?.full_name ?? m.user_id}</option>)}
@@ -454,7 +454,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   type="date"
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -464,7 +464,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                     type="time"
                     value={form.start_time}
                     onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -473,7 +473,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                     type="time"
                     value={form.end_time}
                     onChange={(e) => setForm({ ...form, end_time: e.target.value })}
-                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -484,7 +484,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
                   rows={2}
                   placeholder="Optional notes..."
-                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  className="w-full px-3 py-3 border border-slate-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
               </div>
             </div>
@@ -499,7 +499,7 @@ export function AppointmentsClient({ appointments: initialAppts, members, custom
               <button
                 onClick={createAppt}
                 disabled={saving || !form.customer_name.trim() || !form.service_name.trim()}
-                className="flex-1 py-3.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50"
+                className="flex-1 py-3.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[14px] font-semibold transition active:scale-95 disabled:opacity-50"
               >
                 {saving ? "Booking..." : "Book"}
               </button>

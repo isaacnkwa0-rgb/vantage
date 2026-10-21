@@ -36,7 +36,7 @@ export default async function RecurringPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Recurring Billing" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Recurring Billing" bg="bg-surface" border={false} centered />
       <RecurringClient
         schedules={(schedRes.data ?? []) as any}
         customers={(customersRes.data ?? []) as any}

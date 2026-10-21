@@ -44,7 +44,7 @@ export function ShiftsClient({ shifts, currency }: Props) {
           <p className="text-xs text-slate-500 mt-0.5">Total Shifts</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-emerald-600">{fmt(totalCashSales)}</p>
+          <p className="text-xl font-bold text-success">{fmt(totalCashSales)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Cash Sales</p>
         </div>
         <div className={`bg-white rounded-xl border p-4 shadow-sm text-center ${
@@ -92,11 +92,11 @@ export function ShiftsClient({ shifts, currency }: Props) {
                       </p>
                     </div>
                     {shift.status === "open" && (
-                      <span className="inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full">OPEN</span>
+                      <span className="inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 bg-primary-soft text-primary rounded-full">OPEN</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right text-sm">{fmt(shift.opening_float)}</td>
-                  <td className="px-4 py-3 text-right text-sm text-emerald-600">{shift.cash_sales != null ? fmt(shift.cash_sales) : "—"}</td>
+                  <td className="px-4 py-3 text-right text-sm text-success">{shift.cash_sales != null ? fmt(shift.cash_sales) : "—"}</td>
                   <td className="px-4 py-3 text-right text-sm">{shift.expected_cash != null ? fmt(shift.expected_cash) : "—"}</td>
                   <td className="px-4 py-3 text-right text-sm">{shift.closing_float != null ? fmt(shift.closing_float) : "—"}</td>
                   <td className="px-4 py-3 text-right">

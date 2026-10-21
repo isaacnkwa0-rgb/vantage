@@ -44,7 +44,7 @@ const STATUS_CONFIG: Record<string, {
   paid:       { label: "Paid",       bg: "bg-blue-50",    text: "text-blue-700",    iconBg: "bg-blue-50",    iconColor: "text-blue-500",   Icon: CreditCard    },
   processing: { label: "Processing", bg: "bg-violet-50",  text: "text-violet-700",  iconBg: "bg-violet-50",  iconColor: "text-violet-500", Icon: Package       },
   shipped:    { label: "Shipped",    bg: "bg-indigo-50",  text: "text-indigo-700",  iconBg: "bg-indigo-50",  iconColor: "text-indigo-500", Icon: Truck         },
-  delivered:  { label: "Delivered",  bg: "bg-emerald-50", text: "text-emerald-700", iconBg: "bg-emerald-50", iconColor: "text-emerald-500",Icon: CheckCircle2  },
+  delivered:  { label: "Delivered",  bg: "bg-primary-soft", text: "text-primary", iconBg: "bg-primary-soft", iconColor: "text-success",Icon: CheckCircle2  },
   cancelled:  { label: "Cancelled",  bg: "bg-red-50",     text: "text-red-600",     iconBg: "bg-red-50",     iconColor: "text-red-400",    Icon: XCircle       },
 };
 
@@ -133,7 +133,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
       {/* Stats */}
       <div className="border border-slate-200 rounded-[8px] px-4 py-3 flex items-center justify-between">
         <p className="text-[13px] font-semibold text-slate-500">Total Revenue</p>
-        <p className="text-[20px] font-extrabold text-[#1a9c38] leading-none">{fmt(totalRevenue)}</p>
+        <p className="text-[20px] font-extrabold text-primary leading-none">{fmt(totalRevenue)}</p>
       </div>
 
       {/* Search + Filter */}
@@ -144,7 +144,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
           />
         </div>
         <div ref={filterRef} className="relative">
@@ -153,7 +153,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
             className={cn(
               "h-full flex items-center gap-1.5 px-3 border rounded-[8px] text-[13px] font-semibold transition",
               filter !== "all"
-                ? "border-[#1a9c38] text-[#1a9c38] bg-emerald-50"
+                ? "border-primary text-primary bg-primary-soft"
                 : "border-slate-200 text-slate-600 bg-white hover:bg-slate-50"
             )}
           >
@@ -170,7 +170,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
                   className={cn(
                     "w-full text-left px-4 py-2.5 text-[13px] font-medium transition",
                     filter === key
-                      ? "bg-emerald-50 text-[#1a9c38] font-semibold"
+                      ? "bg-primary-soft text-primary font-semibold"
                       : "text-slate-700 hover:bg-slate-50"
                   )}
                 >
@@ -242,12 +242,12 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
                       {/* Customer info */}
                       <div className="space-y-1.5">
                         {order.customer_email && (
-                          <a href={`mailto:${order.customer_email}`} className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-[#1a9c38] transition">
+                          <a href={`mailto:${order.customer_email}`} className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-primary transition">
                             <Mail className="w-3.5 h-3.5 flex-shrink-0" />{order.customer_email}
                           </a>
                         )}
                         {order.customer_phone && (
-                          <a href={`tel:${order.customer_phone}`} className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-[#1a9c38] transition">
+                          <a href={`tel:${order.customer_phone}`} className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-primary transition">
                             <Phone className="w-3.5 h-3.5 flex-shrink-0" />{order.customer_phone}
                           </a>
                         )}
@@ -282,7 +282,7 @@ export function StoreOrdersClient({ orders: initialOrders, currency, businessSlu
                             <button
                               onClick={() => updateStatus(order.id, flow.next)}
                               disabled={updating === order.id + flow.next}
-                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
                             >
                               {flow.label}
                             </button>

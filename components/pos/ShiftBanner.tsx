@@ -131,14 +131,14 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                     min="0"
                     value={openingFloat}
                     onChange={(e) => setOpeningFloat(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary text-center"
                     autoFocus
                   />
                 </div>
                 <button
                   onClick={startShift}
                   disabled={loading}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="w-full bg-primary hover:bg-ember-deep text-on-primary font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                   Start Shift
@@ -154,7 +154,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
   // Shift is open — show info bar
   return (
     <>
-      <div className="hidden lg:flex items-center justify-between bg-green-50 border-b border-green-200 text-green-700 text-sm px-4 py-1.5 flex-shrink-0">
+      <div className="hidden lg:flex items-center justify-between bg-primary-soft border-b border-primary text-primary text-sm px-4 py-1.5 flex-shrink-0">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
         </div>
         <button
           onClick={openEndModal}
-          className="flex items-center gap-1.5 px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition"
+          className="flex items-center gap-1.5 px-3 py-1 bg-primary text-on-primary text-xs font-bold rounded-lg hover:bg-ember-deep transition"
         >
           End Shift
         </button>
@@ -191,7 +191,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Cash sales</span>
-                  <span className="font-semibold text-emerald-600">+{fmt(cashSales)}</span>
+                  <span className="font-semibold text-success">+{fmt(cashSales)}</span>
                 </div>
                 <div className="border-t border-slate-200 pt-2 flex justify-between font-semibold">
                   <span>Expected in drawer</span>
@@ -208,14 +208,14 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                   value={closingFloat}
                   onChange={(e) => setClosingFloat(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary text-center"
                   autoFocus
                 />
               </div>
 
               {closingFloat && (
                 <div className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold ${
-                  discrepancy === 0 ? "bg-emerald-50 text-emerald-700" :
+                  discrepancy === 0 ? "bg-primary-soft text-primary" :
                   discrepancy > 0 ? "bg-blue-50 text-blue-700" : "bg-red-50 text-red-600"
                 }`}>
                   <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
                   placeholder="Any discrepancy explanation..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
               </div>
 
@@ -242,7 +242,7 @@ export function ShiftBanner({ initialShift, businessId, userId, currency }: Prop
                 <button
                   onClick={endShift}
                   disabled={loading || !closingFloat}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition"
+                  className="flex-1 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition"
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                   Close Shift

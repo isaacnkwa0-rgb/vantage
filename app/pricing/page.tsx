@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, X, Zap, Star, Building2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
 
 const FEATURES = [
   { label: "Products / Services", free: "Up to 50", starter: "Unlimited", pro: "Unlimited" },
@@ -24,7 +25,7 @@ const FEATURES = [
 ];
 
 function FeatureValue({ value }: { value: boolean | string }) {
-  if (value === true) return <Check className="w-4 h-4 text-emerald-500 mx-auto" />;
+  if (value === true) return <Check className="w-4 h-4 text-success mx-auto" />;
   if (value === false) return <X className="w-4 h-4 text-slate-300 mx-auto" />;
   return <span className="text-xs font-medium text-slate-600">{value}</span>;
 }
@@ -51,14 +52,14 @@ export default function PricingPage() {
       key: "starter",
       label: "Starter",
       icon: Zap,
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
+      iconBg: "bg-primary-soft",
+      iconColor: "text-primary",
       price: { monthly: 12, annual: 99 },
       priceNGN: { monthly: 6000, annual: 50000 },
       description: "For growing businesses ready to scale",
       cta: "Start Starter",
       ctaHref: "/register?plan=starter",
-      ctaStyle: "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200",
+      ctaStyle: "bg-primary hover:bg-ember-deep text-on-primary shadow-lg shadow-ember/20",
       highlight: true,
       badge: "Most Popular",
     },
@@ -79,20 +80,17 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-bg">
       {/* Nav */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-md shadow-green-200">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-lg font-extrabold tracking-tight text-green-700">Stokka</span>
+        <Link href="/">
+          <Logo variant="full" size={36} />
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition">
             Sign in
           </Link>
-          <Link href="/register" className="text-sm font-semibold bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+          <Link href="/register" className="text-sm font-semibold bg-primary hover:bg-ember-deep text-on-primary px-4 py-2 rounded-lg transition">
             Get started free
           </Link>
         </div>
@@ -101,13 +99,13 @@ export default function PricingPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <span className="inline-block text-xs font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+          <span className="inline-block text-xs font-bold text-primary bg-primary-soft px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
             Simple pricing
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-[#0F172A] leading-tight">
             Plans for every stage
             <br />
-            <span className="text-green-600">of your business</span>
+            <span className="text-primary">of your business</span>
           </h1>
           <p className="text-slate-500 text-lg mt-4 max-w-xl mx-auto">
             Start free, upgrade when you need more. No hidden fees, cancel anytime.
@@ -118,13 +116,13 @@ export default function PricingPage() {
             <span className={cn("text-sm font-medium", !annual ? "text-[#0F172A]" : "text-slate-400")}>Monthly</span>
             <button
               onClick={() => setAnnual((v) => !v)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${annual ? "bg-green-600" : "bg-slate-200"}`}
+              className={`relative w-12 h-6 rounded-full transition-colors ${annual ? "bg-primary" : "bg-slate-200"}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${annual ? "translate-x-6" : "translate-x-0"}`} />
             </button>
             <span className={cn("text-sm font-medium", annual ? "text-[#0F172A]" : "text-slate-400")}>
               Annual
-              <span className="ml-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Save 30%</span>
+              <span className="ml-2 text-xs font-bold text-success bg-primary-soft px-2 py-0.5 rounded-full">Save 30%</span>
             </span>
           </div>
         </div>
@@ -137,13 +135,13 @@ export default function PricingPage() {
               className={cn(
                 "bg-white rounded-2xl border p-6 flex flex-col relative",
                 plan.highlight
-                  ? "border-green-400 shadow-xl shadow-green-100 scale-[1.02]"
+                  ? "border-primary shadow-xl shadow-ember/20 scale-[1.02]"
                   : "border-slate-200 shadow-sm"
               )}
             >
               {plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                  <span className="bg-primary text-on-primary text-xs font-bold px-3 py-1 rounded-full shadow">
                     {plan.badge}
                   </span>
                 </div>
@@ -170,7 +168,7 @@ export default function PricingPage() {
                     <span className="text-slate-400 text-sm mb-1">/month</span>
                   </div>
                   {annual && (
-                    <p className="text-xs text-emerald-600 font-semibold">
+                    <p className="text-xs text-success font-semibold">
                       Billed ${plan.price.annual}/year
                     </p>
                   )}
@@ -196,9 +194,9 @@ export default function PricingPage() {
                   const val = f[plan.key as "free" | "starter" | "pro"];
                   return (
                     <li key={f.label} className="flex items-center gap-2 text-sm">
-                      {val === true && <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />}
+                      {val === true && <Check className="w-4 h-4 text-success flex-shrink-0" />}
                       {val === false && <X className="w-4 h-4 text-slate-300 flex-shrink-0" />}
-                      {typeof val === "string" && <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />}
+                      {typeof val === "string" && <Check className="w-4 h-4 text-success flex-shrink-0" />}
                       <span className={val === false ? "text-slate-400" : "text-slate-700"}>
                         {f.label}
                         {typeof val === "string" && val !== "Unlimited" && (
@@ -224,7 +222,7 @@ export default function PricingPage() {
                 <tr className="border-b border-slate-100">
                   <th className="text-left px-6 py-3 font-semibold text-slate-500 w-1/2">Feature</th>
                   <th className="text-center px-4 py-3 font-semibold text-slate-500 w-1/6">Free</th>
-                  <th className="text-center px-4 py-3 font-bold text-green-700 w-1/6 bg-green-50">Starter</th>
+                  <th className="text-center px-4 py-3 font-bold text-primary w-1/6 bg-primary-soft">Starter</th>
                   <th className="text-center px-4 py-3 font-bold text-purple-700 w-1/6">Pro</th>
                 </tr>
               </thead>
@@ -233,7 +231,7 @@ export default function PricingPage() {
                   <tr key={f.label} className="hover:bg-slate-50 transition">
                     <td className="px-6 py-3 text-slate-700 font-medium">{f.label}</td>
                     <td className="px-4 py-3 text-center"><FeatureValue value={f.free} /></td>
-                    <td className="px-4 py-3 text-center bg-green-50/50"><FeatureValue value={f.starter} /></td>
+                    <td className="px-4 py-3 text-center bg-primary-soft/50"><FeatureValue value={f.starter} /></td>
                     <td className="px-4 py-3 text-center"><FeatureValue value={f.pro} /></td>
                   </tr>
                 ))}

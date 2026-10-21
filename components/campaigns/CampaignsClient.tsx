@@ -43,13 +43,13 @@ interface Props {
 const CHANNEL_CONFIG = {
   email:    { label: "Email",    Icon: Mail,          color: "text-blue-600",   bg: "bg-blue-50" },
   sms:      { label: "SMS",      Icon: MessageSquare, color: "text-violet-600", bg: "bg-violet-50" },
-  whatsapp: { label: "WhatsApp", Icon: MessageCircle, color: "text-green-600",  bg: "bg-green-50" },
+  whatsapp: { label: "WhatsApp", Icon: MessageCircle, color: "text-primary",  bg: "bg-primary-soft" },
 };
 
 const STATUS_CONFIG = {
   draft:   { label: "Draft",   bg: "bg-slate-100",   text: "text-slate-600" },
   sending: { label: "Sending", bg: "bg-amber-50",    text: "text-amber-700" },
-  sent:    { label: "Sent",    bg: "bg-emerald-50",  text: "text-emerald-700" },
+  sent:    { label: "Sent",    bg: "bg-primary-soft",  text: "text-primary" },
   failed:  { label: "Failed",  bg: "bg-red-50",      text: "text-red-600" },
 };
 
@@ -73,7 +73,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -194,7 +194,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
               className={cn(
                 "flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition",
                 channelTab === ch
-                  ? "border-[#1a9c38] text-[#1a9c38]"
+                  ? "border-primary text-primary"
                   : "border-transparent text-slate-400 hover:text-slate-700"
               )}
             >
@@ -220,13 +220,13 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
-                  className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+                  className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
                 />
               </div>
               {!showForm && (
                 <button
                   onClick={openForm}
-                  className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+                  className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
                   New
@@ -271,7 +271,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
                         />
                       </Field>
                     )}
-                    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+                    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
                       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">
                         Message * <span className="text-slate-400 font-normal">({form.message.length}/160)</span>
                       </legend>
@@ -300,7 +300,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
                           value={opt.value}
                           checked={form.target_type === opt.value}
                           onChange={() => setForm((f) => ({ ...f, target_type: opt.value }))}
-                          className="accent-[#1a9c38]"
+                          className="accent-primary"
                         />
                         <span className="text-[13px] text-slate-700">{opt.label}</span>
                       </label>
@@ -345,7 +345,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
                   <button
                     onClick={saveDraft}
                     disabled={saving}
-                    className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+                    className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
                   >
                     {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                     Save Campaign
@@ -356,7 +356,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
 
             {/* Send result */}
             {sendResult && (
-              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-[8px] text-[13px] font-semibold">
+              <div className="flex items-center gap-2 bg-primary-soft border border-primary text-primary px-4 py-3 rounded-[8px] text-[13px] font-semibold">
                 <Check className="w-4 h-4 flex-shrink-0" />
                 Sent {sendResult.sent} messages{sendResult.failed > 0 ? ` · ${sendResult.failed} failed` : ""}
               </div>
@@ -440,7 +440,7 @@ export function CampaignsClient({ campaigns: initialCampaigns, tags, businessId,
                             <button
                               onClick={() => sendCampaign(campaign)}
                               disabled={isSending}
-                              className="flex items-center gap-1.5 text-[13px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
+                              className="flex items-center gap-1.5 text-[13px] font-semibold text-primary bg-primary-soft hover:bg-primary-soft border border-primary px-3 py-1.5 rounded-lg transition active:scale-95 disabled:opacity-50"
                             >
                               {isSending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                               Send
@@ -501,8 +501,8 @@ function WhatsAppBroadcast({ businessId, businessName, phoneReachCount }: { busi
     <div className="space-y-3">
       <div className="border border-slate-200 rounded-[12px] p-4 space-y-3">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
-            <MessageCircle className="w-5 h-5 text-green-600" />
+          <div className="w-10 h-10 bg-primary-soft rounded-full flex items-center justify-center flex-shrink-0">
+            <MessageCircle className="w-5 h-5 text-primary" />
           </div>
           <div>
             <p className="font-semibold text-[14px] text-[#0F172A]">WhatsApp Broadcast</p>
@@ -512,7 +512,7 @@ function WhatsAppBroadcast({ businessId, businessName, phoneReachCount }: { busi
           </div>
         </div>
 
-        <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+        <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
           <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">
             Message template <span className="text-slate-400 font-normal">(use {"{name}"} for first name)</span>
           </legend>
@@ -527,7 +527,7 @@ function WhatsAppBroadcast({ businessId, businessName, phoneReachCount }: { busi
         <button
           onClick={generateLinks}
           disabled={loading || !message.trim()}
-          className="w-full flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
           Generate {phoneReachCount} WhatsApp links
@@ -548,7 +548,7 @@ function WhatsAppBroadcast({ businessId, businessName, phoneReachCount }: { busi
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition active:bg-slate-100"
               >
-                <div className="w-9 h-9 bg-green-50 rounded-full flex items-center justify-center text-green-700 font-bold text-[14px] flex-shrink-0">
+                <div className="w-9 h-9 bg-primary-soft rounded-full flex items-center justify-center text-primary font-bold text-[14px] flex-shrink-0">
                   {c.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">

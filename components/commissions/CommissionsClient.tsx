@@ -83,19 +83,19 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-slate-600">From</label>
-          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-slate-600">To</label>
-          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
-        <button onClick={applyRange} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition">Apply</button>
+        <button onClick={applyRange} className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-ember-deep transition">Apply</button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
-          <p className="text-xl font-bold text-emerald-600">{fmt(totalCommissions)}</p>
+          <p className="text-xl font-bold text-success">{fmt(totalCommissions)}</p>
           <p className="text-xs text-slate-500 mt-0.5">Total Commissions Due</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm text-center">
@@ -140,7 +140,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
               <tr key={row.userId} className="hover:bg-slate-50 transition">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-sm flex-shrink-0">
+                    <div className="w-8 h-8 bg-primary-soft rounded-full flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
                       {row.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -160,7 +160,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
                 </td>
                 <td className="px-5 py-3 text-right">
                   {row.commission > 0
-                    ? <span className="font-bold text-emerald-600">{fmt(row.commission)}</span>
+                    ? <span className="font-bold text-success">{fmt(row.commission)}</span>
                     : <span className="text-slate-300 text-sm">—</span>}
                 </td>
               </tr>
@@ -170,7 +170,7 @@ export function CommissionsClient({ members, rules, sales, currency, fromDate, t
             <tfoot>
               <tr className="border-t-2 border-slate-200 bg-slate-50">
                 <td className="px-5 py-3 text-sm font-bold text-[#0F172A]" colSpan={4}>Total</td>
-                <td className="px-5 py-3 text-right font-bold text-emerald-600">{fmt(totalCommissions)}</td>
+                <td className="px-5 py-3 text-right font-bold text-success">{fmt(totalCommissions)}</td>
               </tr>
             </tfoot>
           )}

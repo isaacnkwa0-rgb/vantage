@@ -141,7 +141,7 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
               </button>
               <span className={cn(
                 "flex-1 inline-flex items-center justify-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
-                isOutOfStock ? "bg-red-50 text-red-600" : isLowStock ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-700"
+                isOutOfStock ? "bg-red-50 text-red-600" : isLowStock ? "bg-amber-50 text-amber-600" : "bg-primary-soft text-primary"
               )}>
                 {(isLowStock || isOutOfStock) && <AlertTriangle className="w-3 h-3" />}
                 {isOutOfStock ? "Out of stock" : isLowStock ? `Low: ${qty}` : `${qty} in stock`}
@@ -237,7 +237,7 @@ export function ProductCard({ product, currency, slug, onEdit, onDelete, onStock
             <div className="px-5 pt-4">
               <button
                 onClick={() => setShowMenu(false)}
-                className="w-full h-11 border border-[#1a9c38] text-[#1a9c38] font-bold rounded-[4px] text-[15px]"
+                className="w-full h-11 border border-primary text-primary font-bold rounded-[4px] text-[15px]"
               >
                 Cancel
               </button>

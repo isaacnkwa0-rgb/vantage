@@ -43,7 +43,7 @@ export async function TopProductsPanel({ businessId, currency, businessType, slu
           <Package className="w-4 h-4 text-slate-400" />
           <h3 className="text-sm font-semibold text-slate-900">{widgetTitle}</h3>
         </div>
-        <Link href={`/${slug}/reports`} className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-semibold transition">
+        <Link href={`/${slug}/reports`} className="flex items-center gap-1 text-xs text-primary hover:text-primary font-semibold transition">
           Reports <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
@@ -67,7 +67,7 @@ export async function TopProductsPanel({ businessId, currency, businessType, slu
                   <p className="text-sm font-medium text-slate-800 truncate">{name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-400 rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-[10px] text-slate-400 font-medium flex-shrink-0">{pct.toFixed(0)}%</span>
                   </div>

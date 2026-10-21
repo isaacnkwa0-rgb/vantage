@@ -41,7 +41,7 @@ export default async function QuotesPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Quotations" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Quotations" bg="bg-surface" border={false} centered />
       <QuotesClient
         quotes={(quotes ?? []) as any}
         business={business as any}

@@ -150,12 +150,12 @@ export function CustomersClient({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search"
-              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+              className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
             />
           </div>
           <button
             onClick={() => { setEditing(null); setShowForm(true); }}
-            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
           >
             <Plus className="w-4 h-4" />
             New
@@ -209,7 +209,7 @@ export function CustomersClient({
         {customers.length > 0 && (
           <div className="flex gap-3">
             <div className="flex-1 flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-[8px] px-3 py-2.5">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#1a9c38] to-emerald-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-ember to-ember-deep flex items-center justify-center flex-shrink-0">
                 <Users className="w-3 h-3 text-white" />
               </div>
               <div>
@@ -222,7 +222,7 @@ export function CustomersClient({
                 <TrendingUp className="w-3 h-3 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-emerald-600 leading-none truncate">{fmt(totalRevenue)}</p>
+                <p className="text-sm font-bold text-success leading-none truncate">{fmt(totalRevenue)}</p>
                 <p className="text-[11px] text-slate-400 mt-0.5">Revenue</p>
               </div>
             </div>
@@ -248,7 +248,7 @@ export function CustomersClient({
             {!hasFilters && (
               <button
                 onClick={() => { setEditing(null); setShowForm(true); }}
-                className="mt-6 flex items-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white px-5 py-3 rounded-[8px] text-sm font-semibold transition"
+                className="mt-6 flex items-center gap-2 bg-primary hover:bg-ember-deep text-on-primary px-5 py-3 rounded-[8px] text-sm font-semibold transition"
               >
                 <Plus className="w-4 h-4" />
                 {isService ? "Add Client" : "Add Customer"}
@@ -372,7 +372,7 @@ export function CustomersClient({
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
                   placeholder={recordingPaymentFor.credit_balance.toFixed(2)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-[8px] text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#1a9c38]"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-[8px] text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary"
                   autoFocus
                 />
               </div>
@@ -384,7 +384,7 @@ export function CustomersClient({
                   value={paymentNote}
                   onChange={(e) => setPaymentNote(e.target.value)}
                   placeholder="e.g. Part payment"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#1a9c38]"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="flex gap-3 pt-1">
@@ -397,7 +397,7 @@ export function CustomersClient({
                 <button
                   onClick={recordPayment}
                   disabled={recordingPayment || !paymentAmount || parseFloat(paymentAmount) <= 0}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-3 rounded-[8px] text-[13px] font-semibold disabled:opacity-50 transition"
+                  className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-3 rounded-[8px] text-[13px] font-semibold disabled:opacity-50 transition"
                 >
                   {recordingPayment && <Loader2 className="w-4 h-4 animate-spin" />}
                   Confirm Payment

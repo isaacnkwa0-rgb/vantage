@@ -30,7 +30,7 @@ export default async function ShiftsPage({ params }: Props) {
 
   return (
     <div className="flex flex-col flex-1 overflow-auto">
-      <TopBar title="Cash Shifts" bg="bg-[#fafefb]" border={false} centered />
+      <TopBar title="Cash Shifts" bg="bg-surface" border={false} centered />
       <ShiftsClient
         shifts={(shifts ?? []) as any}
         currency={business.currency}

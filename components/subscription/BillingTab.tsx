@@ -14,7 +14,7 @@ interface Props {
 
 const PLAN_META = {
   free:    { label: "Free",    icon: Zap,  color: "slate",  iconBg: "bg-slate-100",  iconColor: "text-slate-500" },
-  starter: { label: "Starter", icon: Zap,  color: "green",  iconBg: "bg-green-100",  iconColor: "text-green-600" },
+  starter: { label: "Starter", icon: Zap,  color: "green",  iconBg: "bg-primary-soft",  iconColor: "text-primary" },
   pro:     { label: "Pro",     icon: Star, color: "purple", iconBg: "bg-purple-100", iconColor: "text-purple-600" },
 };
 
@@ -82,7 +82,7 @@ export function BillingTab({ business, userEmail }: Props) {
   return (
     <div className="max-w-2xl space-y-5">
       {paymentSuccess && (
-        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm font-medium">
+        <div className="flex items-center gap-2 bg-primary-soft border border-primary text-primary px-4 py-3 rounded-xl text-sm font-medium">
           <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
           Payment successful! Your plan has been upgraded.
         </div>
@@ -112,7 +112,7 @@ export function BillingTab({ business, userEmail }: Props) {
           <span className={cn(
             "text-xs font-bold px-3 py-1 rounded-full",
             currentTier === "free" ? "bg-slate-100 text-slate-600" :
-            currentTier === "starter" ? "bg-green-100 text-green-700" :
+            currentTier === "starter" ? "bg-primary-soft text-primary" :
             "bg-purple-100 text-purple-700"
           )}>
             {currentMeta.label}
@@ -127,13 +127,13 @@ export function BillingTab({ business, userEmail }: Props) {
             <span className={cn("text-sm font-medium", !annual ? "text-[#0F172A]" : "text-slate-400")}>Monthly</span>
             <button
               onClick={() => setAnnual((v) => !v)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${annual ? "bg-green-600" : "bg-slate-200"}`}
+              className={`relative w-11 h-6 rounded-full transition-colors ${annual ? "bg-primary" : "bg-slate-200"}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${annual ? "translate-x-5" : "translate-x-0"}`} />
             </button>
             <span className={cn("text-sm font-medium", annual ? "text-[#0F172A]" : "text-slate-400")}>
               Annual
-              <span className="ml-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Save 30%</span>
+              <span className="ml-2 text-xs font-bold text-success bg-primary-soft px-2 py-0.5 rounded-full">Save 30%</span>
             </span>
           </div>
 
@@ -146,7 +146,7 @@ export function BillingTab({ business, userEmail }: Props) {
                 key={plan.key}
                 className={cn(
                   "bg-white rounded-xl border-2 p-5",
-                  plan.color === "green" ? "border-green-200" : "border-purple-200"
+                  plan.color === "green" ? "border-primary" : "border-purple-200"
                 )}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -159,7 +159,7 @@ export function BillingTab({ business, userEmail }: Props) {
                       <span className="text-slate-400 text-xs mb-1">/month</span>
                     </div>
                     {annual && (
-                      <p className="text-xs text-emerald-600 font-semibold">
+                      <p className="text-xs text-success font-semibold">
                         ₦{plan.annualNGN.toLocaleString()} billed annually
                       </p>
                     )}
@@ -173,7 +173,7 @@ export function BillingTab({ business, userEmail }: Props) {
                     className={cn(
                       "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white transition disabled:opacity-60",
                       plan.color === "green"
-                        ? "bg-green-600 hover:bg-green-700 shadow-md shadow-green-200"
+                        ? "bg-primary hover:bg-ember-deep shadow-md shadow-ember/20"
                         : "bg-purple-600 hover:bg-purple-700 shadow-md shadow-purple-200"
                     )}
                   >
@@ -184,7 +184,7 @@ export function BillingTab({ business, userEmail }: Props) {
                 <ul className="space-y-1.5">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                      <Check className={cn("w-3.5 h-3.5 flex-shrink-0", plan.color === "green" ? "text-green-500" : "text-purple-500")} />
+                      <Check className={cn("w-3.5 h-3.5 flex-shrink-0", plan.color === "green" ? "text-primary" : "text-purple-500")} />
                       {f}
                     </li>
                   ))}
@@ -200,7 +200,7 @@ export function BillingTab({ business, userEmail }: Props) {
           <p>Need to cancel or manage your subscription?</p>
           <a
             href="mailto:support@stokka.shop"
-            className="flex items-center gap-1 text-green-600 font-semibold hover:underline whitespace-nowrap"
+            className="flex items-center gap-1 text-primary font-semibold hover:underline whitespace-nowrap"
           >
             Contact support <ExternalLink className="w-3.5 h-3.5" />
           </a>

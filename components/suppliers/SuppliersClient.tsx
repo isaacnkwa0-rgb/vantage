@@ -34,7 +34,7 @@ const innerCls = "w-full text-sm bg-transparent focus:outline-none text-[#0F172A
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+    <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
       <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">{label}</legend>
       {children}
     </fieldset>
@@ -156,13 +156,13 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a9c38] transition"
+            className="w-full h-full pl-9 pr-4 border border-slate-200 rounded-[8px] text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-primary transition"
           />
         </div>
         {!showForm && (
           <button
             onClick={openCreate}
-            className="h-full flex items-center gap-1.5 px-3 bg-[#1a9c38] hover:bg-green-700 text-white rounded-[8px] text-[13px] font-semibold transition active:scale-95"
+            className="h-full flex items-center gap-1.5 px-3 bg-primary hover:bg-ember-deep text-on-primary rounded-[8px] text-[13px] font-semibold transition active:scale-95"
           >
             <Plus className="w-4 h-4" /> New
           </button>
@@ -233,7 +233,7 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
             </div>
 
             <SectionDivider label="Notes" />
-            <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-[#1a9c38] transition">
+            <fieldset className="border border-slate-200 rounded-[8px] px-3 pt-0 pb-2 focus-within:border-primary transition">
               <legend className="text-[11px] font-medium text-slate-600 px-1 ml-0.5 leading-none">Notes</legend>
               <textarea
                 value={form.notes}
@@ -255,7 +255,7 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
             <button
               onClick={save}
               disabled={saving || !form.name.trim()}
-              className="flex-1 flex items-center justify-center gap-2 bg-[#1a9c38] hover:bg-green-700 text-white py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-green-900/20"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-ember-deep text-on-primary py-2.5 rounded-[8px] text-[14px] font-semibold transition disabled:opacity-50 shadow-sm shadow-ember/20"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               {editingId ? "Update Supplier" : "Add Supplier"}
@@ -299,12 +299,12 @@ export function SuppliersClient({ suppliers: initialSuppliers, businessId }: Pro
                     )}
                     <div className="flex flex-col gap-0.5 mt-1">
                       {s.phone && (
-                        <a href={`tel:${s.phone}`} className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-[#1a9c38] transition">
+                        <a href={`tel:${s.phone}`} className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-primary transition">
                           <Phone className="w-3 h-3 flex-shrink-0" />{s.phone}
                         </a>
                       )}
                       {s.email && (
-                        <a href={`mailto:${s.email}`} className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-[#1a9c38] transition truncate">
+                        <a href={`mailto:${s.email}`} className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-primary transition truncate">
                           <Mail className="w-3 h-3 flex-shrink-0" />{s.email}
                         </a>
                       )}

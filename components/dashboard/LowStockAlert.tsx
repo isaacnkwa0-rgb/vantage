@@ -36,7 +36,7 @@ export function LowStockAlert({ products, slug }: Props) {
       <div className="px-4 py-3 border-t border-slate-100">
         <Link
           href={`/${slug}/products`}
-          className="text-xs text-green-500 hover:underline font-medium"
+          className="text-xs text-primary hover:underline font-medium"
         >
           Manage inventory →
         </Link>
