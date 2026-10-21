@@ -484,7 +484,7 @@ export function CartPanel({
 
         <button
           onClick={onCheckout}
-          className="w-full mt-2 bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-green-800 text-white font-bold py-3.5 rounded-xl transition text-base shadow-lg shadow-ember/20 active:scale-[0.98]"
+          className="w-full mt-2 bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-ember-deep text-on-primary font-bold py-3.5 rounded-xl transition text-base shadow-lg shadow-ember/20 active:scale-[0.98]"
         >
           Charge {fmt(tot)}
         </button>

@@ -417,7 +417,7 @@ export function ProductForm({ businessId, categories, locations, editingProduct,
                   {...register("track_inventory")}
                   type="checkbox"
                   id="track_inventory"
-                  className="w-4 h-4 accent-green-500"
+                  className="w-4 h-4 accent-[#F2542D]"
                 />
                 <label htmlFor="track_inventory" className="text-sm text-[#0F172A] font-medium cursor-pointer">
                   Track inventory / stock

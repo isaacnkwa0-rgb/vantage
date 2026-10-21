@@ -235,9 +235,9 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">in your catalog</p>
               </div>
               <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-ember-deep" />
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200 flex-shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-primary to-ember-deep rounded-lg flex items-center justify-center shadow-sm shadow-ember/20 flex-shrink-0">
                     <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
                   </div>
                   <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Avg. Charge</p>
@@ -275,9 +275,9 @@ export function ProductsClient({ products, categories, locations, businessId, cu
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">at cost price</p>
               </div>
               <div className="bg-white rounded-2xl border border-slate-100 p-3 sm:p-4 shadow-sm overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-ember-deep" />
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200 flex-shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-primary to-ember-deep rounded-lg flex items-center justify-center shadow-sm shadow-ember/20 flex-shrink-0">
                     <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
                   </div>
                   <p className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wide leading-tight">Retail Value</p>

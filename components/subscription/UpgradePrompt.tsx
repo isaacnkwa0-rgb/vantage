@@ -35,10 +35,10 @@ export function UpgradePrompt({ feature, description, requiredPlan, onClose, inl
       </div>
       <Link
         href={`/${slug}/settings?tab=billing`}
-        className={`w-full py-2.5 rounded-xl text-sm font-bold text-white transition shadow-md ${
+        className={`w-full py-2.5 rounded-xl text-sm font-bold text-on-primary transition shadow-md ${
           requiredPlan === "pro"
             ? "bg-gradient-to-b from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-purple-200"
-            : "bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-green-800 shadow-ember/20"
+            : "bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-ember-deep shadow-ember/20"
         }`}
       >
         Upgrade to {planLabel}

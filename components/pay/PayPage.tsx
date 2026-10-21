@@ -85,7 +85,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
 
         {/* Success banner */}
         {isPaid && (
-          <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl">
+          <div className="flex items-center gap-3 bg-primary-soft border border-primary text-primary px-4 py-3 rounded-xl">
             <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
             <div>
               <p className="font-semibold">Payment successful!</p>
@@ -155,7 +155,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
               <span>Subtotal</span><span className="">{fmt(invoice.subtotal)}</span>
             </div>
             {invoice.discount_amount > 0 && (
-              <div className="flex justify-between text-sm text-emerald-600">
+              <div className="flex justify-between text-sm text-success">
                 <span>Discount</span><span className="">-{fmt(invoice.discount_amount)}</span>
               </div>
             )}
@@ -165,13 +165,13 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
               </div>
             )}
             {invoice.amount_paid > 0 && (
-              <div className="flex justify-between text-sm text-emerald-600">
+              <div className="flex justify-between text-sm text-success">
                 <span>Already paid</span><span className="">-{fmt(invoice.amount_paid)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-[#0F172A] text-base pt-2 border-t border-slate-100">
               <span>Amount Due</span>
-              <span className="text-green-700">{fmt(amountDue)}</span>
+              <span className="text-primary">{fmt(amountDue)}</span>
             </div>
           </div>
 
@@ -185,14 +185,14 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <button
                 onClick={handlePay}
                 disabled={loading}
-                className="w-full bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-green-300/40"
+                className="w-full bg-primary hover:bg-ember-deep text-on-primary font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
                 {loading ? "Redirecting to Paystack..." : `Pay ${fmt(amountDue)}`}
@@ -205,7 +205,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
 
           {isPaid && (
             <div className="px-6 pb-6 text-center">
-              <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+              <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-2" />
               <p className="font-semibold text-[#0F172A]">All paid up!</p>
               <p className="text-sm text-slate-400 mt-1">This invoice has been fully settled.</p>
             </div>
@@ -213,7 +213,7 @@ export function PayPage({ invoice, items, token, paymentStatus }: Props) {
         </div>
 
         <p className="text-center text-xs text-slate-400">
-          Powered by <span className="font-semibold text-green-700">Stokka</span>
+          Powered by <span className="font-semibold text-primary">Stokka</span>
         </p>
       </div>
     </div>

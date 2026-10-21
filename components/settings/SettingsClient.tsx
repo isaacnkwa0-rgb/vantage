@@ -1106,7 +1106,7 @@ export function SettingsClient({ business, members, locations: initialLocations,
           </div>
 
           {/* ── Shareable store link card ── */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-primary rounded-xl p-5">
+          <div className="bg-gradient-to-br from-primary-soft to-[#FFF6EC] border border-primary rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <Globe className="w-4 h-4 text-primary" />
               <p className="text-sm font-semibold text-primary">Your Store Link</p>

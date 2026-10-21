@@ -384,7 +384,7 @@ export function PaymentModal({ business, userId, customers, loyaltyEnabled, loya
           <button
             onClick={handleCharge}
             disabled={loading}
-            className="w-full bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-green-800 text-white font-bold py-4 rounded-xl transition text-base flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-ember/20"
+            className="w-full bg-gradient-to-b from-ember to-ember-deep hover:from-ember hover:to-ember-deep text-on-primary font-bold py-4 rounded-xl transition text-base flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-ember/20"
           >
             {loading && <Loader2 className="w-5 h-5 animate-spin" />}
             {loading ? "Processing..." : `Confirm Payment ${fmt(tot)}`}

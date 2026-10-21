@@ -216,9 +216,9 @@ export function SalesClient({ sales, business, userId, returnedSaleIds }: Props)
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-ember-deep" />
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm shadow-emerald-200">
+            <div className="w-7 h-7 bg-gradient-to-br from-primary to-ember-deep rounded-lg flex items-center justify-center shadow-sm shadow-ember/20">
               <TrendingUp className="w-3.5 h-3.5 text-white" />
             </div>
             <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Revenue</p>

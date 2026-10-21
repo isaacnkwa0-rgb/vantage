@@ -55,8 +55,8 @@ export function DashboardStats({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Today's Revenue */}
         <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-start gap-4 overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400" />
-          <div className="w-11 h-11 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-200">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-ember-deep" />
+          <div className="w-11 h-11 bg-gradient-to-br from-primary to-ember-deep rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-ember/20">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">

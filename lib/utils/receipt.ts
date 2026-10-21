@@ -43,7 +43,7 @@ export function generateReceiptHTML(
 ): string {
   const currency = business.currency || "NGN";
   const fmt = (n: number) => formatCurrency(n, currency);
-  const accent = "#1a9c38";
+  const accent = "#F2542D";
 
   const date = new Date(sale.created_at).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -128,14 +128,14 @@ export function generateReceiptHTML(
       <p style="font-size:15px;font-weight:600;color:${accent};margin-top:6px">${sale.sale_number}</p>
       <p style="color:#64748b;font-size:13px;margin-top:3px">${date}</p>
       <p style="color:#94a3b8;font-size:12px">${time}</p>
-      <span style="display:inline-block;margin-top:10px;padding:4px 14px;background:#dcfce7;color:#1a9c38;border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">
+      <span style="display:inline-block;margin-top:10px;padding:4px 14px;background:#FDE3D9;color:#F2542D;border-radius:99px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">
         PAID
       </span>
     </div>
   </div>
 
   <!-- ── Accent divider ── -->
-  <div style="height:3px;background:linear-gradient(to right,${accent},#86efac,#f0fdf4);border-radius:2px;margin-bottom:32px"></div>
+  <div style="height:3px;background:linear-gradient(to right,${accent},#FBBCAA,#FDE3D9);border-radius:2px;margin-bottom:32px"></div>
 
   ${sale.customer_name ? `
   <!-- ── Customer ── -->
@@ -182,7 +182,7 @@ export function generateReceiptHTML(
       ${sale.discount_amount > 0 ? `
       <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9">
         <span style="color:#64748b;font-size:13px">Discount</span>
-        <span style="font-weight:500;color:#1a9c38;font-size:13px">-${fmt(sale.discount_amount)}</span>
+        <span style="font-weight:500;color:#F2542D;font-size:13px">-${fmt(sale.discount_amount)}</span>
       </div>` : ""}
       ${sale.tax_amount > 0 ? `
       <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9">

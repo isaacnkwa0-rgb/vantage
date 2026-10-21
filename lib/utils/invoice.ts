@@ -42,7 +42,7 @@ interface InvoiceBusiness {
 export function generateInvoiceHTML(invoice: InvoiceData, business: InvoiceBusiness): string {
   const currency = business.currency || "NGN";
   const fmt = (n: number) => formatCurrency(n, currency);
-  const accent = business.invoice_accent_color || "#1a9c38";
+  const accent = business.invoice_accent_color || "#F2542D";
   const issueDate = new Date(invoice.issue_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const dueDate = invoice.due_date
     ? new Date(invoice.due_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
@@ -51,7 +51,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, business: InvoiceBusin
   const statusColor: Record<string, string> = {
     draft: "#94a3b8",
     sent: "#3b82f6",
-    paid: "#10b981",
+    paid: "#F2542D",
     overdue: "#ef4444",
     cancelled: "#6b7280",
   };
@@ -148,7 +148,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, business: InvoiceBusin
       ${invoice.discount_amount > 0 ? `
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9">
         <span style="color:#64748b">Discount</span>
-        <span style="font-weight:600;color:#10b981">-${fmt(invoice.discount_amount)}</span>
+        <span style="font-weight:600;color:#F2542D">-${fmt(invoice.discount_amount)}</span>
       </div>` : ""}
       ${invoice.tax_amount > 0 ? `
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9">
@@ -183,8 +183,8 @@ export function generateInvoiceHTML(invoice: InvoiceData, business: InvoiceBusin
 
   ${business.invoice_footer_notes ? `
   <!-- Custom footer notes -->
-  <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-bottom:24px;border:1px solid #bbf7d0">
-    <p style="white-space:pre-line;color:#166534;font-size:13px">${business.invoice_footer_notes}</p>
+  <div style="background:#FDE3D9;border-radius:10px;padding:14px;margin-bottom:24px;border:1px solid #FBBCAA">
+    <p style="white-space:pre-line;color:#B8320F;font-size:13px">${business.invoice_footer_notes}</p>
   </div>` : ""}
 
   <div style="border-top:1px solid #e2e8f0;padding-top:16px;text-align:center">

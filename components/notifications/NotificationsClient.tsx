@@ -191,7 +191,7 @@ export function NotificationsClient({ initial, computedAlerts, businessId, busin
             const bg = TYPE_BG[n.type] ?? TYPE_BG.info;
             const isUnread = !n.read_at;
             const inner = (
-              <div className={cn("bg-white rounded-xl border shadow-sm p-4 flex items-start gap-3 group transition hover:shadow-md", isUnread ? "border-l-4 border-l-green-500 border-slate-200" : "border-slate-100")}>
+              <div className={cn("bg-white rounded-xl border shadow-sm p-4 flex items-start gap-3 group transition hover:shadow-md", isUnread ? "border-l-4 border-l-primary border-slate-200" : "border-slate-100")}>
                 <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border", bg)}>
                   {icon}
                 </div>
