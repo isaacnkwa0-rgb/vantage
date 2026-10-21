@@ -42,9 +42,9 @@ export async function proxy(request: NextRequest) {
   if (!isMainHost && !isStoreDomainApex) {
     const url = request.nextUrl.clone();
     url.pathname = "/by-domain";
-    const res = NextResponse.rewrite(url);
-    res.headers.set("x-original-host", hostname);
-    return res;
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-original-host", hostname);
+    return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
   }
 
   // ── Standard app routing ─────────────────────────────────────────────────
