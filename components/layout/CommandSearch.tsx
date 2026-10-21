@@ -145,12 +145,12 @@ export function CommandSearch({ open, onClose }: Props) {
                   onSelect={() => runCommand(cmd.href)}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer transition-colors",
-                    "data-[selected=true]:bg-green-50 data-[selected=true]:text-green-900",
+                    "data-[selected=true]:bg-primary-soft data-[selected=true]:text-ink",
                     "text-slate-700 hover:bg-slate-50"
                   )}
                 >
-                  <span className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-3.5 h-3.5 text-green-700" />
+                  <span className="w-7 h-7 rounded-lg bg-primary-soft flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-3.5 h-3.5 text-primary" />
                   </span>
                   <span className="font-medium">{cmd.label}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-slate-300 ml-auto flex-shrink-0" />
