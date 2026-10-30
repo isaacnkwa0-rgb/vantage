@@ -89,6 +89,7 @@ export type QuerySpec = {
   returningCols: string;
   onConflict?: string;
   ignoreDuplicates: boolean;
+  countOnly?: boolean;
 };
 
 // ── WHERE builder ─────────────────────────────────────────────────────────────
@@ -120,11 +121,18 @@ function buildWhere(table: string, conditions: Condition[], params: any[]): stri
 }
 
 // ── Core executor ─────────────────────────────────────────────────────────────
-export async function executeSpec(spec: QuerySpec): Promise<{ data: any; error: any }> {
+export async function executeSpec(spec: QuerySpec): Promise<{ data: any; error: any; count?: number }> {
   try {
     const params: any[] = [];
     const p = (v: any) => { params.push(v); return `$${params.length}`; };
     let query: string;
+
+    if (spec.op === "select" && spec.countOnly) {
+      const where = buildWhere(spec.table, spec.conditions, params);
+      const cq = `SELECT COUNT(*)::int AS count FROM "${spec.table}" ${where}`;
+      const rows = (await sql(cq, params)) as any[];
+      return { data: null, error: null, count: rows[0]?.count ?? 0 };
+    }
 
     if (spec.op === "select") {
       const { mainCols, embeds } = parseSelect(spec.selectStr);
@@ -247,7 +255,8 @@ export class NeonQueryBuilder {
     this._spec = defaultSpec(table);
   }
 
-  select(cols = "*") {
+  select(cols = "*", opts?: { count?: string; head?: boolean }) {
+    if (opts?.head) this._spec.countOnly = true;
     if (this._spec.op === "select") {
       this._spec.selectStr = cols;
     } else {
@@ -307,8 +316,8 @@ export class NeonQueryBuilder {
   maybeSingle() { this._spec.maybeSingle = true; this._spec.limitN = 1; return this; }
   throwOnError() { return this; }
 
-  then<R1 = { data: any; error: any }, R2 = never>(
-    onfulfilled?: ((v: { data: any; error: any }) => R1 | PromiseLike<R1>) | null,
+  then<R1 = { data: any; error: any; count?: number }, R2 = never>(
+    onfulfilled?: ((v: { data: any; error: any; count?: number }) => R1 | PromiseLike<R1>) | null,
     onrejected?: ((r: any) => R2 | PromiseLike<R2>) | null
   ): Promise<R1 | R2> {
     return executeSpec(this._spec).then(onfulfilled, onrejected);

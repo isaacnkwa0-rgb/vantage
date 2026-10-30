@@ -1,0 +1,18 @@
+[    5712ms] [LOG] MIXPANEL PEOPLE REQUEST (QUEUED, PENDING IDENTIFY): @ https://www.getbumpa.com/_next/static/chunks/pages/_app-57f0145ba581e2ec.js:112
+[    5712ms] [LOG] {$set_once: Object, $token: 49eb59a1be411d0fc79a4a485ed7e1f1, $distinct_id: $device:1a160108e671639-09d82fd9c6ec5f-26071c51-e1000-1a160108e671639, $device_id: 1a160108e671639-09d82fd9c6ec5f-26071c51-e1000-1a160108e671639} @ https://www.getbumpa.com/_next/static/chunks/pages/_app-57f0145ba581e2ec.js:112
+[    5734ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    8924ms] [LOG] Freshchat SDK loaded @ https://www.getbumpa.com/_next/static/chunks/pages/_app-57f0145ba581e2ec.js:112
+[    9930ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    9930ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    9930ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    9930ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    9931ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    9931ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[    9931ms] [WARNING] Autoplay failed. Consider user interaction for playback. @ https://www.getbumpa.com/_next/static/chunks/8881-b28bb5c6381fe3a7.js:0
+[   10942ms] [LOG] [batch] MIXPANEL REQUEST: [Object] @ https://www.getbumpa.com/_next/static/chunks/pages/_app-57f0145ba581e2ec.js:112
+[   13277ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.getbumpa.com/images/-mobile.svg:0
+[   27001ms] [INFO] RTS: shouldLoadV2 - sw: true, bc: true, sse: true, ws: true, fetch: true, localStorage: true @ https://rts-static-prod.freshworksapi.com/us/rts-min.js:1
+[   27013ms] [INFO] RTS: shouldLoadV2 - window.location.hostname: getbumpa.freshchat.com - proxyDomain: freshchat.com @ https://rts-static-prod.freshworksapi.com/us/rts-min.js:1
+[   27015ms] [INFO] RTS: shouldLoadV2 - proxy configured: false @ https://rts-static-prod.freshworksapi.com/us/rts-min.js:1
+[   27017ms] [LOG] RTS_LEGACY is being loaded for RTS-2.0.17 @ https://rts-static-prod.freshworksapi.com/us/rts-min.js:1
+[   95842ms] [INFO] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://www.getbumpa.com/font/Freizeit-Medium.otf @ https://www.getbumpa.com/_next/static/chunks/pages/_app-57f0145ba581e2ec.js:117

@@ -1,0 +1,46 @@
+- generic [active] [ref=f17e1]:
+  - link "Skip to content":
+    - /url: "#geist-skip-nav"
+  - generic [ref=f17e3]:
+    - banner [ref=f17e4]:
+      - link "Vercel logo":
+        - /url: /home
+        - button [ref=f17e5] [cursor=pointer]:
+          - img "Vercel Logo" [ref=f17e6]
+      - navigation [ref=f17e8]:
+        - navigation [ref=f17e9]:
+          - link [ref=f17e10] [cursor=pointer]:
+            - /url: /signup?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23
+            - paragraph [ref=f17e12]: Sign Up
+    - main [ref=f17e13]:
+      - generic [ref=f17e15]:
+        - heading "Log in to Vercel" [level=1] [ref=f17e18]
+        - generic [ref=f17e19]:
+          - generic [ref=f17e20]:
+            - textbox "Email Address" [ref=f17e23]
+            - button "Continue with Email" [ref=f17e26] [cursor=pointer]
+          - generic [ref=f17e29]:
+            - button "Continue with Google" [ref=f17e30] [cursor=pointer]:
+              - generic [ref=f17e34]:
+                - generic [ref=f17e35]: Continue with
+                - text: Google
+            - button "Continue with GitHub" [ref=f17e36] [cursor=pointer]:
+              - generic [ref=f17e40]:
+                - generic [ref=f17e41]: Continue with
+                - text: GitHub
+            - button "Continue with ChatGPT" [ref=f17e42] [cursor=pointer]:
+              - generic [ref=f17e46]:
+                - generic [ref=f17e47]: Continue with
+                - text: ChatGPT
+            - button "Continue with SAML SSO" [ref=f17e49] [cursor=pointer]
+            - button "Continue with Passkey" [ref=f17e54] [cursor=pointer]
+            - button "Show other options" [ref=f17e59] [cursor=pointer]
+        - paragraph [ref=f17e62]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=f17e63] [cursor=pointer]:
+            - /url: /signup?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23
+      - generic [ref=f17e66]:
+        - link "Terms" [ref=f17e67] [cursor=pointer]:
+          - /url: /legal/terms
+        - link "Privacy Policy" [ref=f17e68] [cursor=pointer]:
+          - /url: /legal/privacy-policy

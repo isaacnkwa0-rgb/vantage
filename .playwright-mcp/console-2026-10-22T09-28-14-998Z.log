@@ -1,0 +1,8 @@
+[    2551ms] [ERROR] Not signed in with the identity provider. @ https://www.perplexity.ai/download-comet?referrer=singular_click_id%3Daf2d3b17-ebee-4ccc-bfa9-051ac060e122:0
+[    4014ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.perplexity.ai/rest/homepage-widgets/upsell/add-to-cohort?version=2.18&source=default:0
+[    7155ms] [ERROR] [GSI_LOGGER]: FedCM get() rejects with AbortError: signal is aborted without reason @ https://pplx-next-static-public.perplexity.ai/_spa-aux/assets/vendors__v2-COTnYsBm.js:4
+[   15093ms] [ERROR] Access to fetch at 'https://www.perplexity.ai/rest/event/analytics/probe' from origin 'https://count.perplexity.ai' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://count.perplexity.ai/bs#e367e767-b5e4-4a5f-9b01-8ddf210c2ab5:0
+[   15102ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://www.perplexity.ai/rest/event/analytics/probe:0
+[   15427ms] [WARNING] The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127 @ https://count.perplexity.ai/api/v1/bs/618b666a7a0ecf98337180c96a2fbbdfa2eb8e04754144bbb6311d6620fc62f0:0
+[   15443ms] [WARNING] The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127 @ https://count.perplexity.ai/api/v1/bs/618b666a7a0ecf98337180c96a2fbbdfa2eb8e04754144bbb6311d6620fc62f0:0
+[   15464ms] [WARNING] No available adapters. @ https://count.perplexity.ai/bs#e367e767-b5e4-4a5f-9b01-8ddf210c2ab5:0

@@ -11,47 +11,23 @@ function CallbackInner() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const supabase = createClient();
+    const next = searchParams.get("next") ?? "/onboarding";
 
     async function handleCallback() {
-      const code = searchParams.get("code");
-      const next = searchParams.get("next") ?? "/onboarding";
-
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (!error) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const { data: membership } = await supabase
-              .from("business_members")
-              .select("businesses(slug)")
-              .eq("user_id", user.id)
-              .eq("is_active", true)
-              .limit(1)
-              .single();
-
-            const biz = membership?.businesses as unknown as { slug: string } | null;
-            const slug = Array.isArray(biz) ? biz[0]?.slug : biz?.slug;
-            router.replace(slug ? `/${slug}/dashboard` : next);
-            return;
-          }
-        }
-      }
-
-      // Implicit flow: tokens may be in URL hash; check session
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
         const { data: membership } = await supabase
           .from("business_members")
           .select("businesses(slug)")
-          .eq("user_id", session.user.id)
+          .eq("user_id", user.id)
           .eq("is_active", true)
           .limit(1)
           .single();
 
         const biz = membership?.businesses as unknown as { slug: string } | null;
         const slug = Array.isArray(biz) ? biz[0]?.slug : biz?.slug;
-        router.replace(slug ? `/${slug}/dashboard` : "/onboarding");
+        router.replace(slug ? `/${slug}/dashboard` : next);
         return;
       }
 
@@ -59,6 +35,7 @@ function CallbackInner() {
     }
 
     handleCallback();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

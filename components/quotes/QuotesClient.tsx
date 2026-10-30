@@ -137,7 +137,7 @@ export function QuotesClient({ quotes, business, customers, userId, businessSlug
 
     const { data: numData } = await supabase
       .rpc("generate_invoice_number", { p_business_id: business.id })
-      .single<string>();
+      .single();
     const invoiceNumber = numData ?? `INV-${Date.now()}`;
 
     const { data: inv, error: invErr } = await supabase

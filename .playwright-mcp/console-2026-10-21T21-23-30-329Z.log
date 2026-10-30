@@ -1,0 +1,45 @@
+[    5772ms] [LOG] %c
+▲
+
+    ________   _ __ _          ____           __
+   /  _/ __/  (_) /( )_____   / __/___ ______/ /_
+   / // /_   / / __/// ___/  / /_/ __ `/ ___/ __/
+ _/ // __/  / / /_  (__  )  / __/ /_/ (__  ) /_
+/___/_/    /_/\__/ /____/  /_/  \__,_/____/\__/
+    _ __ _                         _    __                    __
+   (_) /( )_____   ____  ____     | |  / /__  _____________  / /
+  / / __/// ___/  / __ \/ __ \    | | / / _ \/ ___/ ___/ _ \/ /
+ / / /_  (__  )  / /_/ / / / /    | |/ /  __/ /  / /__/  __/ /
+/_/\__/ /____/   \____/_/ /_/     |___/\___/_/   \___/\___/_/
+  
+
+Hello!
+
+- Open Source https://vercel.com/oss
+- Careers https://vercel.com/careers
+- Status https://www.vercel-status.com
+
+ font-family: "Geist Mono", monospace; white-space: pre; line-height: 1; @ https://vercel.com/_next/static/immutable/chunks/1esxzfu31v8ph.js:78
+[   11761ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/jwt:0
+[   11761ms] [WARNING] The resource https://accounts.google.com/gsi/client was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   11761ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/2i2ghry-44ju7.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   11761ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/0vectsfdy5k3d.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   13666ms] [WARNING] Deprecated API for given entry type. @ https://vercel.com/_next/static/immutable/chunks/0luxc18ouvq9p.js:18
+[   14223ms] [WARNING] [GSI_LOGGER]: Your client application uses one of the Google One Tap prompt UI status methods that may stop functioning when FedCM becomes mandatory. Refer to the migration guide to update your code accordingly and opt-in to FedCM to test your changes. Learn more: https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#display_moment and https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#skipped_moment @ https://vercel.com/_next/static/immutable/chunks/0luxc18ouvq9p.js:16
+[   14237ms] [ERROR] Not signed in with the identity provider. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   20538ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/2i2ghry-44ju7.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   20538ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/0vectsfdy5k3d.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   30186ms] [ERROR] [GSI_LOGGER]: FedCM get() rejects with NetworkError: Error retrieving a token. @ https://vercel.com/_next/static/immutable/chunks/3ahwj734y17q-.js:8
+[   31325ms] [ERROR] Failed to load resource: the server responded with a status of 429 () @ https://o205439.ingest.sentry.io/api/1323670/envelope/?sentry_key=d00780d432ac4ccf882f60dd02062e14&sentry_version=7&sentry_client=sentry.javascript.browser%2F7.111.0:0
+[   34849ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/2i2ghry-44ju7.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   34876ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/0vectsfdy5k3d.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   51477ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/2i2ghry-44ju7.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[   51480ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/0vectsfdy5k3d.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[  305198ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/2i2ghry-44ju7.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[  305199ms] [WARNING] The resource https://vercel.com/_next/static/immutable/chunks/0vectsfdy5k3d.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fvantage-ctn6jf0v1-isaacnkwa0-rgbs-projects.vercel.app%252F%26nonce%3D331eb95d723cac51a6d64406716169183445c84c3a684bdad97c70cd695f7c23:0
+[43480339ms] [LOG] [Framer On-Page Editing] Unavailable because not on a `framer.app` subdomain and access status is no-auth @ https://app.framerstatic.com/editorbar.3FC5KSZG.mjs:0
+[43609376ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
+[43609377ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
+[43611623ms] [ERROR] Not signed in with the identity provider. @ https://www.perplexity.ai/download-comet?referrer=singular_click_id%3D268612ef-6d4c-4513-b861-47871c961547:0
+[43612921ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.perplexity.ai/rest/homepage-widgets/upsell/add-to-cohort?version=2.18&source=default:0
+[43622125ms] [ERROR] [GSI_LOGGER]: FedCM get() rejects with NetworkError: Error retrieving a token. @ https://pplx-next-static-public.perplexity.ai/_spa-aux/assets/vendors__v2-COTnYsBm.js:4

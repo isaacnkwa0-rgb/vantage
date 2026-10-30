@@ -155,7 +155,7 @@ export function InvoiceForm({ business, customers, editingInvoice, backHref, ini
     } else {
       const { data: numData } = await supabase
         .rpc("generate_invoice_number", { p_business_id: business.id })
-        .single<string>();
+        .single();
       const invoiceNumber = numData ?? `INV-${Date.now()}`;
 
       const { data: inv, error: invErr } = await supabase

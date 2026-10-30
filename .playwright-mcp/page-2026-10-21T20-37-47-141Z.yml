@@ -1,0 +1,381 @@
+- generic [active] [ref=f8e1]:
+  - main [ref=f8e4]:
+    - generic [ref=f8e5]:
+      - generic [ref=f8e6]:
+        - navigation [ref=f8e7]:
+          - generic [ref=f8e8]:
+            - generic [ref=f8e9]:
+              - link [ref=f8e10] [cursor=pointer]:
+                - /url: /
+                - img "Catlog Logo" [ref=f8e11]
+              - list [ref=f8e12]:
+                - listitem [ref=f8e13] [cursor=pointer]:
+                  - link "Products" [ref=f8e14]:
+                    - /url: "#"
+                  - generic:
+                    - list:
+                      - listitem:
+                        - link "Online Store Showcase your products and take orders with one link":
+                          - /url: /online-store
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "Online Store" [level=6]
+                            - generic: Showcase your products and take orders with one link
+                      - listitem:
+                        - link "Record Keeping Easily keep track of all your orders & customers":
+                          - /url: /record-keeping
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "Record Keeping" [level=6]
+                            - generic: Easily keep track of all your orders & customers
+                      - listitem:
+                        - link "Global Payments Seamlessly collect payments & issue invoices":
+                          - /url: /payments
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "Global Payments" [level=6]
+                            - generic: Seamlessly collect payments & issue invoices
+                      - listitem:
+                        - link "Deliveries Effortlessly get items delivered at discounted prices":
+                          - /url: /deliveries
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "Deliveries" [level=6]
+                            - generic: Effortlessly get items delivered at discounted prices
+                - listitem [ref=f8e17] [cursor=pointer]:
+                  - link "Pricing" [ref=f8e18]:
+                    - /url: "#"
+                - listitem [ref=f8e19] [cursor=pointer]:
+                  - link "Why Catlog" [ref=f8e20]:
+                    - /url: "#"
+                - listitem [ref=f8e21] [cursor=pointer]:
+                  - link "Learn" [ref=f8e22]:
+                    - /url: "#"
+                  - generic:
+                    - list:
+                      - listitem:
+                        - link "About Us":
+                          - /url: /about
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "About Us" [level=6]
+                      - listitem:
+                        - link "Blog":
+                          - /url: /blog
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "Blog" [level=6]
+                      - listitem:
+                        - link "Find Answers":
+                          - /url: /support
+                          - figure
+                          - generic:
+                            - generic:
+                              - heading "Find Answers" [level=6]
+            - generic [ref=f8e25]:
+              - generic [ref=f8e26] [cursor=pointer]:
+                - button [ref=f8e27]:
+                  - figure [ref=f8e28]
+                - generic:
+                  - list:
+                    - listitem:
+                      - button "Nigeria":
+                        - figure
+                        - generic:
+                          - generic:
+                            - heading "Nigeria" [level=6]
+                    - listitem:
+                      - button "Ghana":
+                        - figure
+                        - generic:
+                          - generic:
+                            - heading "Ghana" [level=6]
+                    - listitem:
+                      - button "South Africa":
+                        - figure
+                        - generic:
+                          - generic:
+                            - heading "South Africa" [level=6]
+                    - listitem:
+                      - button "Kenya":
+                        - figure
+                        - generic:
+                          - generic:
+                            - heading "Kenya" [level=6]
+              - link "Log In" [ref=f8e35] [cursor=pointer]:
+                - /url: https://app.catlog.shop/login
+              - link "Get Started" [ref=f8e36] [cursor=pointer]:
+                - /url: https://app.catlog.shop/sign-up
+        - generic [ref=f8e40]:
+          - generic [ref=f8e41]:
+            - button "NEW Introducing Catlog's Mobile App" [ref=f8e42] [cursor=pointer]:
+              - generic [ref=f8e43]: NEW
+              - generic [ref=f8e44]: Introducing Catlog's Mobile App
+            - heading "Grow your Business Without the Chaos" [level=1] [ref=f8e47]:
+              - generic [ref=f8e48]:
+                - generic [ref=f8e49]: Grow your Business
+                - generic [ref=f8e51]: Without
+                - generic [ref=f8e52]: the
+                - generic [ref=f8e53]: Chaos
+            - paragraph [ref=f8e54]: Tired of sending pictures and prices back and forth? Create your online store in 5 minutes, manage sales & records, and accept payments from anywhere.
+            - generic [ref=f8e55]:
+              - button "Download App" [ref=f8e56] [cursor=pointer]
+              - link "Continue on the web" [ref=f8e60] [cursor=pointer]:
+                - /url: https://app.catlog.shop/sign-up
+          - figure [ref=f8e63]:
+            - figure [ref=f8e64]:
+              - img "Catlog hero video placholder" [ref=f8e65]
+              - button [ref=f8e67] [cursor=pointer]:
+                - figure [ref=f8e68]
+      - generic [ref=f8e71]:
+        - generic [ref=f8e72]: Trusted by 50k+ businesses
+        - list [ref=f8e75]:
+          - listitem [ref=f8e76]:
+            - link "FitFuse" [ref=f8e77] [cursor=pointer]:
+              - /url: https://fitfuse.org/
+              - figure [ref=f8e78]:
+                - img "FitFuse" [ref=f8e80]
+          - listitem [ref=f8e81]:
+            - link "QueenChic" [ref=f8e82] [cursor=pointer]:
+              - /url: https://queenchicfancy.catlog.shop
+              - figure [ref=f8e83]:
+                - img "QueenChic" [ref=f8e85]
+          - listitem [ref=f8e86]:
+            - link "Heux Beauty" [ref=f8e87] [cursor=pointer]:
+              - /url: https://heuxbeauty.catlog.shop
+              - figure [ref=f8e88]:
+                - img "Heux Beauty" [ref=f8e90]
+          - listitem [ref=f8e91]:
+            - link "Wywrd" [ref=f8e92] [cursor=pointer]:
+              - /url: https://wywrd.catlog.shop
+              - figure [ref=f8e93]:
+                - img "Wywrd" [ref=f8e95]
+          - listitem [ref=f8e96]:
+            - link "Fresh Picks by Tem" [ref=f8e97] [cursor=pointer]:
+              - /url: https://freshpicksbytems.catlog.shop/
+              - figure [ref=f8e98]:
+                - img "Fresh Picks by Tem" [ref=f8e100]
+          - listitem [ref=f8e101]:
+            - link "Tees and Co" [ref=f8e102] [cursor=pointer]:
+              - /url: http://teesandco.co
+              - figure [ref=f8e103]:
+                - img "Tees and Co" [ref=f8e105]
+    - generic [ref=f8e108]:
+      - generic [ref=f8e109]:
+        - generic [ref=f8e110]: Online Store in 5 Minutes
+        - paragraph [ref=f8e111]: Connect your Instagram to import posts as products or add them manually. Customise with your brand colour and domain - and you're ready to go!
+        - link "Online Store in 5 Minutes" [ref=f8e112] [cursor=pointer]:
+          - /url: /online-store
+          - text: Learn More
+        - figure [ref=f8e115]:
+          - img "Online Store in 5 Minutes" [ref=f8e116]
+      - generic [ref=f8e117]:
+        - generic [ref=f8e118]: Take orders while you sleep
+        - paragraph [ref=f8e119]: Share your store link everywhere — use discounts and coupons to run sales. Customers pay online or send their order via WhatsApp or Instagram.
+        - figure [ref=f8e120]:
+          - img "Take orders while you sleep" [ref=f8e121]
+      - generic [ref=f8e122]:
+        - generic [ref=f8e123]: Showcase your products
+        - paragraph [ref=f8e124]: Add videos, images, and detailed options. Use Highlights like “Best Sellers” to guide shoppers and boost sales.
+        - figure [ref=f8e125]:
+          - img "Showcase your products" [ref=f8e126]
+      - generic [ref=f8e127]:
+        - generic [ref=f8e128]: Get Paid, from Anywhere
+        - paragraph [ref=f8e129]: Accept payments in Naira or 7+ global currencies. You can also generate payment links or branded invoices for custom orders.
+        - link "Get Paid, from Anywhere" [ref=f8e130] [cursor=pointer]:
+          - /url: /payments
+          - text: Learn More
+        - figure [ref=f8e133]:
+          - img "Get Paid, from Anywhere" [ref=f8e134]
+    - generic [ref=f8e137]:
+      - generic [ref=f8e138]:
+        - paragraph [ref=f8e140]: Chowbot lets hungry customers place orders, pay, and get delivery — all on WhatsApp, with no human needed. Built for food businesses, powered by AI, so you can focus on cooking.
+        - link "Learn More" [ref=f8e141] [cursor=pointer]:
+          - /url: /
+      - figure [ref=f8e145]:
+        - img "title" [ref=f8e147]
+    - generic [ref=f8e152]:
+      - generic [ref=f8e153]:
+        - generic [ref=f8e154]: Your Business, In One View
+        - paragraph [ref=f8e155]: Track sales, customers, and abandoned carts. Log expenses, debts, and get a full view of your business with detailed analytics
+        - link "Your Business, In One View" [ref=f8e156] [cursor=pointer]:
+          - /url: /record-keeping
+          - text: Learn More
+        - figure [ref=f8e159]:
+          - img "Your Business, In One View" [ref=f8e160]
+      - generic [ref=f8e161]:
+        - generic [ref=f8e162]: Smart Inventory, Smooth Sales
+        - paragraph [ref=f8e163]: Manage your products and backend supplies with ease. Track what's available or running low, so you never miss a sale.
+        - figure [ref=f8e164]:
+          - img "Smart Inventory, Smooth Sales" [ref=f8e165]
+      - generic [ref=f8e166]:
+        - generic [ref=f8e167]: Marketing That Converts
+        - paragraph [ref=f8e168]: Boost loyalty with campaigns via SMS, WhatsApp. Use affiliate links to track referrals and see what's getting you sales.
+        - figure [ref=f8e169]:
+          - img "Marketing That Converts" [ref=f8e170]
+      - generic [ref=f8e171]:
+        - generic [ref=f8e172]: Deliveries Your Way
+        - paragraph [ref=f8e173]: Book deliveries directly from your dashboard. Choose from 20+ trusted partners & compare speed and prices.
+        - link "Deliveries Your Way" [ref=f8e174] [cursor=pointer]:
+          - /url: /deliveries
+          - text: Learn More
+        - figure [ref=f8e177]:
+          - img "Deliveries Your Way" [ref=f8e178]
+    - generic [ref=f8e183]:
+      - generic [ref=f8e184]:
+        - generic [ref=f8e185]:
+          - img "Testimonial poster" [ref=f8e186]
+          - button [ref=f8e188] [cursor=pointer]
+          - generic [ref=f8e191]:
+            - generic [ref=f8e192]: Testimonial
+            - generic [ref=f8e196]:
+              - paragraph [ref=f8e197]: Organization for me in business is very important. I like my business to be organized. When I started, there was a rush from clients, especially during sales...
+              - heading "— Temidayo Akanmode, Owner Tees and Co" [level=3] [ref=f8e199]
+        - generic [ref=f8e200]:
+          - img "Testimonial poster" [ref=f8e201]
+          - generic [ref=f8e203]:
+            - generic [ref=f8e204]: Testimonial
+            - generic [ref=f8e208]:
+              - paragraph [ref=f8e209]: Before Catlog, I was mixing my business money with my personal funds and every business owner knows that's very bad. Since I started using Catlog, I've been ...
+              - heading "— Ibukun Makinde, Owner Penguin Hairs" [level=3] [ref=f8e211]
+        - generic [ref=f8e212]:
+          - img "Testimonial poster" [ref=f8e213]
+          - generic [ref=f8e215]:
+            - generic [ref=f8e216]: Testimonial
+            - generic [ref=f8e220]:
+              - paragraph [ref=f8e221]: Since I started using Catlog, running my business has been so much easier. All I have to do is send customers my link, and they can shop directly. No more st...
+              - heading "— Deborah Eichie, Owner Debe Empire" [level=3] [ref=f8e223]
+      - generic [ref=f8e224]:
+        - button "Previous testimonial" [ref=f8e225] [cursor=pointer]
+        - button "Next testimonial" [ref=f8e228] [cursor=pointer]
+    - generic [ref=f8e234]:
+      - generic [ref=f8e235]:
+        - generic [ref=f8e236]:
+          - button "What is Catlog?" [ref=f8e237] [cursor=pointer]:
+            - button [ref=f8e239]
+          - region:
+            - paragraph [ref=f8e242]: Catlog is an app that helps you run your business online with ease. With Catlog you can create an online store in 5 minutes, collect payments locally & internationally and manage your business records easily.
+        - generic [ref=f8e243]:
+          - button "Is Catlog a marketplace like Jumia?" [ref=f8e244] [cursor=pointer]:
+            - button [ref=f8e246]
+          - region:
+            - paragraph [ref=f8e249]: No. Catlog is a business management app that helps you run your business efficiently. The online store you create with Catlog is yours to sell directly to your customers.
+        - generic [ref=f8e250]:
+          - button "Who can use Catlog?" [ref=f8e251] [cursor=pointer]:
+            - button [ref=f8e253]
+          - region:
+            - paragraph [ref=f8e256]: Catlog is for business owners of all sizes who sell physical products online and want a simple way to manage their business — from fashion and food to beauty, personal care, electronics, and more.
+        - generic [ref=f8e257]:
+          - button "How do I get paid?" [ref=f8e258] [cursor=pointer]:
+            - button [ref=f8e260]
+          - region:
+            - paragraph [ref=f8e263]: Catlog integrates with payment processors like Paystack so your customers can pay by card, transfer, or USSD. Payments are confirmed instantly, and the money goes into your Catlog account. From there, you can withdraw to your bank account anytime.
+        - generic [ref=f8e264]:
+          - button "Where is Catlog available?" [ref=f8e265] [cursor=pointer]:
+            - button [ref=f8e267]
+          - region:
+            - paragraph [ref=f8e270]: Catlog is available in Nigeria, Ghana, South Africa & Kenya. Also, you don't need to be a registered business to use Catlog.
+        - generic [ref=f8e271]:
+          - button "Is Catlog free to use?" [ref=f8e272] [cursor=pointer]:
+            - button [ref=f8e274]
+          - region:
+            - paragraph [ref=f8e277]: You can use Catlog free for 3 days. After the trial, you'll need to subscribe to one of our plans. The Basic plan costs ₦6,500 monthly, lets you upload up to 100 products, and gives you access to most of our core features. The Business+ plan costs ₦12,500 monthly and gives you unlimited product uploads, the ability to manage multiple stores from one account, accept international payments, upload product videos, and more.
+      - paragraph [ref=f8e278]:
+        - text: Still have questions? Email us at
+        - link "support@catlog.shop" [ref=f8e279] [cursor=pointer]:
+          - /url: mailto:holla@catlog.shop
+    - generic [ref=f8e281]:
+      - generic [ref=f8e282]:
+        - generic [ref=f8e283]:
+          - generic [ref=f8e284]:
+            - generic [ref=f8e285]: "Available in:"
+            - generic [ref=f8e286]:
+              - figure [ref=f8e287]
+              - figure [ref=f8e292]
+              - figure [ref=f8e299]
+              - figure [ref=f8e310]
+          - heading [level=6] [ref=f8e322]:
+            - generic [ref=f8e323]: Get startedin 5 minutes
+          - paragraph [ref=f8e324]: Set up an online store, accept payments, and manage operations all from your phone.
+          - generic [ref=f8e325]:
+            - button "Download App" [ref=f8e326] [cursor=pointer]
+            - link "Use the web" [ref=f8e330] [cursor=pointer]:
+              - /url: https://app.catlog.shop/sign-up
+        - img "Hands holding phone mockup" [ref=f8e334]
+      - generic [ref=f8e335]:
+        - generic [ref=f8e336]:
+          - figure [ref=f8e337]:
+            - img "Catlog logo light" [ref=f8e338]
+          - paragraph [ref=f8e339]: The smartest way to manage your business
+        - generic [ref=f8e340]:
+          - list [ref=f8e341]:
+            - listitem [ref=f8e342]: Products
+            - listitem [ref=f8e343]:
+              - link "Online Store" [ref=f8e344] [cursor=pointer]:
+                - /url: /online-store
+            - listitem [ref=f8e345]:
+              - link "Record Keeping" [ref=f8e346] [cursor=pointer]:
+                - /url: /record-keeping
+            - listitem [ref=f8e347]:
+              - link "Global Payments" [ref=f8e348] [cursor=pointer]:
+                - /url: /payments
+            - listitem [ref=f8e349]:
+              - link "Deliveries" [ref=f8e350] [cursor=pointer]:
+                - /url: /deliveries
+          - list [ref=f8e351]:
+            - listitem [ref=f8e352]: Learn
+            - listitem [ref=f8e353]:
+              - link "Why Catlog" [ref=f8e354] [cursor=pointer]:
+                - /url: /why-catlog
+            - listitem [ref=f8e355]:
+              - link "About" [ref=f8e356] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=f8e357]:
+              - link "Pricing" [ref=f8e358] [cursor=pointer]:
+                - /url: /pricing
+            - listitem [ref=f8e359]:
+              - link "Blog" [ref=f8e360] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=f8e361]:
+              - link "Help Articles" [ref=f8e362] [cursor=pointer]:
+                - /url: /support
+            - listitem [ref=f8e363]:
+              - link "Privacy Policy" [ref=f8e364] [cursor=pointer]:
+                - /url: https://catlog-help-center.notion.site/Privacy-Policy-2b9b7ac5613b48f7b53016a597a40680
+          - list [ref=f8e365]:
+            - listitem [ref=f8e366]: What can I sell?
+            - listitem [ref=f8e367]:
+              - link "Food & Drinks" [ref=f8e368] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=f8e369]:
+              - link "Fashion Items" [ref=f8e370] [cursor=pointer]:
+                - /url: /fashion
+            - listitem [ref=f8e371]:
+              - link "Gadgets" [ref=f8e372] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=f8e373]:
+              - link "Beauty & Makeup" [ref=f8e374] [cursor=pointer]:
+                - /url: /fashion
+            - listitem [ref=f8e375]:
+              - link "Physical Products" [ref=f8e376] [cursor=pointer]:
+                - /url: /
+      - generic [ref=f8e377]:
+        - generic [ref=f8e378]:
+          - generic [ref=f8e379]: © 2026 Catlog Technologies Nigeria Limited.
+          - text: G3, Victoria Bay Estate, Orchid Road, Lagos, Nigeria.
+        - generic [ref=f8e380]:
+          - link "Catlog's instagram" [ref=f8e381] [cursor=pointer]:
+            - /url: https://instagram.com/catlogshop
+          - link "Catlog's twitter" [ref=f8e385] [cursor=pointer]:
+            - /url: https://twitter.com/catlogshop
+          - link "Catlog's linkedin" [ref=f8e389] [cursor=pointer]:
+            - /url: https://linkedin.com/company/myshopcatlog
+  - alert [ref=f8e393]
+  - iframe [aria-hidden] [ref=f8e394]
+  - button "Open Intercom Messenger" [ref=f8e395] [cursor=pointer]

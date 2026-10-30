@@ -1,0 +1,485 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - heading [level=4] [ref=e9]:
+          - text: Receive payments in 15 secs and get alerts on Whatsapp with Bumpa Terminal. Click
+          - link "here" [ref=e10] [cursor=pointer]:
+            - /url: https://terminal.bumpa.com/
+          - text: to learn more
+        - heading [level=4] [ref=e13]:
+          - text: Share Your Shopping Experience Across Different Businesses This Year.
+          - link "Take Survey" [ref=e14] [cursor=pointer]:
+            - /url: https://docs.google.com/forms/d/e/1FAIpQLSeVP-VXGb9EosGMz81DErSzAXnBZQ5-i9oACZXWqBPKzTxQ-A/viewform?usp=sharing&ouid=111766698511844748276
+        - heading [level=4] [ref=e17]:
+          - text: Receive payments in 15 secs and get alerts on Whatsapp with Bumpa Terminal. Click
+          - link "here" [ref=e18] [cursor=pointer]:
+            - /url: https://terminal.bumpa.com/
+          - text: to learn more
+        - heading [level=4] [ref=e21]:
+          - text: Share Your Shopping Experience Across Different Businesses This Year.
+          - link "Take Survey" [ref=e22] [cursor=pointer]:
+            - /url: https://docs.google.com/forms/d/e/1FAIpQLSeVP-VXGb9EosGMz81DErSzAXnBZQ5-i9oACZXWqBPKzTxQ-A/viewform?usp=sharing&ouid=111766698511844748276
+      - button [ref=e25] [cursor=pointer]
+      - button [ref=e30] [cursor=pointer]
+    - generic [ref=e34]:
+      - link "Logo" [ref=e35] [cursor=pointer]:
+        - /url: /
+        - img "Logo" [ref=e36]
+      - button [ref=e49] [cursor=pointer]:
+        - img "selected country" [ref=e50]
+      - button "Click to open navigation bar" [ref=e53] [cursor=pointer]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e59]:
+          - link "2025 E-Commerce Report Forward Arrow" [ref=e60] [cursor=pointer]:
+            - /url: /e-commerce-reports-2025
+            - generic [ref=e65]: 2025 E-Commerce Report
+            - img "Forward Arrow" [ref=e67]
+          - heading "Solving your sales | management problems, one solution at a time." [level=1] [ref=e69]:
+            - text: Solving your
+            - generic [ref=e70]:
+              - text: sales
+              - generic [ref=e71]: "|"
+            - text: management problems, one solution at a time.
+          - paragraph [ref=e72]: Simplify your business operations with tools that make inventory, sales, orders & customer management easy.
+          - button "Get Started" [ref=e73] [cursor=pointer]
+        - generic [ref=e75]:
+          - generic [ref=e77]:
+            - button "Features Button" [ref=e78] [cursor=pointer]: Multi-currency
+            - button "Features Button" [ref=e84] [cursor=pointer]: Multiple Locations
+            - button "Features Button" [ref=e90] [cursor=pointer]: Manage Inventories
+            - button "Features Button" [ref=e95] [cursor=pointer]: Analytics
+            - button "Features Button" [ref=e101] [cursor=pointer]: Staff Accounts
+            - button "Features Button" [ref=e107] [cursor=pointer]: Invoice/Receipt
+            - button "Features Button" [ref=e110] [cursor=pointer]: Run Discounts
+            - button "Features Button" [ref=e116] [cursor=pointer]: Business Website
+            - button "Features Button" [ref=e122] [cursor=pointer]: Instant Payment Confirmation
+            - button "Features Button" [ref=e128] [cursor=pointer]: Multi-currency
+            - button "Features Button" [ref=e134] [cursor=pointer]: Multiple Locations
+            - button "Features Button" [ref=e140] [cursor=pointer]: Manage Inventories
+            - button "Features Button" [ref=e145] [cursor=pointer]: Analytics
+            - button "Features Button" [ref=e151] [cursor=pointer]: Staff Accounts
+            - button "Features Button" [ref=e157] [cursor=pointer]: Invoice/Receipt
+            - button "Features Button" [ref=e160] [cursor=pointer]: Run Discounts
+            - button "Features Button" [ref=e166] [cursor=pointer]: Business Website
+            - button "Features Button" [ref=e172] [cursor=pointer]: Instant Payment Confirmation
+          - generic [aria-hidden] [ref=e178]:
+            - button [ref=e179] [cursor=pointer]: Multi-currency
+            - button [ref=e185] [cursor=pointer]: Multiple Locations
+            - button [ref=e191] [cursor=pointer]: Manage Inventories
+            - button [ref=e196] [cursor=pointer]: Analytics
+            - button [ref=e202] [cursor=pointer]: Staff Accounts
+            - button [ref=e208] [cursor=pointer]: Invoice/Receipt
+            - button [ref=e211] [cursor=pointer]: Run Discounts
+            - button [ref=e217] [cursor=pointer]: Business Website
+            - button [ref=e223] [cursor=pointer]: Instant Payment Confirmation
+            - button [ref=e229] [cursor=pointer]: Multi-currency
+            - button [ref=e235] [cursor=pointer]: Multiple Locations
+            - button [ref=e241] [cursor=pointer]: Manage Inventories
+            - button [ref=e246] [cursor=pointer]: Analytics
+            - button [ref=e252] [cursor=pointer]: Staff Accounts
+            - button [ref=e258] [cursor=pointer]: Invoice/Receipt
+            - button [ref=e261] [cursor=pointer]: Run Discounts
+            - button [ref=e267] [cursor=pointer]: Business Website
+            - button [ref=e273] [cursor=pointer]: Instant Payment Confirmation
+        - generic:
+          - img "herolytics"
+      - generic [ref=e279]:
+        - generic [ref=e280]:
+          - generic [ref=e282]:
+            - heading "Get a business website to run online sales" [level=3] [ref=e283]
+            - paragraph [ref=e284]: Add products easily, run discount sales, ship products & integrate tools for online ads & website analytics.
+          - link "Learn More Forward Arrow" [ref=e285] [cursor=pointer]:
+            - /url: /sales
+            - text: Learn More
+            - img "Forward Arrow" [ref=e286]
+        - generic [ref=e288]: Your browser does not support the video tag.
+      - generic [ref=e290]:
+        - generic [ref=e291]:
+          - generic [ref=e292]:
+            - heading "Share invoices, receipts and record sales easily" [level=2] [ref=e293]
+            - paragraph [ref=e294]: Create invoices, send receipts, record sales and log expenses that you cannot lose on your Bumpa app.
+            - link "Learn More Forward Arrow" [ref=e295] [cursor=pointer]:
+              - /url: /feature/record-sales
+              - text: Learn More
+              - img "Forward Arrow" [ref=e296]
+          - generic [ref=e298]: Your browser does not support the video tag.
+        - generic [ref=e300]:
+          - generic [ref=e301]:
+            - heading "Stay ahead of your competitors with Bumpa Analytics" [level=2] [ref=e302]
+            - paragraph [ref=e303]: Get important data like Profit, Avg. Spend per Customer, Best Selling Product, Website clicks etc with Bumpa Analytics.
+            - link "Learn More Forward Arrow" [ref=e304] [cursor=pointer]:
+              - /url: /feature/analytics
+              - text: Learn More
+              - img "Forward Arrow" [ref=e305]
+          - generic [ref=e307]: Your browser does not support the video tag.
+      - generic [ref=e309]:
+        - generic [ref=e310]:
+          - generic [ref=e312]:
+            - heading "Receive local and international payments easily for your business" [level=3] [ref=e313]
+            - paragraph [ref=e314]: Choose from payment options that allow you get paid in Naira/US Dollar, set up payment alerts...
+          - link "Learn More Forward Arrow" [ref=e315] [cursor=pointer]:
+            - /url: https://terminal.bumpa.com/
+            - text: Learn More
+            - img "Forward Arrow" [ref=e316]
+        - generic [ref=e318]: Your browser does not support the video tag.
+      - generic [ref=e323]:
+        - heading "One app that has all the features your business needs to grow." [level=3] [ref=e324]
+        - button "Get Started" [ref=e325] [cursor=pointer]
+      - generic [ref=e326]:
+        - generic [ref=e327]:
+          - generic [ref=e328]:
+            - heading "Have visibility on your business operations" [level=2] [ref=e329]
+            - paragraph [ref=e330]: Don’t do business blindly. View your staff actions, sales, inventory & analytics across numerous store locations with one dashboard.
+            - link "Learn More Forward Arrow" [ref=e331] [cursor=pointer]:
+              - /url: /growth#staff-mgt
+              - text: Learn More
+              - img "Forward Arrow" [ref=e332]
+          - generic [ref=e334]: Your browser does not support the video tag.
+        - generic [ref=e336]:
+          - generic [ref=e337]:
+            - heading "Save Customer Details & Keep Them Loyal on Bumpa." [level=2] [ref=e338]
+            - paragraph [ref=e339]: Record customer details with their purchase history, shipping address and contact details for marketing purposes.
+          - generic [ref=e340]: Your browser does not support the video tag.
+      - list [ref=e343]:
+        - listitem [ref=e344]:
+          - generic [ref=e345]:
+            - generic [ref=e346]:
+              - generic [ref=e348]:
+                - heading "Turn your physical store into a smart store" [level=3] [ref=e349]
+                - paragraph [ref=e350]: Generate barcodes for your products for better inventory management & set up checkout software on your device for faster sales in your physical store.
+              - link "Learn More Forward Arrow" [ref=e351] [cursor=pointer]:
+                - /url: /growth#growth-inventory
+                - text: Learn More
+                - img "Forward Arrow" [ref=e352]
+            - generic [ref=e354]: Your browser does not support the video tag.
+        - listitem [ref=e356]:
+          - generic [ref=e357]:
+            - generic [ref=e358]:
+              - generic [ref=e360]:
+                - heading "Set up an automated order processing system without stress" [level=3] [ref=e361]
+                - paragraph [ref=e362]: Automatically get stock levels updated after every sale, process deliveries quickly & get emails sent to your customer when items are shipped, delivered & ready for review
+              - link "Learn More Forward Arrow" [ref=e363] [cursor=pointer]:
+                - /url: /blog/bumpas-automated-order-processing-system-for-small-and-large-scale
+                - text: Learn More
+                - img "Forward Arrow" [ref=e364]
+            - generic [ref=e366]: Your browser does not support the video tag.
+      - generic [ref=e368]:
+        - generic [ref=e369]:
+          - heading "All our connected platforms" [level=2] [ref=e370]
+          - paragraph [ref=e371]: These business tools and many more to come, work well with your Bumpa app
+        - generic [ref=e372]: Your browser does not support the video tag.
+        - paragraph [ref=e375]:
+          - text: Do you want to integrate with Bumpa?
+          - link "Contact Us" [ref=e376] [cursor=pointer]:
+            - /url: mailto:hello@getbumpa.com
+      - generic [ref=e377]:
+        - generic [ref=e378]:
+          - heading "Trusted by over 0 SMEs" [level=2] [ref=e379]
+          - paragraph [ref=e380]: See what business owners like yourself are saying about Bumpa
+        - generic [ref=e381]:
+          - generic [ref=e384]:
+            - generic [ref=e386]:
+              - generic [ref=e387]:
+                - img "Female" [ref=e390]
+                - generic [ref=e391]:
+                  - heading "Nyne and Nuel" [level=4] [ref=e392]
+                  - link "www.nyneandnuel.com" [ref=e394] [cursor=pointer]:
+                    - /url: https://nyneandnuel.com/
+              - paragraph [ref=e396]: Bumpa app is honestly a must have for any business owner!! From book keeping to analytics, to website and now the latest Meta and Bumpa integration; Managing my business has become easier and more structured. I’m happy to be a bumpreneur
+            - generic [ref=e398]:
+              - generic [ref=e399]:
+                - img "Female" [ref=e402]
+                - generic [ref=e403]:
+                  - heading "Lights and Cotton" [level=4] [ref=e404]
+                  - link "www.lightandcottons.co" [ref=e406] [cursor=pointer]:
+                    - /url: https://lightandcottons.co/
+              - paragraph [ref=e408]: I have never seen an excellent app like Bumpa! Their business analytics feature that helped me navigate business growth so much better.
+            - generic [ref=e410]:
+              - generic [ref=e411]:
+                - img "Female" [ref=e414]
+                - generic [ref=e415]:
+                  - heading "Ibadan Bible Store" [level=4] [ref=e416]
+                  - link "ibadanbiblestore.bumpa.shop" [ref=e418] [cursor=pointer]:
+                    - /url: https://ibadanbiblestore.bumpa.shop/
+              - paragraph [ref=e420]: I use Bumpa for my two different businesses, and it’s the best thing that has happened to me and my businesses in terms of automation.The interface is very easy to navigate, processing orders is very seamless and inventory management is a piece of cake.
+            - generic [ref=e422]:
+              - generic [ref=e423]:
+                - img "Female" [ref=e426]
+                - generic [ref=e427]:
+                  - heading "Lipgloss Wholesale" [level=4] [ref=e428]
+                  - link "www.lipglosswholesale.com" [ref=e430] [cursor=pointer]:
+                    - /url: http://www.lipglosswholesale.com/
+              - paragraph [ref=e432]: Thank you Bumpa for making my entrepreneurial journey easy. As a Pro Bumpa user, I go to rest knowing I have one less thing to worry about, with regard to the success of my business because of the resources you provide.
+            - generic [ref=e434]:
+              - generic [ref=e435]:
+                - img "Female" [ref=e438]
+                - generic [ref=e439]:
+                  - heading "Shop Tadi" [level=4] [ref=e440]
+                  - link "www.shoptadi.com.ngg" [ref=e442] [cursor=pointer]:
+                    - /url: https://www.shoptadi.com.ng
+              - paragraph [ref=e444]: Bumpa is doing an extraordinary thing for every small and Medium business owners on the platform. For Shop Tadi, It's more than just an app. It's the fact that they make out time to teach and walk me through the process of being a better entrepreneur. Not every brand can do that and that's incredible
+            - generic [ref=e446]:
+              - generic [ref=e447]:
+                - img "Female" [ref=e450]
+                - generic [ref=e451]:
+                  - heading "Naomi and Chris" [level=4] [ref=e452]
+                  - link "www.naomichriscompany.com.ng" [ref=e454] [cursor=pointer]:
+                    - /url: https://naomichriscompany.com.ng/
+              - paragraph [ref=e456]: This app is your business bestfriend. The organisation, seamless operations is top notch. If you want structure for your orders and inventory, this is it!
+          - generic [ref=e458]:
+            - generic [ref=e460]:
+              - generic [ref=e465]:
+                - heading [level=4] [ref=e466]: Nyne and Nuel
+                - link [ref=e468] [cursor=pointer]:
+                  - /url: https://nyneandnuel.com/
+                  - text: www.nyneandnuel.com
+              - paragraph [ref=e470]: Bumpa app is honestly a must have for any business owner!! From book keeping to analytics, to website and now the latest Meta and Bumpa integration; Managing my business has become easier and more structured. I’m happy to be a bumpreneur
+            - generic [ref=e472]:
+              - generic [ref=e477]:
+                - heading [level=4] [ref=e478]: Lights and Cotton
+                - link [ref=e480] [cursor=pointer]:
+                  - /url: https://lightandcottons.co/
+                  - text: www.lightandcottons.co
+              - paragraph [ref=e482]: I have never seen an excellent app like Bumpa! Their business analytics feature that helped me navigate business growth so much better.
+            - generic [ref=e484]:
+              - generic [ref=e489]:
+                - heading [level=4] [ref=e490]: Ibadan Bible Store
+                - link [ref=e492] [cursor=pointer]:
+                  - /url: https://ibadanbiblestore.bumpa.shop/
+                  - text: ibadanbiblestore.bumpa.shop
+              - paragraph [ref=e494]: I use Bumpa for my two different businesses, and it’s the best thing that has happened to me and my businesses in terms of automation.The interface is very easy to navigate, processing orders is very seamless and inventory management is a piece of cake.
+            - generic [ref=e496]:
+              - generic [ref=e501]:
+                - heading [level=4] [ref=e502]: Lipgloss Wholesale
+                - link [ref=e504] [cursor=pointer]:
+                  - /url: http://www.lipglosswholesale.com/
+                  - text: www.lipglosswholesale.com
+              - paragraph [ref=e506]: Thank you Bumpa for making my entrepreneurial journey easy. As a Pro Bumpa user, I go to rest knowing I have one less thing to worry about, with regard to the success of my business because of the resources you provide.
+            - generic [ref=e508]:
+              - generic [ref=e513]:
+                - heading [level=4] [ref=e514]: Shop Tadi
+                - link [ref=e516] [cursor=pointer]:
+                  - /url: https://www.shoptadi.com.ng
+                  - text: www.shoptadi.com.ngg
+              - paragraph [ref=e518]: Bumpa is doing an extraordinary thing for every small and Medium business owners on the platform. For Shop Tadi, It's more than just an app. It's the fact that they make out time to teach and walk me through the process of being a better entrepreneur. Not every brand can do that and that's incredible
+            - generic [ref=e520]:
+              - generic [ref=e525]:
+                - heading [level=4] [ref=e526]: Naomi and Chris
+                - link [ref=e528] [cursor=pointer]:
+                  - /url: https://naomichriscompany.com.ng/
+                  - text: www.naomichriscompany.com.ng
+              - paragraph [ref=e530]: This app is your business bestfriend. The organisation, seamless operations is top notch. If you want structure for your orders and inventory, this is it!
+      - generic [ref=e531]:
+        - heading "Want to know the kind of Bumpa business owner you would be?" [level=2] [ref=e532]
+        - link [ref=e533] [cursor=pointer]:
+          - /url: /quiz
+          - button "Take this fun Quiz" [ref=e534]
+      - generic [ref=e535]:
+        - generic [ref=e536]:
+          - heading "Save up to 20% on a yearly plan" [level=2] [ref=e537]
+          - paragraph [ref=e538]: Pay less for more subscription coverage when you bulk purchase.
+        - generic [ref=e540]:
+          - button "quarterly" [ref=e541] [cursor=pointer]
+          - button "biannually" [ref=e542] [cursor=pointer]
+          - button "yearly" [ref=e543] [cursor=pointer]
+        - generic [ref=e545]:
+          - generic [ref=e547]:
+            - generic [ref=e548]:
+              - paragraph [ref=e550]: Bumpa Starter
+              - paragraph [ref=e551]: For new businesses still figuring things out.
+              - paragraph [ref=e552]
+              - paragraph [ref=e554]: N15,000
+              - paragraph [ref=e555]: Billed quarterly. ( ₦ 5,000 per month)
+            - paragraph [ref=e556]: Start your business with a simple website, record sales & manage orders efficiently.
+            - button "Start Free Trial" [ref=e558] [cursor=pointer]
+          - generic [ref=e560]:
+            - generic [ref=e561]:
+              - paragraph [ref=e563]: Bumpa Pro
+              - paragraph [ref=e564]: For small businesses with staff & growing needs.
+              - paragraph [ref=e565]
+              - paragraph [ref=e567]: N30,000
+              - paragraph [ref=e568]: Billed quarterly. ( ₦ 10,000 per month)
+            - paragraph [ref=e569]: Set up your own sales system with features designed to help you manage your customer base and grow it.
+            - button "Start Free Trial" [ref=e571] [cursor=pointer]
+          - generic [ref=e573]:
+            - generic [ref=e574]:
+              - paragraph [ref=e576]: Bumpa Growth
+              - paragraph [ref=e577]: For growing businesses with a small team & multiple locations
+              - paragraph [ref=e578]
+              - paragraph [ref=e580]: N/A
+              - paragraph [ref=e581]: Not available on quarterly subscription
+            - paragraph [ref=e582]: Automate your business & grow with features that help you manage orders, staff & customers from different channels & locations.
+            - button "Start Free Trial" [ref=e584] [cursor=pointer]
+          - generic [ref=e586]:
+            - generic [ref=e587]:
+              - paragraph [ref=e589]: Bumpa Scale
+              - paragraph [ref=e590]: For bigger businesses with multiple locations, staff and high-traffic
+              - paragraph [ref=e591]
+              - paragraph [ref=e593]: N/A
+              - paragraph [ref=e594]: Not available on quarterly subscription
+            - paragraph [ref=e595]: Create an efficent operation system with advanced features that let you oversee staff actions, revenue per location & local + international orders.
+            - button "Book A Demo" [ref=e597] [cursor=pointer]
+          - generic [ref=e599]:
+            - generic [ref=e600]:
+              - paragraph [ref=e602]: Bumpa Premium
+              - paragraph [ref=e603]: For large scale enterprises with custom needs and requests.
+              - paragraph [ref=e604]
+              - paragraph [ref=e606]: N/A
+              - paragraph [ref=e607]: Not available on quarterly subscription
+            - paragraph [ref=e608]: Get customised solutions for your enterprise business with a suite of tools adaptable for your large team, size of operations & clientele.
+            - button "Book A Demo" [ref=e610] [cursor=pointer]
+        - generic [ref=e612]:
+          - heading "Need Help Finding A Plan or Want To Use Bumpa for Free?" [level=2] [ref=e613]
+          - paragraph [ref=e614]: Get a plan recommendation or Try Paperless by Bumpa for free.
+          - generic [ref=e615]:
+            - button "Find your plan" [ref=e616] [cursor=pointer]
+            - link "Use Paperless by Bumpa" [ref=e617] [cursor=pointer]:
+              - /url: https://www.usepaperless.com
+        - link "See Full Pricing Plans" [ref=e619] [cursor=pointer]:
+          - /url: /pricing
+      - generic [ref=e620]:
+        - generic [ref=e621]:
+          - heading "More than just an app" [level=2] [ref=e622]
+          - paragraph [ref=e623]: Bumpa has an entire support system for business owners like you to thrive.
+        - generic [ref=e624]:
+          - generic [ref=e632]:
+            - heading "Bumpa Academy" [level=5] [ref=e633]
+            - paragraph [ref=e634]: Take free courses on business management, marketing, and more.
+            - link [ref=e635] [cursor=pointer]:
+              - /url: https://academy.getbumpa.com/
+              - button "Take a Free Course" [ref=e636]
+          - generic [ref=e644]:
+            - heading "Bumpa Community" [level=5] [ref=e645]
+            - paragraph [ref=e646]: Join a thriving community of business owners to gain business friends & resources.
+            - link [ref=e647] [cursor=pointer]:
+              - /url: /community
+              - button "Sign Up" [ref=e648]
+          - generic [ref=e656]:
+            - heading "Bumpa Champions" [level=5] [ref=e657]
+            - paragraph [ref=e658]: Refer other business owners and earn up to 2,500,000 yearly.
+            - link [ref=e659] [cursor=pointer]:
+              - /url: https://champions.bumpa.com/
+              - button "Learn More" [ref=e660]
+      - generic [ref=e661]:
+        - generic [ref=e662]:
+          - heading "Bumpa in the press" [level=2] [ref=e663]
+          - paragraph [ref=e664]: The media recognises what we are doing for small businesses in Africa.
+        - generic:
+          - link:
+            - /url: https://technext.ng/2022/08/16/app-review-bumpa-app-an-ecommerce-platform/
+          - link:
+            - /url: https://old.disruptafrica.com/2022/01/19/nigerias-bumpa-a-shopify-for-africa-has-grand-plans-post-funding/
+          - link:
+            - /url: https://qz.com/nigeria-based-bumpa-is-adapting-instagram-messaging-for-1849358874
+          - link:
+            - /url: https://techcabal.com/2022/08/02/did-bumpa-just-lay-the-foundation-for-conversational-commerce-in-africa/
+          - link:
+            - /url: https://techpoint.africa/2022/06/13/bumpa-partners-with-google-to-empower-smbs-across-africa-with-the-google-hustle-academy-program/
+          - link:
+            - /url: https://businessday.ng/technology/article/what-bumpa-instagram-integration-means-for-africas-c-commerce/
+          - link:
+            - /url: https://punchng.com/bumpa-announces-integration-with-meta-to-make-selling-on-instagram-faster-for-business-owners/
+          - link:
+            - /url: https://techpoint.africa/2022/06/13/bumpa-partners-with-google-to-empower-smbs-across-africa-with-the-google-hustle-academy-program/
+      - generic [ref=e666]:
+        - heading "Frequently Asked Questions" [level=3] [ref=e667]
+        - generic [ref=e668]:
+          - img "Search" [ref=e669]
+          - textbox "Search for your most important questions" [ref=e672]
+        - generic [ref=e673]:
+          - button [ref=e675] [cursor=pointer]:
+            - heading "Is Bumpa a marketplace like Jumia & Jiji?" [level=2] [ref=e677]
+          - button [ref=e682] [cursor=pointer]:
+            - heading "Is Bumpa app free?" [level=2] [ref=e684]
+          - button [ref=e689] [cursor=pointer]:
+            - heading "Does Bumpa run ads for businesses?" [level=2] [ref=e691]
+          - button [ref=e696] [cursor=pointer]:
+            - heading "Can I set up my Bumpa website in dollars?" [level=2] [ref=e698]
+          - button [ref=e703] [cursor=pointer]:
+            - heading "Can I pay monthly for a Bumpa subscription plan?" [level=2] [ref=e705]
+          - button [ref=e710] [cursor=pointer]:
+            - heading "Will Bumpa bring me customers?" [level=2] [ref=e712]
+        - paragraph [ref=e717] [cursor=pointer]: View All FAQs
+      - generic [ref=e718]:
+        - generic [ref=e720]:
+          - heading "Your Business Bestfriend." [level=2] [ref=e721]
+          - generic [ref=e722]:
+            - img "Play Store" [ref=e723] [cursor=pointer]
+            - img "App Store" [ref=e738] [cursor=pointer]
+        - generic [ref=e764]:
+          - generic [ref=e765]:
+            - img "Logo" [ref=e766]
+            - paragraph [ref=e776]: The best business management app for retail businesses.
+            - generic [ref=e777]:
+              - link "Twitter" [ref=e778] [cursor=pointer]:
+                - /url: https://twitter.com/getBumpa?t=k07W5NGdumx2VVd-AUpzSw&s=09
+                - img "Twitter" [ref=e779]
+              - link "Instagram" [ref=e782] [cursor=pointer]:
+                - /url: https://www.instagram.com/getbumpa/?igshid=YmMyMTA2M2Y
+                - img "Instagram" [ref=e783]
+              - link "Facebook" [ref=e785] [cursor=pointer]:
+                - /url: https://www.facebook.com/getbumpa
+                - img "Facebook" [ref=e786]
+              - link "LinkedIn" [ref=e788] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/getbumpa
+                - img "LinkedIn" [ref=e789]
+            - paragraph [ref=e791]: 2026 Salescabal Inc. All Rights Reserved.
+            - img "ndpr logo" [ref=e795]
+          - generic [ref=e796]:
+            - paragraph [ref=e797]: Product
+            - generic [ref=e798]:
+              - link "Pricing" [ref=e799] [cursor=pointer]:
+                - /url: /pricing
+              - link "Updates" [ref=e800] [cursor=pointer]:
+                - /url: https://updates.getbumpa.com/
+              - link "Request A Feature" [ref=e801] [cursor=pointer]:
+                - /url: https://updates.getbumpa.com/
+          - generic [ref=e802]:
+            - paragraph [ref=e803]: Company
+            - generic [ref=e804]:
+              - link "About Us" [ref=e805] [cursor=pointer]:
+                - /url: /about
+              - link "Careers" [ref=e806] [cursor=pointer]:
+                - /url: /career
+              - link "Contact" [ref=e807] [cursor=pointer]:
+                - /url: /contact
+          - generic [ref=e808]:
+            - paragraph [ref=e809]: Resources
+            - generic [ref=e810]:
+              - link "Bumpa Academy" [ref=e811] [cursor=pointer]:
+                - /url: https://academy.getbumpa.com/
+              - link "Blog" [ref=e812] [cursor=pointer]:
+                - /url: /blog
+              - link "Reports" [ref=e813] [cursor=pointer]:
+                - /url: /e-commerce-reports-2024
+              - link "FAQs" [ref=e814] [cursor=pointer]:
+                - /url: /faq
+              - link "Support" [ref=e815] [cursor=pointer]:
+                - /url: https://support.getbumpa.com/
+              - link "Report Fraud" [ref=e816] [cursor=pointer]:
+                - /url: https://forms.gle/fzHjjH4g3yLnZMVz7
+          - generic [ref=e817]:
+            - paragraph [ref=e818]: Privacy Policy
+            - generic [ref=e819]:
+              - link "General" [ref=e820] [cursor=pointer]:
+                - /url: /legal/general-privacy-policy
+              - link "Merchant" [ref=e821] [cursor=pointer]:
+                - /url: https://www.getbumpa.com/legal/merchant-privacy-policy
+              - link "Customer" [ref=e822] [cursor=pointer]:
+                - /url: https://www.getbumpa.com/legal/customer-privacy-policy
+              - link "Visitor" [ref=e823] [cursor=pointer]:
+                - /url: https://www.getbumpa.com/legal/visitor-privacy-policy
+          - generic [ref=e824]:
+            - paragraph [ref=e825]: Legal
+            - generic [ref=e826]:
+              - link "General Terms of Use" [ref=e827] [cursor=pointer]:
+                - /url: https://www.getbumpa.com/legal/general-terms-of-use
+              - link "Merchant Terms of Use" [ref=e828] [cursor=pointer]:
+                - /url: /legal/merchant-terms-of-service
+              - link "Bumpa Acceptable Use Policy" [ref=e829] [cursor=pointer]:
+                - /url: /legal/bumpa-acceptable-use-policy
+              - link "COVID‑19 Related Products" [ref=e830] [cursor=pointer]:
+                - /url: /legal/bumpa-rules-of-engagement-for-the-sale-of-covid-19-related-products
+  - alert [ref=e831]

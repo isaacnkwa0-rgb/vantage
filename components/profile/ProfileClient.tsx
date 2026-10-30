@@ -141,7 +141,7 @@ export function ProfileClient({ slug, profile, userId }: Props) {
     setEmailError(null);
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({ email: newEmail });
-    if (error) { setEmailError(error.message); return; }
+    if (error) { setEmailError((error as any)?.message ?? "Unknown error"); return; }
     setEmailSent(true);
   }
 

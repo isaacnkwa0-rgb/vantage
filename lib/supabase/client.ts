@@ -28,7 +28,7 @@ class BrowserQueryBuilder {
     this._spec = defaultSpec(table);
   }
 
-  select(cols = "*") {
+  select(cols = "*", _opts?: any) {
     if (this._spec.op === "select") {
       this._spec.selectStr = cols;
     } else {
@@ -84,7 +84,7 @@ class BrowserQueryBuilder {
   maybeSingle() { this._spec.maybeSingle = true; this._spec.limitN = 1; return this; }
   throwOnError() { return this; }
 
-  private async _execute(): Promise<{ data: any; error: any }> {
+  private async _execute(): Promise<{ data: any; error: any; count?: number }> {
     try {
       const res = await fetch("/api/db", {
         method: "POST",
@@ -101,8 +101,8 @@ class BrowserQueryBuilder {
     }
   }
 
-  then<R1 = { data: any; error: any }, R2 = never>(
-    onfulfilled?: ((v: { data: any; error: any }) => R1 | PromiseLike<R1>) | null,
+  then<R1 = { data: any; error: any; count?: number }, R2 = never>(
+    onfulfilled?: ((v: { data: any; error: any; count?: number }) => R1 | PromiseLike<R1>) | null,
     onrejected?: ((r: any) => R2 | PromiseLike<R2>) | null
   ): Promise<R1 | R2> {
     return this._execute().then(onfulfilled, onrejected);
@@ -120,8 +120,8 @@ class BrowserQueryBuilder {
 // ── Realtime stub (keeps existing code from crashing; realtime is a later phase) ──
 function makeChannel() {
   return {
-    on: () => makeChannel(),
-    subscribe: () => ({ unsubscribe: () => {} }),
+    on: (..._args: any[]) => makeChannel(),
+    subscribe: (..._args: any[]) => ({ unsubscribe: () => {} }),
   };
 }
 
@@ -166,7 +166,7 @@ const authShim = {
     });
     return { error };
   },
-  updateUser: async ({ password }: { password?: string; data?: any }) => {
+  updateUser: async ({ password, email }: { password?: string; email?: string; data?: any }) => {
     if (password) {
       const url = new URL(window.location.href);
       const token = url.searchParams.get("token") ?? "";
@@ -178,6 +178,15 @@ const authShim = {
   onAuthStateChange: (cb: (event: string, session: any) => void) => {
     // Lightweight stub — components using this need separate migration
     return { data: { subscription: { unsubscribe: () => {} } } };
+  },
+  signInWithOtp: async (_opts: any) => {
+    return { data: null, error: new Error("OTP sign-in is not available") };
+  },
+  verifyOtp: async (_opts: any) => {
+    return { data: null, error: new Error("OTP verification is not available") };
+  },
+  exchangeCodeForSession: async (_code: string) => {
+    return { data: { session: null }, error: null };
   },
 };
 
@@ -199,13 +208,20 @@ export function createClient() {
     channel: (_name: string) => makeChannel(),
     removeChannel: (_ch: any) => {},
     storage: storageStub,
-    rpc: async (fn: string, params?: Record<string, any>) => {
-      const res = await fetch("/api/db/rpc", {
+    rpc: (fn: string, params?: Record<string, any>) => {
+      const go = () => fetch("/api/db/rpc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fn, params }),
-      });
-      return res.ok ? res.json() : { data: null, error: await res.json() };
+      }).then(r => r.ok ? r.json() : r.json().then((e: any) => ({ data: null, error: e })));
+      const thenable: any = {
+        single: (_?: any) => thenable,
+        maybeSingle: () => thenable,
+        then: (f?: any, r?: any) => go().then(f, r),
+        catch: (f?: any) => go().catch(f),
+        finally: (f?: any) => go().finally(f),
+      };
+      return thenable;
     },
   };
 }

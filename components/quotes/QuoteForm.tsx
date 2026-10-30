@@ -152,7 +152,7 @@ export function QuoteForm({ business, customers, editingQuote, userId, backHref,
     } else {
       const { data: numData } = await supabase
         .rpc("generate_quote_number", { p_business_id: business.id })
-        .single<string>();
+        .single();
       const quoteNumber = numData ?? `QTE-${Date.now()}`;
 
       const { data: q, error: qErr } = await supabase

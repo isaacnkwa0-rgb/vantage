@@ -1,0 +1,156 @@
+- generic [ref=f13e4]:
+  - navigation [ref=f13e5]:
+    - link "Unsplash Home" [ref=f13e8] [cursor=pointer]:
+      - /url: /
+      - img "Unsplash Home" [ref=f13e9]
+    - generic [ref=f13e11]:
+      - link "Log in / Sign up" [ref=f13e12] [cursor=pointer]:
+        - /url: /login?referrer=%2Fs%2Fphotos%2Fafrican-fabric
+      - button "Language" [ref=f13e15] [cursor=pointer]
+      - button "Menu" [ref=f13e18] [cursor=pointer]
+  - generic [ref=f13e21]:
+    - generic [ref=f13e22]:
+      - navigation [ref=f13e23]:
+        - search "Find visuals sitewide" [ref=f13e25]:
+          - button "Search Unsplash" [ref=f13e26] [cursor=pointer]
+          - combobox [ref=f13e29]:
+            - searchbox "Search Unsplash" [ref=f13e30]: african fabric
+            - listbox
+          - button "Clear" [ref=f13e31] [cursor=pointer]
+          - button "Visual search" [ref=f13e36] [cursor=pointer]
+      - generic [ref=f13e39]:
+        - generic [ref=f13e45]:
+          - list [ref=f13e46]:
+            - listitem [ref=f13e47]:
+              - link "Photos 291":
+                - /url: /s/photos/african-fabric
+                - text: Photos
+                - generic: "291"
+            - listitem [ref=f13e48]:
+              - link "Illustrations 23" [ref=f13e49] [cursor=pointer]:
+                - /url: /s/illustrations/african-fabric
+                - text: Illustrations
+                - generic [ref=f13e52]: "23"
+            - listitem [ref=f13e53]:
+              - button "More" [ref=f13e54] [cursor=pointer]
+          - button [ref=f13e56] [cursor=pointer]
+        - generic [ref=f13e60]:
+          - heading "African fabric" [level=1] [ref=f13e62]
+          - generic [ref=f13e66]:
+            - link "african pattern" [ref=f13e68] [cursor=pointer]:
+              - /url: /s/photos/african-pattern
+            - link "fabric" [ref=f13e70] [cursor=pointer]:
+              - /url: /s/photos/fabric
+            - link "african textile" [ref=f13e72] [cursor=pointer]:
+              - /url: /s/photos/african-textile
+            - link "african" [ref=f13e74] [cursor=pointer]:
+              - /url: /s/photos/african
+            - link "textile" [ref=f13e76] [cursor=pointer]:
+              - /url: /s/photos/textile
+            - link "pattern" [ref=f13e78] [cursor=pointer]:
+              - /url: /s/photos/pattern
+            - link "style" [ref=f13e80] [cursor=pointer]:
+              - /url: /s/photos/style
+            - link "fashion" [ref=f13e82] [cursor=pointer]:
+              - /url: /s/photos/fashion
+            - link "wax print" [ref=f13e84] [cursor=pointer]:
+              - /url: /s/photos/wax-print
+            - link "sophistication" [ref=f13e86] [cursor=pointer]:
+              - /url: /s/photos/sophistication
+        - generic [ref=f13e88]:
+          - generic [ref=f13e92]:
+            - generic [ref=f13e93]:
+              - figure [ref=f13e94]:
+                - link [ref=f13e97]:
+                  - /url: /photos/a-woman-in-a-green-and-blue-dress-with-her-hands-on-her-hips-fyzfGBCkrWM
+                  - img "a woman in a green and blue dress with her hands on her hips" [ref=f13e98]
+              - figure [ref=f13e99]:
+                - link [ref=f13e102]:
+                  - /url: /photos/assorted-color-textiles-SfPOkp6-2eA
+                  - img "assorted-color textiles" [ref=f13e103]
+              - figure [ref=f13e104]:
+                - link [ref=f13e107]:
+                  - /url: /photos/colorful-african-fabrics-displayed-for-sale-toQSUFO1hSA
+                  - img "Colorful african fabrics displayed for sale" [ref=f13e108]
+              - figure [ref=f13e109]:
+                - link [ref=f13e112]:
+                  - /url: /photos/a-woman-in-an-orange-dress-poses-for-a-picture-diJTALtejHY
+                  - img "a woman in an orange dress poses for a picture" [ref=f13e113]
+              - figure [ref=f13e114]:
+                - link [ref=f13e117]:
+                  - /url: /photos/two-decorative-plates-fm9wqDNXyQ0
+                  - img "two decorative plates" [ref=f13e118]
+              - figure [ref=f13e119]:
+                - link [ref=f13e122]:
+                  - /url: /photos/colorful-african-tribal-pattern-with-squares-and-geometric-shapes-_FmWGJ5m43w
+                  - img "Colorful african tribal pattern with squares and geometric shapes" [ref=f13e123]
+              - figure [ref=f13e124]:
+                - link [ref=f13e127]:
+                  - /url: /photos/vibrant-african-wax-print-fabric-with-butterfly-and-bird-motifs-jjWXuu3Ewhg
+                  - img "Vibrant african wax-print fabric with butterfly and bird motifs" [ref=f13e128]
+              - figure [ref=f13e129]:
+                - link [ref=f13e132]:
+                  - /url: /photos/dancers-parade-in-orange-and-blue-wax-print-costumes-1_0hAqVoVs0
+                  - img "Dancers parade in orange and blue wax-print costumes" [ref=f13e133]
+              - figure [ref=f13e134]:
+                - link [ref=f13e137]:
+                  - /url: /photos/a-close-up-of-a-colorful-rug-with-fringes-rBjkj61mpus
+                  - img "A close up of a colorful rug with fringes" [ref=f13e138]
+              - figure [ref=f13e139]:
+                - link [ref=f13e142]:
+                  - /url: /photos/colorful-textiles-with-intricate-patterns-hanging-on-display-Q43GOm-D06k
+                  - img "Colorful textiles with intricate patterns hanging on display" [ref=f13e143]
+              - figure [ref=f13e144]:
+                - link [ref=f13e147]:
+                  - /url: /photos/a-woman-in-a-white-dress-with-a-white-blouse-9TpI0mT78-s
+                  - img "a woman in a white dress with a white blouse" [ref=f13e148]
+              - figure [ref=f13e149]:
+                - link [ref=f13e152]:
+                  - /url: /photos/person-in-white-pants-lying-on-red-and-white-hammock-inYdtB3d8nM
+                  - img "person in white pants lying on red and white hammock" [ref=f13e153]
+              - figure [ref=f13e154]:
+                - link [ref=f13e157]:
+                  - /url: /photos/women-sewing-fabric-in-workshop-KK1SKkRfk1c
+                  - img "Two women in patterned dresses sewing fabric on a machine in a workshop" [ref=f13e158]
+            - generic [ref=f13e159]:
+              - contentinfo [ref=f13e164]:
+                - generic [ref=f13e165]: –– ––– ––– –– ––– – ––– ––– –––– – – –– ––– – – ––– –– –– –––– ––
+                - generic [ref=f13e171] [cursor=pointer]
+              - figure [ref=f13e172]:
+                - link [ref=f13e175]:
+                  - /url: /photos/woman-standing-in-the-middle-of-wheat-field-GSh_PwsZsPQ
+                  - img "woman standing in the middle of wheat field" [ref=f13e176]
+              - figure [ref=f13e177]:
+                - link [ref=f13e180]:
+                  - /url: /photos/colorful-african-fabric-with-intricate-patterns-and-designs-j60zrJOTn_o
+                  - img "Colorful african fabric with intricate patterns and designs" [ref=f13e181]
+              - figure [ref=f13e182]:
+                - link [ref=f13e185]:
+                  - /url: /photos/multicolored-textiles-SBbCQJYzmKU
+                  - img "multicolored textiles" [ref=f13e186]
+              - figure [ref=f13e187]:
+                - link [ref=f13e190]:
+                  - /url: /photos/blue-red-and-yellow-textile-SL6_FsAHMlI
+                  - img "blue red and yellow textile" [ref=f13e191]
+              - figure [ref=f13e192]:
+                - link [ref=f13e195]:
+                  - /url: /photos/a-group-of-colorful-objects-JnOFLg09yRE
+                  - img "a group of colorful objects" [ref=f13e196]
+              - figure [ref=f13e197]:
+                - link [ref=f13e200]:
+                  - /url: /photos/a-woman-standing-in-front-of-a-green-van-zNSsZVH_KfE
+                  - img "A woman standing in front of a green van" [ref=f13e201]
+              - figure [ref=f13e202]:
+                - link [ref=f13e205]:
+                  - /url: /photos/a-woman-sitting-on-top-of-a-wooden-bench-_VYEcLzGJYk
+                  - img "A woman sitting on top of a wooden bench" [ref=f13e206]
+          - heading "Browse premium images on iStock | Claim your discount now" [level=2] [ref=f13e210]:
+            - text: Browse premium images on iStock
+            - generic [ref=f13e211]: "| Claim your discount now"
+          - button "Load more" [ref=f13e225] [cursor=pointer]
+          - generic [ref=f13e226]:
+            - link [ref=f13e227] [cursor=pointer]:
+              - /url: /
+            - paragraph [ref=f13e230]: Make something awesome
+    - generic:
+      - region "Notifications"
