@@ -10,12 +10,12 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET!,
 
   trustedOrigins: (req) => {
-    const origin = req.headers.get("origin") ?? "";
-    return (
-      origin === "https://stokka.shop" ||
-      origin.endsWith(".vercel.app") ||
-      origin.startsWith("http://localhost")
-    );
+    const origin = req?.headers.get("origin") ?? "";
+    const trusted = ["https://stokka.shop", "http://localhost:3000"];
+    if (origin.endsWith(".vercel.app") || origin.startsWith("http://localhost")) {
+      trusted.push(origin);
+    }
+    return trusted;
   },
 
   database: new Pool({
