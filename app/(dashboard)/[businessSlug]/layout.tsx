@@ -20,20 +20,26 @@ export default async function BusinessLayout({ children, params }: Props) {
 
   if (!user) redirect("/login");
 
-  // Verify the user is a member of this business
-  const { data: membership } = await supabase
-    .from("business_members")
-    .select("role, businesses!inner(*)")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .eq("businesses.slug", businessSlug)
+  // Verify the user is a member of this business (two separate queries — no !inner)
+  const { data: bizData } = await supabase
+    .from("businesses")
+    .select("id, name, slug, currency, logo_url")
+    .eq("slug", businessSlug)
     .single();
 
-  if (!membership || !membership.businesses) {
-    redirect("/onboarding");
-  }
+  if (!bizData) redirect("/onboarding");
 
-  const business = membership.businesses as unknown as {
+  const { data: membership } = await supabase
+    .from("business_members")
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("business_id", bizData.id)
+    .eq("is_active", true)
+    .single();
+
+  if (!membership) redirect("/onboarding");
+
+  const business = bizData as {
     id: string;
     name: string;
     slug: string;

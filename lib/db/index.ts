@@ -13,6 +13,7 @@ export const sql = async (query: string, params: any[] = []): Promise<any[]> => 
 };
 
 // ── FK inference ──────────────────────────────────────────────────────────────
+// Many-to-one: FK is on the SOURCE table pointing to the embed table
 const FK_MAP: Record<string, string> = {
   businesses: "business_id",
   categories: "category_id",
@@ -27,6 +28,19 @@ const FK_MAP: Record<string, string> = {
   owner: "owner_id",
 };
 
+// One-to-many: FK is on the CHILD (embed) table pointing back to the source
+// These return arrays via json_agg instead of single objects
+const CHILD_FK_MAP: Record<string, string> = {
+  sale_items:           "sale_id",
+  invoice_items:        "invoice_id",
+  quote_items:          "quote_id",
+  purchase_order_items: "purchase_order_id",
+  bundle_items:         "bundle_id",
+  return_items:         "return_id",
+  store_order_items:    "order_id",
+  payroll_entries:      "payroll_run_id",
+};
+
 function getFkCol(embedTable: string): string {
   if (FK_MAP[embedTable]) return FK_MAP[embedTable];
   const singular = embedTable
@@ -39,7 +53,7 @@ function getFkCol(embedTable: string): string {
 // ── Select string parser ──────────────────────────────────────────────────────
 function parseSelect(selectStr: string) {
   const mainCols: string[] = [];
-  const embeds: Array<{ alias: string; table: string; cols: string[]; fkCol: string }> = [];
+  const embeds: Array<{ alias: string; table: string; cols: string[]; fkCol: string; isChild: boolean }> = [];
 
   const parts: string[] = [];
   let depth = 0, cur = "";
@@ -52,9 +66,13 @@ function parseSelect(selectStr: string) {
   if (cur.trim()) parts.push(cur.trim());
 
   for (const part of parts) {
-    const m = part.match(/^(\w+)\(([\s\S]+)\)$/);
+    // Strip Supabase !inner / !left hints — just use the table name
+    const m = part.match(/^(\w+)(?:![a-z]+)?\(([\s\S]+)\)$/);
     if (m) {
-      embeds.push({ alias: m[1], table: m[1], cols: m[2].split(",").map((c) => c.trim()).filter(Boolean), fkCol: getFkCol(m[1]) });
+      const table = m[1];
+      const isChild = table in CHILD_FK_MAP;
+      const fkCol = isChild ? CHILD_FK_MAP[table] : getFkCol(table);
+      embeds.push({ alias: table, table, cols: m[2].split(",").map((c) => c.trim()).filter(Boolean), fkCol, isChild });
     } else {
       mainCols.push(part);
     }
@@ -147,16 +165,38 @@ export async function executeSpec(spec: QuerySpec): Promise<{ data: any; error: 
         }
       }
 
+      let hasChildEmbed = false;
       for (const embed of embeds) {
-        joinClauses.push(`LEFT JOIN "${embed.table}" ON "${spec.table}"."${embed.fkCol}" = "${embed.table}"."id"`);
-        const args = embed.cols.map((c) => `'${c}', "${embed.table}"."${c}"`).join(", ");
-        selectParts.push(`CASE WHEN "${embed.table}"."id" IS NULL THEN NULL ELSE json_build_object(${args}) END AS "${embed.alias}"`);
+        if (embed.isChild) {
+          // One-to-many: FK is on child table → use json_agg + GROUP BY
+          hasChildEmbed = true;
+          joinClauses.push(`LEFT JOIN "${embed.table}" ON "${embed.table}"."${embed.fkCol}" = "${spec.table}"."id"`);
+          const cols = embed.cols[0] === "*"
+            ? `"${embed.table}".*`
+            : embed.cols.map((c) => `'${c}', "${embed.table}"."${c}"`).join(", ");
+          const agg = embed.cols[0] === "*"
+            ? `row_to_json("${embed.table}".*)`
+            : `json_build_object(${cols})`;
+          selectParts.push(`COALESCE(json_agg(${agg}) FILTER (WHERE "${embed.table}"."id" IS NOT NULL), '[]'::json) AS "${embed.alias}"`);
+        } else {
+          // Many-to-one: FK is on source table → single JSON object
+          joinClauses.push(`LEFT JOIN "${embed.table}" ON "${spec.table}"."${embed.fkCol}" = "${embed.table}"."id"`);
+          const args = embed.cols.map((c) => `'${c}', "${embed.table}"."${c}"`).join(", ");
+          selectParts.push(`CASE WHEN "${embed.table}"."id" IS NULL THEN NULL ELSE json_build_object(${args}) END AS "${embed.alias}"`);
+        }
       }
 
       const where = buildWhere(spec.table, spec.conditions, params);
       query = `SELECT ${selectParts.join(", ")} FROM "${spec.table}"`;
       if (joinClauses.length) query += " " + joinClauses.join(" ");
       if (where) query += " " + where;
+      if (hasChildEmbed) {
+        // GROUP BY all selected non-aggregate columns from source table
+        const groupCols = mainCols.length
+          ? mainCols.map((c) => c === "*" ? `"${spec.table}"."id"` : `"${spec.table}"."${c}"`).join(", ")
+          : `"${spec.table}"."id"`;
+        query += ` GROUP BY ${groupCols}`;
+      }
       if (spec.orderCol) query += ` ORDER BY "${spec.table}"."${spec.orderCol}" ${spec.orderAsc ? "ASC" : "DESC"}`;
       if (spec.limitN != null) query += ` LIMIT ${spec.limitN}`;
       if (spec.offsetN != null) query += ` OFFSET ${spec.offsetN}`;
