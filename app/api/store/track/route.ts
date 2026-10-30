@@ -1,10 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { sql } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-
-const adminClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
 
 export async function POST(req: NextRequest) {
   const { businessId } = await req.json().catch(() => ({}));
@@ -18,13 +13,12 @@ export async function POST(req: NextRequest) {
   const today = new Date().toISOString().split("T")[0];
 
   // Unique constraint on (business_id, ip_address, visit_date) deduplicates same IP per day
-  await adminClient.from("store_visits").insert({
-    business_id: businessId,
-    ip_address: ip,
-    visit_date: today,
-    visited_at: new Date().toISOString(),
-  });
-  // Ignore error — unique constraint violation means already counted today
+  await sql(
+    `INSERT INTO store_visits (business_id, ip_address, visit_date, visited_at)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (business_id, ip_address, visit_date) DO NOTHING`,
+    [businessId, ip, today, new Date().toISOString()]
+  ).catch(() => {});
 
   return NextResponse.json({ ok: true });
 }
