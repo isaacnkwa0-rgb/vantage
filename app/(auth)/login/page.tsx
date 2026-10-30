@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,7 +35,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -44,7 +42,7 @@ export default function LoginPage() {
     setGoogleLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${window.location.origin}/api/auth/callback/google`,
+      callbackURL: "/auth/callback",
     });
   }
 
@@ -56,36 +54,13 @@ export default function LoginPage() {
 
   async function onSubmit(data: FormData) {
     setError(null);
-    const { data: authData, error: authError } = await authClient.signIn.email({
+    const { error: authError } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
     });
     if (authError) { setError(authError.message ?? "Sign in failed"); return; }
-
-    // Look up the user's first active business
-    const res = await fetch("/api/db", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        table: "business_members",
-        op: "select",
-        selectStr: "businesses(slug)",
-        conditions: [
-          { type: "op", col: "user_id", op: "=", val: authData?.user?.id },
-          { type: "op", col: "is_active", op: "=", val: true },
-        ],
-        orderAsc: true,
-        limitN: 1,
-        single: true,
-        maybeSingle: false,
-        returning: false,
-        returningCols: "*",
-        ignoreDuplicates: false,
-      }),
-    });
-    const { data: membership } = await res.json();
-    const biz = membership?.businesses as { slug: string } | null;
-    router.push(biz?.slug ? `/${biz.slug}/dashboard` : "/onboarding");
+    // Full-page navigation so the session cookie is firmly set before we look up the business
+    window.location.href = "/auth/callback";
   }
 
   return (
