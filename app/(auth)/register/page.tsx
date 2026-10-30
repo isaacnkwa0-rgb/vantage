@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Loader2, CheckCircle2, ShoppingCart, Package, TrendingUp, Mail, ChevronDown, X, ChevronLeft } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
@@ -214,19 +214,14 @@ function RegisterPageInner() {
 
   async function onSubmit(data: FormData) {
     setError(null);
-    const supabase = createClient();
-    const { data: signUpData, error: authError } = await supabase.auth.signUp({
+    const { data: signUpData, error: authError } = await authClient.signUp.email({
       email: data.email,
       password: data.password,
-      options: {
-        data: { full_name: `${data.firstName} ${data.lastName}` },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      name: `${data.firstName} ${data.lastName}`,
+      callbackURL: `${window.location.origin}/onboarding`,
     });
-    if (authError) { setError(authError.message); return; }
-    // If Supabase returns a session immediately (email confirmation disabled),
-    // go straight to onboarding. Otherwise show the "check your email" screen.
-    if (signUpData.session) {
+    if (authError) { setError(authError.message ?? "Sign up failed"); return; }
+    if (signUpData?.user) {
       router.push("/onboarding");
       return;
     }
@@ -236,10 +231,9 @@ function RegisterPageInner() {
 
   async function signInWithGoogle() {
     setGoogleLoading(true);
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    await authClient.signIn.social({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      callbackURL: `${window.location.origin}/onboarding`,
     });
   }
 

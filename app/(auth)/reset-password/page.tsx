@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Loader2, CheckCircle2, Lock } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
@@ -14,14 +14,13 @@ const schema = z
     password: z.string().min(8, "At least 8 characters"),
     confirm: z.string(),
   })
-  .refine((d) => d.password === d.confirm, {
-    message: "Passwords don't match",
-    path: ["confirm"],
-  });
+  .refine((d) => d.password === d.confirm, { message: "Passwords don't match", path: ["confirm"] });
 type FormData = z.infer<typeof schema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,9 +30,9 @@ export default function ResetPasswordPage() {
 
   async function onSubmit(data: FormData) {
     setError(null);
-    const supabase = createClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password: data.password });
-    if (updateError) { setError(updateError.message); return; }
+    if (!token) { setError("Missing reset token. Please request a new reset link."); return; }
+    const { error: updateError } = await authClient.resetPassword({ newPassword: data.password, token });
+    if (updateError) { setError(updateError.message ?? "Failed to update password"); return; }
     setDone(true);
     setTimeout(() => router.push("/login"), 2500);
   }
@@ -54,17 +53,11 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-bg flex flex-col">
       <div className="flex-1 px-5 pt-16 pb-10">
         <Logo variant="full" size={36} className="mb-6" />
-
         <div className="w-12 h-12 bg-primary-soft rounded-2xl flex items-center justify-center mb-6">
           <Lock className="w-6 h-6 text-primary" />
         </div>
-
-        <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">
-          Set a new password
-        </h2>
-        <p className="text-slate-400 text-[14px] mb-8">
-          Choose a strong password for your account.
-        </p>
+        <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">Set a new password</h2>
+        <p className="text-slate-400 text-[14px] mb-8">Choose a strong password for your account.</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
@@ -77,7 +70,6 @@ export default function ResetPasswordPage() {
             />
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>
-
           <div>
             <input
               {...register("confirm")}
@@ -103,4 +95,8 @@ export default function ResetPasswordPage() {
       </div>
     </div>
   );
+}
+
+export default function ResetPasswordPage() {
+  return <Suspense><ResetPasswordForm /></Suspense>;
 }

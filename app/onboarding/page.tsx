@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { generateBusinessSlug } from "@/lib/utils/slugify";
 import { Loader2, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -132,31 +132,37 @@ export default function OnboardingPage() {
     setError(null);
     setIsSubmitting(true);
 
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: session } = await authClient.getSession();
+    const user = session?.user;
     if (!user) { router.push("/login"); return; }
 
-    await supabase.from("profiles").upsert({
-      id: user.id,
-      full_name: user.user_metadata?.full_name ?? "Business Owner",
-      email: user.email!,
+    // Ensure profile exists (may already exist from signup hook)
+    await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "profiles", op: "upsert",
+        data: [{ id: user.id, full_name: user.name ?? "Business Owner", email: user.email }],
+        selectStr: "*", conditions: [], orderAsc: true, single: false, maybeSingle: false,
+        returning: false, returningCols: "*", ignoreDuplicates: false,
+      }),
     });
 
     const baseSlug = storeUrl || businessName.trim().toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
     const suffix = Math.random().toString(36).slice(2, 5);
     const slug = `${baseSlug}-${suffix}`;
-    const { data: business, error: bizError } = await supabase
-      .from("businesses")
-      .insert({
-        owner_id: user.id,
-        name: businessName.trim(),
-        slug,
-        business_type: businessType,
-        currency: country.currency,
-        country: country.label,
-      })
-      .select()
-      .single();
+
+    const bizRes = await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "businesses", op: "insert",
+        data: [{ owner_id: user.id, name: businessName.trim(), slug, business_type: businessType, currency: country.currency, country: country.label }],
+        selectStr: "*", conditions: [], orderAsc: true, single: true, maybeSingle: false,
+        returning: true, returningCols: "*", ignoreDuplicates: false,
+      }),
+    });
+    const { data: business, error: bizError } = await bizRes.json();
 
     if (bizError || !business) {
       setError(bizError?.message ?? "Failed to create business");
@@ -164,17 +170,28 @@ export default function OnboardingPage() {
       return;
     }
 
-    await supabase.from("business_members").insert({
-      business_id: business.id,
-      user_id: user.id,
-      role: "owner",
-      is_active: true,
+    await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "business_members", op: "insert",
+        data: [{ business_id: business.id, user_id: user.id, role: "owner", is_active: true }],
+        selectStr: "*", conditions: [], orderAsc: true, single: false, maybeSingle: false,
+        returning: false, returningCols: "*", ignoreDuplicates: false,
+      }),
     });
 
     const defaultCats = DEFAULT_CATEGORIES[businessType] ?? DEFAULT_CATEGORIES.retail;
-    await supabase.from("categories").insert(
-      defaultCats.map((c) => ({ business_id: business.id, name: c.name, color: c.color }))
-    );
+    await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "categories", op: "insert",
+        data: defaultCats.map((c) => ({ business_id: business.id, name: c.name, color: c.color })),
+        selectStr: "*", conditions: [], orderAsc: true, single: false, maybeSingle: false,
+        returning: false, returningCols: "*", ignoreDuplicates: false,
+      }),
+    });
 
     router.push(`/onboarding/verify?slug=${slug}`);
   }

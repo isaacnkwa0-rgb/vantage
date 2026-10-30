@@ -1,45 +1,41 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { getSessionCookie } from "better-auth/cookies";
 
-const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/auth/callback", "/api/auth/callback", "/verify", "/invite", "/pricing", "/pay", "/portal", "/store", "/by-domain", "/api/store", "/api/instagram/callback"];
+const PUBLIC_PATHS = [
+  "/", "/login", "/register", "/forgot-password", "/reset-password",
+  "/auth", "/onboarding/verify", "/terms", "/privacy",
+  "/store", "/by-domain", "/pay", "/portal",
+  "/api/auth", "/api/store", "/api/instagram/callback", "/api/pay",
+];
+
 const AUTH_PATHS = ["/login", "/register"];
 
 // Set STORE_DOMAIN to your platform domain, e.g. "stokka.shop"
-// Branded subdomains (zikkygadgets.stokka.shop) will then route automatically.
 const STORE_DOMAIN = process.env.STORE_DOMAIN ?? "";
-
-// The main app hostname (used to distinguish custom domains from the app itself).
-// Set APP_HOSTNAME to e.g. "app.stokka.shop" or your Vercel deployment domain.
 const APP_HOSTNAME = process.env.APP_HOSTNAME ?? "";
 
 export async function proxy(request: NextRequest) {
   const hostname = request.headers.get("host") ?? "";
+  const { pathname } = request.nextUrl;
 
-  // ── Branded subdomain: zikkygadgets.stokka.shop ─────────────────────────
-  // When STORE_DOMAIN is configured, any subdomain of it serves that store.
+  // ── Branded subdomain: zikkygadgets.stokka.shop ───────────────────────────
   if (STORE_DOMAIN && hostname.endsWith(`.${STORE_DOMAIN}`)) {
     const slug = hostname.slice(0, hostname.length - STORE_DOMAIN.length - 1);
     if (slug) {
       const url = request.nextUrl.clone();
-      const storePath = url.pathname === "/" ? "" : url.pathname;
-      url.pathname = `/store/${slug}${storePath}`;
+      url.pathname = `/store/${slug}${pathname === "/" ? "" : pathname}`;
       return NextResponse.rewrite(url);
     }
   }
 
-  // ── Custom domain: shop.yourbusiness.com ─────────────────────────────────
-  // Any request that isn't to the main app hostname (and isn't localhost/Vercel
-  // preview) gets routed to the custom-domain resolver which looks up the
-  // business by its stored custom_domain value.
+  // ── Custom domain: shop.yourbusiness.com ──────────────────────────────────
   const isMainHost =
     !hostname ||
     hostname.startsWith("localhost") ||
     hostname.endsWith(".vercel.app") ||
     (APP_HOSTNAME && hostname === APP_HOSTNAME);
 
-  const isStoreDomainApex = STORE_DOMAIN && hostname === STORE_DOMAIN;
-
-  if (!isMainHost && !isStoreDomainApex) {
+  if (!isMainHost && !(STORE_DOMAIN && hostname === STORE_DOMAIN)) {
     const url = request.nextUrl.clone();
     url.pathname = "/by-domain";
     const requestHeaders = new Headers(request.headers);
@@ -47,81 +43,33 @@ export async function proxy(request: NextRequest) {
     return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
   }
 
-  // ── Standard app routing ─────────────────────────────────────────────────
-  const { pathname } = request.nextUrl;
-  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
-  const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p));
-  const isRoot = pathname === "/";
-
-  // Fast path: skip Supabase network call when no session cookie exists.
-  const hasSessionCookie = request.cookies
-    .getAll()
-    .some((c) => c.name.includes("-auth-token"));
-
-  if (!hasSessionCookie) {
-    if (isPublic || isRoot) return NextResponse.next();
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
-  // Session cookie exists — validate with Supabase and handle routing.
-  // Timeout after 4s to avoid hanging the entire response on slow Supabase calls.
-  const sessionResult = await Promise.race([
-    updateSession(request),
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000)),
-  ]);
-
-  if (!sessionResult) {
-    // Supabase timed out — trust the cookie and let the request through.
-    // The page's own server-side auth will handle invalid sessions.
+  // ── Standard app routing ──────────────────────────────────────────────────
+  // Allow static assets and explicitly public paths through immediately
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.includes(".") ||
+    PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))
+  ) {
     return NextResponse.next();
   }
 
-  const { supabaseResponse, user, supabase } = sessionResult;
+  // Fast session check via cookie — no DB round-trip
+  const session = getSessionCookie(request);
 
-  if (!user) {
-    if (!isPublic && !isRoot) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      return NextResponse.redirect(url);
-    }
-    return supabaseResponse;
+  if (!session) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Logged-in user visiting auth page or root → restore last page or send to dashboard.
-  if (isAuthPath || isRoot) {
-    const { data: membership } = await supabase
-      .from("business_members")
-      .select("businesses!inner(slug)")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .limit(1)
-      .single();
-
-    const slug = (
-      membership?.businesses as unknown as { slug: string } | null
-    )?.slug;
-    const url = request.nextUrl.clone();
-
-    // If coming from root (reload/open), restore last visited page
-    if (isRoot) {
-      const lastPath = request.cookies.get("last_path")?.value;
-      if (lastPath) {
-        url.pathname = decodeURIComponent(lastPath);
-        return NextResponse.redirect(url);
-      }
-    }
-
-    url.pathname = slug ? `/${slug}/dashboard` : "/onboarding";
-    return NextResponse.redirect(url);
+  // Logged-in user visiting an auth page → send to dashboard
+  if (AUTH_PATHS.some((p) => pathname.startsWith(p))) {
+    return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|public|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

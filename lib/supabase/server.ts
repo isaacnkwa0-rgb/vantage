@@ -1,35 +1,59 @@
-import { createServerClient } from "@supabase/ssr";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+/**
+ * Server-side Supabase compatibility shim — backed by Neon + Better Auth.
+ * All existing code that does `const supabase = await createClient()` works unchanged.
+ */
+import { auth } from "@/lib/auth";
+import { createDbClient } from "@/lib/db";
+import { headers } from "next/headers";
+import { sql } from "@/lib/db";
 
 export async function createClient() {
-  const cookieStore = await cookies();
+  const hdrs = await headers();
+  const session = await auth.api.getSession({ headers: hdrs }).catch(() => null);
+  const db = createDbClient();
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
+  return {
+    // ── Auth ────────────────────────────────────────────────────────────────
+    auth: {
+      getUser: async () => ({
+        data: { user: session?.user ?? null },
+        error: session ? null : { message: "Not authenticated" },
+      }),
+      getSession: async () => ({
+        data: { session: session?.session ?? null, user: session?.user ?? null },
+        error: null,
+      }),
+    },
+
+    // ── Database ─────────────────────────────────────────────────────────────
+    from: (table: string) => db.from(table),
+
+    // ── RPC ──────────────────────────────────────────────────────────────────
+    rpc: (fn: string, params?: Record<string, any>) => db.rpc(fn, params),
+  };
+}
+
+/**
+ * Service-role equivalent — bypasses session check, same DB access.
+ * Used for admin operations like account deletion. Synchronous (no headers needed).
+ */
+export function createServiceClient() {
+  const db = createDbClient();
+  return {
+    auth: {
+      admin: {
+        deleteUser: async (userId: string) => {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options as any)
-            );
-          } catch {
-            // Called from Server Component — cookies can't be set; middleware handles refresh
+            // Delete the Better Auth user (cascades to sessions/accounts)
+            await sql(`DELETE FROM "user" WHERE id = $1`, [userId]);
+            return { error: null };
+          } catch (err: any) {
+            return { error: err };
           }
         },
       },
-    }
-  );
-}
-
-export function createServiceClient() {
-  return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+    },
+    from: (table: string) => db.from(table),
+    rpc: (fn: string, params?: Record<string, any>) => db.rpc(fn, params),
+  };
 }

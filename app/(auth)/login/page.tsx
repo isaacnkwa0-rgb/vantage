@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Loader2, ChevronLeft } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
@@ -42,10 +42,9 @@ export default function LoginPage() {
 
   async function signInWithGoogle() {
     setGoogleLoading(true);
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
+    await authClient.signIn.social({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      callbackURL: `${window.location.origin}/api/auth/callback/google`,
     });
   }
 
@@ -57,43 +56,52 @@ export default function LoginPage() {
 
   async function onSubmit(data: FormData) {
     setError(null);
-    const supabase = createClient();
-    const { error: authError, data: authData } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
     });
-    if (authError) { setError(authError.message); return; }
+    if (authError) { setError(authError.message ?? "Sign in failed"); return; }
 
-    const { data: membership } = await supabase
-      .from("business_members")
-      .select("businesses(slug)")
-      .eq("user_id", authData.user.id)
-      .eq("is_active", true)
-      .limit(1)
-      .single();
-
-    const biz = membership?.businesses as unknown as { slug: string } | { slug: string }[] | null;
-    const slug = Array.isArray(biz) ? biz[0]?.slug : biz?.slug;
-    router.push(slug ? `/${slug}/dashboard` : "/onboarding");
+    // Look up the user's first active business
+    const res = await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "business_members",
+        op: "select",
+        selectStr: "businesses(slug)",
+        conditions: [
+          { type: "op", col: "user_id", op: "=", val: authData?.user?.id },
+          { type: "op", col: "is_active", op: "=", val: true },
+        ],
+        orderAsc: true,
+        limitN: 1,
+        single: true,
+        maybeSingle: false,
+        returning: false,
+        returningCols: "*",
+        ignoreDuplicates: false,
+      }),
+    });
+    const { data: membership } = await res.json();
+    const biz = membership?.businesses as { slug: string } | null;
+    router.push(biz?.slug ? `/${biz.slug}/dashboard` : "/onboarding");
   }
 
   return (
     <div className="min-h-screen bg-bg flex flex-col px-5">
-      {/* Back */}
       <div className="pt-12 pb-2">
         <Link href="/register" className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit">
           <ChevronLeft className="w-[13px] h-[13px]" /> Back
         </Link>
       </div>
 
-      {/* Heading */}
       <div className="mt-8 mb-8">
         <Logo variant="full" size={36} className="mb-4" />
         <h1 className="text-[22px] font-bold text-slate-900 leading-tight mb-1">Welcome back</h1>
         <p className="text-slate-500 text-[14px]">Login and start managing your business like a pro</p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 flex-1">
         <input
           {...register("email")}
@@ -130,14 +138,12 @@ export default function LoginPage() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
 
-        {/* Divider */}
         <div className="relative flex items-center gap-3 !mt-5">
           <div className="flex-1 h-px bg-slate-200" />
           <span className="text-xs text-slate-400 font-medium">or</span>
           <div className="flex-1 h-px bg-slate-200" />
         </div>
 
-        {/* Apple */}
         <button
           type="button"
           className="w-full h-11 flex items-center justify-center gap-3 border border-slate-900 rounded-[4px] text-[15px] font-semibold text-slate-900 hover:bg-slate-50 transition"
@@ -146,7 +152,6 @@ export default function LoginPage() {
           Sign in with Apple
         </button>
 
-        {/* Google */}
         <button
           type="button"
           onClick={signInWithGoogle}
@@ -163,14 +168,12 @@ export default function LoginPage() {
         </p>
       </form>
 
-      {/* Footer */}
       <p className="text-center text-[11px] text-slate-400 leading-relaxed py-8 px-4">
         By continuing, I agree to the{" "}
         <Link href="/terms" className="text-primary">General Terms of Use</Link>,{" "}
         <Link href="/terms/merchant" className="text-primary">Merchant Terms of Use</Link>{" "}
         &amp;{" "}
-        <Link href="/privacy" className="text-primary">General Privacy Policy</Link>{" "}
-        of Stokka
+        <Link href="/privacy" className="text-primary">General Privacy Policy</Link>
       </p>
     </div>
   );

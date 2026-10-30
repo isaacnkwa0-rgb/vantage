@@ -5,13 +5,11 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Loader2, CheckCircle2, Mail, ChevronLeft } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
-const schema = z.object({
-  email: z.string().email("Enter a valid email"),
-});
+const schema = z.object({ email: z.string().email("Enter a valid email") });
 type FormData = z.infer<typeof schema>;
 
 export default function ForgotPasswordPage() {
@@ -24,11 +22,11 @@ export default function ForgotPasswordPage() {
 
   async function onSubmit(data: FormData) {
     setError(null);
-    const supabase = createClient();
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+    const { error: resetError } = await authClient.requestPasswordReset({
+      email: data.email,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
-    if (resetError) { setError(resetError.message); return; }
+    if (resetError) { setError(resetError.message ?? "Failed to send reset email"); return; }
     setSent(true);
   }
 
@@ -52,27 +50,18 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen bg-bg flex flex-col">
       <div className="px-5 pt-12 pb-4">
-        <Link
-          href="/login"
-          className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit"
-        >
+        <Link href="/login" className="flex items-center gap-1 text-[13px] font-medium text-primary bg-slate-100 px-3 py-1.5 rounded-full w-fit">
           <ChevronLeft className="w-[13px] h-[13px]" /> Back
         </Link>
       </div>
 
       <div className="flex-1 px-5 pt-8 pb-10">
         <Logo variant="full" size={36} className="mb-6" />
-
         <div className="w-12 h-12 bg-primary-soft rounded-2xl flex items-center justify-center mb-6">
           <Mail className="w-6 h-6 text-primary" />
         </div>
-
-        <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">
-          Forgot your password?
-        </h2>
-        <p className="text-slate-400 text-[14px] mb-8">
-          Enter your email and we&apos;ll send you a reset link.
-        </p>
+        <h2 className="text-[22px] font-bold text-slate-900 leading-snug mb-1">Forgot your password?</h2>
+        <p className="text-slate-400 text-[14px] mb-8">Enter your email and we&apos;ll send you a reset link.</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
