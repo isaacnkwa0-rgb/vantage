@@ -1,4 +1,10 @@
-import { Pool } from "pg";
+import pg from "pg";
+const { Pool, types } = pg;
+
+// Return timestamps/dates as ISO strings (same as Supabase client behaviour)
+types.setTypeParser(1114, (v: string) => v); // timestamp
+types.setTypeParser(1184, (v: string) => v); // timestamptz
+types.setTypeParser(1082, (v: string) => v); // date
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL!,

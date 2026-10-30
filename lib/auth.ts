@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
-import { Pool } from "pg";
+import pg from "pg";
+const { Pool } = pg;
 import { Resend } from "resend";
 import { sql } from "@/lib/db";
 
