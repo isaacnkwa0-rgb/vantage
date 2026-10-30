@@ -38,7 +38,7 @@ export default async function CampaignsPage({ params }: Props) {
       .eq("business_id", business.id),
   ]);
 
-  const customers = statsRes.data ?? [];
+  const customers = (statsRes.data ?? []) as { id: string; email: string | null; phone: string | null }[];
   const emailCount = customers.filter((c) => c.email).length;
   const phoneCount = customers.filter((c) => c.phone).length;
 
