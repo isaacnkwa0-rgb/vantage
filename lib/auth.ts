@@ -9,6 +9,15 @@ export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   secret: process.env.BETTER_AUTH_SECRET!,
 
+  trustedOrigins: (req) => {
+    const origin = req.headers.get("origin") ?? "";
+    return (
+      origin === "https://stokka.shop" ||
+      origin.endsWith(".vercel.app") ||
+      origin.startsWith("http://localhost")
+    );
+  },
+
   database: new Pool({
     connectionString: process.env.DATABASE_URL!,
     ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
